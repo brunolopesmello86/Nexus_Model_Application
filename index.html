@@ -3287,6 +3287,7 @@ async function renderContinueFlow() {
           <div class="gs-fitness">
             <div><div class="gs-fitness-score">${g.fitness_score}</div><div class="gs-fitness-label">fitness</div></div>
           </div>
+          <button class="gs-delete-btn" onclick="event.stopPropagation();tryChangePassword('${g.id}','${g.name.replace(/'/g,"\\'")}',${!!g.has_password})" title="${g.has_password?'Change or remove password':'Set password'}">🔑</button>
           <button class="gs-delete-btn" onclick="event.stopPropagation();tryDeleteGame('${g.id}','${g.name.replace(/'/g,"\\'")}',${!!g.has_password})" title="Delete game">🗑</button>
           <div class="gs-arrow">→</div>
         </div>
@@ -3376,7 +3377,7 @@ async function tryEnterGame(gameId, hasPassword) {
       enterGame(gameId);
     } catch(e) {
       const err = document.getElementById('gsPwError');
-      err.textContent = 'Wrong password — try again';
+      err.textContent = e.message || 'Verification failed';
       err.style.display = 'block';
     }
   }, { btnLabel: 'Enter Game' });
@@ -3395,7 +3396,7 @@ async function tryDeleteGame(gameId, gameName, hasPassword) {
         renderContinueFlow();
       } catch(e) {
         const err = document.getElementById('gsPwError');
-        err.textContent = e.message === 'Wrong password' ? 'Wrong password — try again' : e.message;
+        err.textContent = e.message || 'Delete failed';
         err.style.display = 'block';
       }
     }, { danger: true, btnLabel: 'Delete Game' });
@@ -3407,6 +3408,42 @@ async function tryDeleteGame(gameId, gameName, hasPassword) {
       renderContinueFlow();
     } catch(e) { alert(e.message); }
   }
+}
+
+// ── Change / add / remove a game's password ──
+function tryChangePassword(gameId, gameName, hasPassword) {
+  const existing = document.getElementById('gsPwModal');
+  if (existing) existing.remove();
+  const div = document.createElement('div');
+  div.id = 'gsPwModal';
+  div.className = 'gs-pw-modal';
+  div.innerHTML = `<div class="gs-pw-box">
+    <h3>🔑 ${hasPassword ? 'Change' : 'Set'} password for "${gameName}"</h3>
+    <p>${hasPassword ? 'Enter the current password, then the new one. Leave the new password blank to remove protection.' : 'Set a password to protect this game. Leave blank to keep unprotected.'}</p>
+    ${hasPassword ? '<input id="gsPwCurrent" type="password" placeholder="Current password" autofocus>' : ''}
+    <input id="gsPwNew" type="password" placeholder="${hasPassword ? 'New password (blank = remove)' : 'New password'}" ${hasPassword?'':'autofocus'}>
+    <div class="gs-pw-error" id="gsPwError"></div>
+    <div class="gs-pw-btns">
+      <button class="gs-pw-cancel" onclick="document.getElementById('gsPwModal').remove()">Cancel</button>
+      <button class="gs-pw-confirm" id="gsPwSubmit">Save</button>
+    </div>
+  </div>`;
+  document.body.appendChild(div);
+  div.addEventListener('click', e => { if (e.target === div) div.remove(); });
+  document.getElementById('gsPwSubmit').addEventListener('click', async () => {
+    const currentPassword = hasPassword ? (document.getElementById('gsPwCurrent').value || '') : '';
+    const newPassword = document.getElementById('gsPwNew').value || '';
+    try {
+      await api('PATCH', `/games/${gameId}/password`, { currentPassword, newPassword: newPassword || null });
+      document.getElementById('gsPwModal').remove();
+      showToast(newPassword ? 'Password updated' : 'Password removed', 'success');
+      renderContinueFlow();
+    } catch(e) {
+      const err = document.getElementById('gsPwError');
+      err.textContent = e.message || 'Update failed';
+      err.style.display = 'block';
+    }
+  });
 }
 
 // ══════════════════════════════════════════

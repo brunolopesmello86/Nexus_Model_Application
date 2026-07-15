@@ -14,6 +14,33 @@ app.use(cors());
 app.use(express.json({ limit: '1mb' }));
 app.use(express.static(path.join(__dirname, '..')));
 
+// ── Bootstrap migrations — run once at module init so all endpoints are safe ──
+// Each endpoint previously had inline ALTERs, but many endpoints reference these
+// columns in read paths (SELECT ...). On a cold DB this would crash with
+// "column does not exist" before the write-path ALTER could ever run.
+let _bootstrapPromise = null;
+async function ensureSchema() {
+  if (_bootstrapPromise) return _bootstrapPromise;
+  _bootstrapPromise = (async () => {
+    const stmts = [
+      "ALTER TABLE games ADD COLUMN IF NOT EXISTS board_milestones JSONB NOT NULL DEFAULT '[]'",
+      "ALTER TABLE games ADD COLUMN IF NOT EXISTS board_risks JSONB NOT NULL DEFAULT '[]'",
+      "ALTER TABLE games ADD COLUMN IF NOT EXISTS loop_sessions JSONB NOT NULL DEFAULT '[]'",
+      "ALTER TABLE games ADD COLUMN IF NOT EXISTS board_instances JSONB NOT NULL DEFAULT '{}'",
+      "ALTER TABLE games ADD COLUMN IF NOT EXISTS password_hash TEXT",
+      "ALTER TABLE games ADD COLUMN IF NOT EXISTS anchors JSONB NOT NULL DEFAULT '[]'",
+    ];
+    for (const s of stmts) {
+      try { await db.query(s); } catch (e) { console.warn('bootstrap ALTER failed (non-fatal):', s, e.message); }
+    }
+  })();
+  return _bootstrapPromise;
+}
+// Guard: run bootstrap before any /api request
+app.use('/api', async (req, res, next) => {
+  try { await ensureSchema(); next(); } catch (e) { next(); }
+});
+
 // ── Health ──
 app.get('/api/health', async (req, res) => {
   try {
@@ -99,6 +126,28 @@ app.get('/api/games/:gameId', async (req, res) => {
     row.has_password = !!row.password_hash;
     delete row.password_hash;
     res.json(row);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Change / add / remove a game's password
+// Body: { currentPassword: string, newPassword: string|null }
+// - If game has a password, currentPassword must match
+// - newPassword null/empty removes the password
+app.patch('/api/games/:gameId/password', async (req, res) => {
+  const { currentPassword, newPassword } = req.body || {};
+  try {
+    const { rows } = await db.query('SELECT password_hash FROM games WHERE id = $1', [req.params.gameId]);
+    if (!rows.length) return res.status(404).json({ error: 'Game not found' });
+    const existing = rows[0].password_hash;
+    if (existing) {
+      if (!currentPassword) return res.status(401).json({ error: 'Current password required' });
+      if (hashPassword(currentPassword) !== existing) return res.status(401).json({ error: 'Wrong current password' });
+    }
+    const newHash = newPassword ? hashPassword(newPassword) : null;
+    await db.query('UPDATE games SET password_hash = $1, updated_at = NOW() WHERE id = $2', [newHash, req.params.gameId]);
+    res.json({ ok: true, has_password: !!newHash });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
