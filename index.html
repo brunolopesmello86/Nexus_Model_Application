@@ -150,6 +150,87 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .gs-pw-box .gs-pw-delete { background:#d94a4a; color:#fff; border-color:#d94a4a; }
 .gs-pw-error { color:#d94a4a; font-size:12px; margin-bottom:8px; display:none; }
 
+/* ══ ANCHOR MAPPING ══ */
+.anchors-page { flex:1; overflow-y:auto; background:var(--bg); padding:20px 24px; display:none; }
+.am-hdr { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px; gap:20px; }
+.am-title { font-size:20px; font-weight:700; color:var(--text); margin-bottom:4px; }
+.am-subtitle { font-size:12px; color:var(--text-muted); max-width:640px; line-height:1.5; }
+.am-actions { display:flex; gap:10px; flex-shrink:0; }
+.am-btn { padding:9px 16px; background:var(--surface); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:12px; font-weight:600; cursor:pointer; transition:all .2s; }
+.am-btn:hover { border-color:var(--accent); color:var(--accent); }
+.am-btn.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+.am-btn.primary:hover { filter:brightness(1.1); }
+.am-btn.danger { color:#d94a4a; }
+.am-btn.danger:hover { border-color:#d94a4a; background:rgba(217,74,74,.08); }
+.am-summary { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:20px; }
+.am-summary-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 14px; }
+.am-summary-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.8px; margin-bottom:4px; }
+.am-summary-value { font-size:22px; font-weight:700; color:var(--text); }
+.am-summary-value.blue { color:var(--accent); }
+.am-summary-value.teal { color:#38b2a0; }
+.am-summary-value.orange { color:#e8943a; }
+.am-add-panel { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:20px; }
+.am-add-tabs { display:flex; gap:4px; margin-bottom:12px; }
+.am-add-tab { padding:6px 14px; font-size:11px; font-weight:600; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text-muted); cursor:pointer; transition:all .2s; }
+.am-add-tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+.am-form-row { display:grid; grid-template-columns:1fr 1fr auto; gap:10px; margin-bottom:8px; }
+.am-form-row.wide { grid-template-columns:1fr; }
+.am-input, .am-select, .am-textarea { padding:9px 12px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:12px; font-family:inherit; }
+.am-input:focus, .am-select:focus, .am-textarea:focus { outline:none; border-color:var(--accent); }
+.am-textarea { resize:vertical; min-height:44px; }
+.am-empty { text-align:center; padding:40px; color:var(--text-muted); font-size:13px; border:1px dashed var(--border); border-radius:12px; }
+.am-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; margin-bottom:12px; overflow:hidden; transition:all .2s; }
+.am-card.expanded { border-color:var(--accent); }
+.am-card.backlog { border-left:3px solid #38b2a0; }
+.am-card-hdr { display:flex; align-items:center; gap:14px; padding:14px 16px; cursor:pointer; }
+.am-card-hdr:hover { background:var(--surface2); }
+.am-card-chevron { font-size:11px; color:var(--text-muted); width:12px; transition:transform .2s; }
+.am-card.expanded .am-card-chevron { transform:rotate(90deg); }
+.am-card-main { flex:1; min-width:0; }
+.am-card-name { font-size:14px; font-weight:600; color:var(--text); margin-bottom:2px; }
+.am-card-meta { font-size:11px; color:var(--text-muted); }
+.am-source-badge { display:inline-block; padding:2px 8px; border-radius:6px; font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; margin-right:6px; }
+.am-source-badge.library { background:rgba(74,144,217,.15); color:var(--accent); }
+.am-source-badge.freeform { background:rgba(232,148,58,.15); color:#e8943a; }
+.am-maturity { display:flex; align-items:center; gap:10px; min-width:160px; }
+.am-maturity-bar { flex:1; height:8px; background:var(--surface2); border-radius:4px; overflow:hidden; position:relative; }
+.am-maturity-fill { height:100%; border-radius:4px; transition:width .3s; }
+.am-maturity-num { font-weight:700; font-size:14px; min-width:38px; text-align:right; }
+.am-maturity-num.low { color:#d94a4a; }
+.am-maturity-num.med { color:#e8943a; }
+.am-maturity-num.high { color:#2d9d5e; }
+.am-card-actions { display:flex; gap:6px; align-items:center; }
+.am-toggle { display:flex; align-items:center; gap:6px; padding:6px 10px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; font-size:11px; font-weight:600; color:var(--text-muted); cursor:pointer; transition:all .2s; }
+.am-toggle.on { background:#38b2a0; color:#fff; border-color:#38b2a0; }
+.am-icon-btn { width:28px; height:28px; border-radius:6px; background:none; border:1px solid var(--border); color:var(--text-muted); cursor:pointer; font-size:12px; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+.am-icon-btn:hover { border-color:#d94a4a; color:#d94a4a; }
+.am-body { padding:14px 18px 18px; border-top:1px solid var(--border); background:var(--surface2); display:none; }
+.am-card.expanded .am-body { display:block; }
+.am-desc { font-size:12px; color:var(--text-muted); line-height:1.5; margin-bottom:14px; }
+.am-practice { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:10px; }
+.am-practice-hdr { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.am-practice-name { font-size:13px; font-weight:600; color:var(--text); flex:1; }
+.am-practice-maturity { font-size:12px; font-weight:700; padding:3px 10px; border-radius:6px; background:var(--surface2); }
+.am-practice-desc { font-size:11px; color:var(--text-muted); margin-bottom:10px; line-height:1.4; }
+.am-patterns-lbl { font-size:10px; text-transform:uppercase; letter-spacing:.8px; color:var(--text-muted); margin:8px 0 6px; font-weight:600; }
+.am-pattern-row { display:grid; grid-template-columns:1fr 140px 60px auto; gap:10px; align-items:center; margin-bottom:6px; }
+.am-pattern-name { padding:7px 10px; background:var(--surface2); border:1px solid var(--border); border-radius:6px; font-size:11px; color:var(--text); }
+.am-pattern-name input { width:100%; background:transparent; border:none; color:var(--text); font-size:11px; }
+.am-pattern-name input:focus { outline:none; }
+.am-slider { width:100%; -webkit-appearance:none; appearance:none; height:6px; background:var(--surface2); border-radius:4px; outline:none; }
+.am-slider::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:16px; height:16px; border-radius:50%; background:var(--accent); cursor:pointer; border:2px solid var(--surface); }
+.am-slider::-moz-range-thumb { width:16px; height:16px; border-radius:50%; background:var(--accent); cursor:pointer; border:2px solid var(--surface); }
+.am-score-input { padding:6px 8px; background:var(--surface2); border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:12px; text-align:center; font-weight:600; }
+.am-add-mini { padding:6px 10px; background:none; border:1px dashed var(--border); border-radius:6px; color:var(--text-muted); font-size:11px; cursor:pointer; margin-top:4px; }
+.am-add-mini:hover { border-color:var(--accent); color:var(--accent); }
+.am-practice-add { background:var(--surface); border:1px dashed var(--border); border-radius:10px; padding:10px 14px; margin-top:6px; display:flex; gap:8px; align-items:center; }
+.am-practice-add input { flex:1; padding:7px 10px; background:var(--surface2); border:1px solid var(--border); border-radius:6px; font-size:12px; color:var(--text); }
+.am-gate { position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:280; display:flex; align-items:center; justify-content:center; padding:20px; }
+.am-gate-box { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:32px; max-width:520px; width:100%; text-align:center; animation:gsFadeIn .4s ease-out; }
+.am-gate-box h2 { font-size:22px; margin-bottom:10px; }
+.am-gate-box p { color:var(--text-muted); font-size:13px; line-height:1.6; margin-bottom:24px; }
+.am-gate-actions { display:flex; gap:10px; justify-content:center; }
+
 /* ══ HEADER ══ */
 .app-header { background:linear-gradient(135deg,#171c24,#1c2233); border-bottom:1px solid var(--border); padding:10px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
 .logo { display:flex; align-items:center; gap:10px; flex-shrink:0; cursor:default; }
@@ -1221,10 +1302,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
         <!-- View tabs -->
         <div class="bvt-bar">
           <button class="bvt-btn active" id="bvtBoard" onclick="switchBoardView('board')">⬡ Board</button>
+          <button class="bvt-btn" id="bvtAnchors" onclick="switchBoardView('anchors')">🎯 Anchors</button>
           <button class="bvt-btn" id="bvtExps" onclick="switchBoardView('experiments')">🧪 Experiments</button>
           <button class="bvt-btn" id="bvtCaps" onclick="switchBoardView('capabilities')">◈ Capabilities Library</button>
           <button class="bvt-btn" id="bvtReport" onclick="switchBoardView('report')">📋 Cycle Report</button>
         </div>
+        <!-- Anchor Mapping page (hidden until tab active) -->
+        <div id="anchorsPage" class="anchors-page" style="display:none;"></div>
         <!-- Experiment Tracker page (hidden until tab active) -->
         <div id="expTrackerPage" class="exp-tracker-page" style="display:none;"></div>
         <!-- Capabilities Library page (hidden until tab active) -->
@@ -1539,7 +1623,14 @@ let currentItems = []; // hexIds in the Current Reality backlog
 const DOMAIN_COLORS = ['#4a90d9','#d94a4a','#2d9d5e','#e8943a','#7b5ea7','#38b2a0','#d9a84a','#d94a8a','#5ea7a7','#8b949e'];
 // Capabilities Library
 let capabilitiesLibrary = []; // [{id, name, description, practices:[{id,name,description}]}]
-let currentView = 'board'; // 'board' | 'capabilities'
+// Anchors — Nexus facilitator's org-fitness mapping (per game)
+// Shape: {id, source:'library'|'freeform', capabilityId?, name, description, domain,
+//         practices:[{id, name, description, patterns:[{id, name, score}]}],
+//         inBacklog:bool, backlogItemId?}
+let anchors = [];
+let _amAddMode = 'library'; // 'library' | 'freeform'
+let _amExpandedId = null;
+let currentView = 'board'; // 'board' | 'capabilities' | 'anchors'
 let _capSelHexId = null; // hex being linked in capability selector modal
 // DB state
 let currentGameId = null, currentCompanyId = null;
@@ -1601,7 +1692,8 @@ async function saveGame() {
       board_milestones: boardMilestones,
       board_risks: boardRisks,
       loop_sessions: window.loopSessions || [],
-      board_instances: boardInstances
+      board_instances: boardInstances,
+      anchors: anchors
     });
     showSave('saved');
   } catch(e) { showSave('error'); console.error('Save failed:',e); }
@@ -1692,10 +1784,33 @@ async function loadGame(gameId) {
   completedPhases = new Set(g.completed_phases || []);
   logEntries = g.log_entries || [];
   (g.custom_items||[]).forEach(ci => { if (!allItems.find(i=>i.id===ci.id)) allItems.push(ci); });
+  anchors = g.anchors || [];
+  // Rehydrate anchor-backed anti-pattern items so the Backlog rendering can resolve them
+  anchors.filter(a => a.inBacklog && a.backlogItemId).forEach(a => {
+    if (!allItems.find(i => i.id === a.backlogItemId)) {
+      const mat = amAnchorMaturity(a);
+      const patternsN = (a.practices||[]).reduce((s,p) => s + (p.patterns||[]).length, 0);
+      allItems.push({
+        id: a.backlogItemId,
+        type: 'antipattern',
+        name: a.name,
+        signal: a.description || 'Anchor from Nexus mapping',
+        impact: `Maturity ${mat}/100 · ${(a.practices||[]).length} practices · ${patternsN} patterns assessed`,
+        domain: a.domain || 'People, Culture & Governance',
+        _anchorRef: a.id
+      });
+    }
+  });
   document.getElementById('gameNameTag').textContent = g.name;
   renderAll();
   if (window.renderLoopDock) window.renderLoopDock();
   addLog('Game loaded: ' + g.name, 'success');
+  // If this is a fresh game (no anchors, no board activity), prompt the facilitator to map anchors first
+  const looksFresh = anchors.length === 0
+    && Object.keys(gridState||{}).length === 0
+    && (currentItems||[]).length === 0
+    && (connections||[]).length === 0;
+  if (looksFresh) amShowGate();
 }
 function renderAll() {
   renderCategories(); renderDrivers(); renderLibrary(); renderCycleSteps(); renderBoard(); renderCurrentBacklog(); renderDomainList(); renderFitnessPanel(); updateStats(); renderLog();
@@ -1737,7 +1852,9 @@ function switchBoardView(view) {
   const capPage = document.getElementById('capLibPage');
   const expPage = document.getElementById('expTrackerPage');
   const reportPage = document.getElementById('reportPage');
+  const anchorsPage = document.getElementById('anchorsPage');
   document.getElementById('bvtBoard').classList.toggle('active', view === 'board');
+  document.getElementById('bvtAnchors').classList.toggle('active', view === 'anchors');
   document.getElementById('bvtExps').classList.toggle('active', view === 'experiments');
   document.getElementById('bvtCaps').classList.toggle('active', view === 'capabilities');
   document.getElementById('bvtReport').classList.toggle('active', view === 'report');
@@ -1745,9 +1862,11 @@ function switchBoardView(view) {
   expPage.style.display = view === 'experiments' ? 'flex' : 'none';
   capPage.style.display = view === 'capabilities' ? 'flex' : 'none';
   reportPage.style.display = view === 'report' ? 'flex' : 'none';
+  if (anchorsPage) anchorsPage.style.display = view === 'anchors' ? 'flex' : 'none';
   if (view === 'capabilities') renderCapabilitiesPage();
   if (view === 'experiments') renderExperimentsPage();
   if (view === 'report') renderReportPage();
+  if (view === 'anchors') renderAnchorsPage();
 }
 
 // ══════════════════════════════════════════
@@ -1761,6 +1880,374 @@ const KANBAN_STAGES = [
   {id:'adopted',   label:'✅ Adopted',    color:'var(--green)',      dot:'#10b981'},
   {id:'abandoned', label:'⏸ Abandoned',  color:'var(--red)',        dot:'#ef4444'},
 ];
+
+// ══════════════════════════════════════════
+// ANCHOR MAPPING (Org Fitness assessment)
+// ══════════════════════════════════════════
+const AM_DOMAINS = [
+  'Strategy & Portfolio','Product & Delivery','Technology & Architecture',
+  'People, Culture & Governance','Operations'
+];
+
+function amPracticeMaturity(prac) {
+  if (!prac || !prac.patterns || !prac.patterns.length) return 0;
+  const sum = prac.patterns.reduce((s,p) => s + (Number(p.score)||0), 0);
+  return Math.round(sum / prac.patterns.length);
+}
+function amAnchorMaturity(a) {
+  if (!a || !a.practices || !a.practices.length) return 0;
+  const scored = a.practices.filter(p => p.patterns && p.patterns.length);
+  if (!scored.length) return 0;
+  const sum = scored.reduce((s,p) => s + amPracticeMaturity(p), 0);
+  return Math.round(sum / scored.length);
+}
+function amMaturityColor(n) {
+  if (n < 40) return '#d94a4a';
+  if (n < 70) return '#e8943a';
+  return '#2d9d5e';
+}
+function amMaturityBucket(n) {
+  if (n < 40) return 'low';
+  if (n < 70) return 'med';
+  return 'high';
+}
+
+function renderAnchorsPage() {
+  const page = document.getElementById('anchorsPage');
+  if (!page) return;
+  const total = anchors.length;
+  const backlogCount = anchors.filter(a => a.inBacklog).length;
+  const scored = anchors.filter(a => amAnchorMaturity(a) > 0);
+  const avgMat = scored.length ? Math.round(scored.reduce((s,a) => s + amAnchorMaturity(a), 0)/scored.length) : 0;
+  const patternsCount = anchors.reduce((s,a) => s + (a.practices||[]).reduce((ss,p) => ss + (p.patterns||[]).length, 0), 0);
+
+  const capOptions = capabilitiesLibrary
+    .filter(c => !anchors.some(a => a.source==='library' && a.capabilityId===c.id))
+    .map(c => `<option value="${c.id}">${c.name}${c.domain?' — '+c.domain:''}</option>`).join('');
+
+  page.innerHTML = `
+    <div class="am-hdr">
+      <div>
+        <div class="am-title">🎯 Anchor Mapping &amp; Org-Fitness Assessment</div>
+        <div class="am-subtitle">Map organizational anchors (capabilities the team needs to improve), assess each practice by listing the good patterns teams should follow, and score each pattern from 1 to 100. Anchors marked <b>Move to Backlog</b> will appear in the Current Reality Backlog ready for the Möbius Loop.</div>
+      </div>
+      <div class="am-actions">
+        <button class="am-btn" onclick="amSendSelectedToBacklog()">Sync Backlog Now</button>
+        <button class="am-btn primary" onclick="switchBoardView('board')">Continue to Board →</button>
+      </div>
+    </div>
+
+    <div class="am-summary">
+      <div class="am-summary-card"><div class="am-summary-label">Anchors mapped</div><div class="am-summary-value blue">${total}</div></div>
+      <div class="am-summary-card"><div class="am-summary-label">Avg. maturity</div><div class="am-summary-value" style="color:${amMaturityColor(avgMat)}">${avgMat}</div></div>
+      <div class="am-summary-card"><div class="am-summary-label">Patterns scored</div><div class="am-summary-value orange">${patternsCount}</div></div>
+      <div class="am-summary-card"><div class="am-summary-label">In Backlog</div><div class="am-summary-value teal">${backlogCount}</div></div>
+    </div>
+
+    <div class="am-add-panel">
+      <div class="am-add-tabs">
+        <div class="am-add-tab ${_amAddMode==='library'?'active':''}" onclick="amSetAddMode('library')">From Capabilities Library</div>
+        <div class="am-add-tab ${_amAddMode==='freeform'?'active':''}" onclick="amSetAddMode('freeform')">Freeform</div>
+      </div>
+      ${_amAddMode==='library' ? `
+        <div class="am-form-row">
+          <select class="am-select" id="amLibSelect" style="grid-column:span 2">
+            <option value="">${capOptions? '— Select a capability —' : 'All library capabilities already added'}</option>
+            ${capOptions}
+          </select>
+          <button class="am-btn primary" onclick="amAddFromLibrary()">Add Anchor</button>
+        </div>
+      ` : `
+        <div class="am-form-row">
+          <input class="am-input" id="amFfName" placeholder="Anchor name (e.g. Deployment reliability)">
+          <select class="am-select" id="amFfDomain">
+            ${AM_DOMAINS.map(d => `<option value="${d}">${d}</option>`).join('')}
+          </select>
+          <button class="am-btn primary" onclick="amAddFreeform()">Add Anchor</button>
+        </div>
+        <div class="am-form-row wide">
+          <textarea class="am-textarea" id="amFfDesc" placeholder="Description — what makes this anchor important? (optional)"></textarea>
+        </div>
+      `}
+    </div>
+
+    <div id="amList">
+      ${total === 0
+        ? `<div class="am-empty">No anchors mapped yet. Start by adding one above — either from the capabilities library or as freeform.</div>`
+        : anchors.map(a => amRenderCard(a)).join('')}
+    </div>
+  `;
+}
+
+function amRenderCard(a) {
+  const mat = amAnchorMaturity(a);
+  const bucket = amMaturityBucket(mat);
+  const isExp = _amExpandedId === a.id;
+  const patternsN = (a.practices||[]).reduce((s,p) => s + (p.patterns||[]).length, 0);
+  return `
+    <div class="am-card ${isExp?'expanded':''} ${a.inBacklog?'backlog':''}" data-id="${a.id}">
+      <div class="am-card-hdr" onclick="amToggleExpand('${a.id}')">
+        <div class="am-card-chevron">▶</div>
+        <div class="am-card-main">
+          <div class="am-card-name">
+            <span class="am-source-badge ${a.source}">${a.source}</span>${amEsc(a.name)}
+          </div>
+          <div class="am-card-meta">${amEsc(a.domain||'—')} · ${(a.practices||[]).length} practices · ${patternsN} patterns</div>
+        </div>
+        <div class="am-maturity">
+          <div class="am-maturity-bar"><div class="am-maturity-fill" style="width:${mat}%;background:${amMaturityColor(mat)}"></div></div>
+          <div class="am-maturity-num ${bucket}">${mat}</div>
+        </div>
+        <div class="am-card-actions" onclick="event.stopPropagation()">
+          <div class="am-toggle ${a.inBacklog?'on':''}" onclick="amToggleBacklog('${a.id}')" title="Include in Nexus Backlog">${a.inBacklog?'✓ In Backlog':'+ Backlog'}</div>
+          <button class="am-icon-btn" onclick="amDeleteAnchor('${a.id}')" title="Delete anchor">🗑</button>
+        </div>
+      </div>
+      <div class="am-body">
+        ${a.description ? `<div class="am-desc">${amEsc(a.description)}</div>` : ''}
+        ${(a.practices||[]).map(pr => amRenderPractice(a.id, pr)).join('')}
+        <div class="am-practice-add">
+          <input placeholder="New practice name (e.g. Trunk-based development)" id="amNewPrac_${a.id}">
+          <button class="am-btn" onclick="amAddPractice('${a.id}')">+ Practice</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function amRenderPractice(anchorId, pr) {
+  const mat = amPracticeMaturity(pr);
+  return `
+    <div class="am-practice">
+      <div class="am-practice-hdr">
+        <div class="am-practice-name">${amEsc(pr.name)}</div>
+        <div class="am-practice-maturity" style="color:${amMaturityColor(mat)}">Maturity: ${mat}</div>
+        <button class="am-icon-btn" onclick="amDeletePractice('${anchorId}','${pr.id}')" title="Remove practice">✕</button>
+      </div>
+      ${pr.description ? `<div class="am-practice-desc">${amEsc(pr.description)}</div>` : ''}
+      <div class="am-patterns-lbl">Good patterns teams should follow (score each 1–100)</div>
+      ${(pr.patterns||[]).map(pat => `
+        <div class="am-pattern-row" data-pat="${pat.id}">
+          <div class="am-pattern-name"><input value="${amEscAttr(pat.name)}" onchange="amUpdatePatternName('${anchorId}','${pr.id}','${pat.id}',this.value)"></div>
+          <input type="range" min="1" max="100" value="${pat.score||1}" class="am-slider" oninput="amUpdatePatternScore('${anchorId}','${pr.id}','${pat.id}',this.value,true)">
+          <input type="number" min="1" max="100" value="${pat.score||1}" class="am-score-input" onchange="amUpdatePatternScore('${anchorId}','${pr.id}','${pat.id}',this.value,false)">
+          <button class="am-icon-btn" onclick="amDeletePattern('${anchorId}','${pr.id}','${pat.id}')" title="Remove pattern">✕</button>
+        </div>
+      `).join('')}
+      <button class="am-add-mini" onclick="amAddPattern('${anchorId}','${pr.id}')">+ Add good pattern</button>
+    </div>
+  `;
+}
+
+function amEsc(s) { return String(s==null?'':s).replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'})[c]); }
+function amEscAttr(s) { return amEsc(s); }
+
+function amSetAddMode(mode) { _amAddMode = mode; renderAnchorsPage(); }
+function amToggleExpand(id) { _amExpandedId = _amExpandedId === id ? null : id; renderAnchorsPage(); }
+
+function amAddFromLibrary() {
+  const sel = document.getElementById('amLibSelect');
+  const capId = sel && sel.value;
+  if (!capId) { showToast('Pick a capability from the list','warning'); return; }
+  const cap = capabilitiesLibrary.find(c => c.id === capId);
+  if (!cap) return;
+  const newId = 'anch_'+Date.now();
+  anchors.push({
+    id: newId,
+    source: 'library',
+    capabilityId: cap.id,
+    name: cap.name,
+    description: cap.description || '',
+    domain: cap.domain || 'People, Culture & Governance',
+    practices: (cap.practices||[]).map(p => ({
+      id: 'prac_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+      name: p.name,
+      description: p.description || '',
+      patterns: []
+    })),
+    inBacklog: false
+  });
+  _amExpandedId = newId;
+  addLog(`Added anchor from library: "${cap.name}"`,'success');
+  renderAnchorsPage();
+  scheduleAutoSave();
+}
+
+function amAddFreeform() {
+  const name = document.getElementById('amFfName').value.trim();
+  const domain = document.getElementById('amFfDomain').value;
+  const desc = document.getElementById('amFfDesc').value.trim();
+  if (!name) { showToast('Enter an anchor name','warning'); return; }
+  const newId = 'anch_'+Date.now();
+  anchors.push({
+    id: newId,
+    source: 'freeform',
+    name, domain,
+    description: desc,
+    practices: [],
+    inBacklog: false
+  });
+  _amExpandedId = newId;
+  addLog(`Added freeform anchor: "${name}"`,'success');
+  renderAnchorsPage();
+  scheduleAutoSave();
+}
+
+function amDeleteAnchor(id) {
+  const a = anchors.find(x => x.id === id);
+  if (!a) return;
+  if (!confirm(`Delete anchor "${a.name}"? Any backlog item created from it will also be removed.`)) return;
+  if (a.backlogItemId) amRemoveBacklogItemFor(a);
+  anchors = anchors.filter(x => x.id !== id);
+  addLog(`Deleted anchor: "${a.name}"`,'warning');
+  renderAnchorsPage();
+  scheduleAutoSave();
+}
+
+function amAddPractice(anchorId) {
+  const a = anchors.find(x => x.id === anchorId);
+  if (!a) return;
+  const inp = document.getElementById('amNewPrac_'+anchorId);
+  const name = (inp && inp.value.trim()) || '';
+  if (!name) { showToast('Enter a practice name','warning'); return; }
+  a.practices = a.practices || [];
+  a.practices.push({
+    id: 'prac_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+    name, description:'', patterns: []
+  });
+  renderAnchorsPage();
+  scheduleAutoSave();
+}
+function amDeletePractice(anchorId, pracId) {
+  const a = anchors.find(x => x.id === anchorId);
+  if (!a) return;
+  a.practices = (a.practices||[]).filter(p => p.id !== pracId);
+  renderAnchorsPage();
+  scheduleAutoSave();
+}
+function amAddPattern(anchorId, pracId) {
+  const a = anchors.find(x => x.id === anchorId); if (!a) return;
+  const pr = (a.practices||[]).find(p => p.id === pracId); if (!pr) return;
+  pr.patterns = pr.patterns || [];
+  pr.patterns.push({ id:'pat_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), name:'New good pattern', score: 50 });
+  renderAnchorsPage();
+  scheduleAutoSave();
+}
+function amDeletePattern(anchorId, pracId, patId) {
+  const a = anchors.find(x => x.id === anchorId); if (!a) return;
+  const pr = (a.practices||[]).find(p => p.id === pracId); if (!pr) return;
+  pr.patterns = (pr.patterns||[]).filter(x => x.id !== patId);
+  renderAnchorsPage();
+  scheduleAutoSave();
+}
+function amUpdatePatternName(anchorId, pracId, patId, val) {
+  const a = anchors.find(x => x.id === anchorId); if (!a) return;
+  const pr = (a.practices||[]).find(p => p.id === pracId); if (!pr) return;
+  const pat = (pr.patterns||[]).find(x => x.id === patId); if (!pat) return;
+  pat.name = val;
+  scheduleAutoSave();
+}
+function amUpdatePatternScore(anchorId, pracId, patId, val, fromSlider) {
+  const a = anchors.find(x => x.id === anchorId); if (!a) return;
+  const pr = (a.practices||[]).find(p => p.id === pracId); if (!pr) return;
+  const pat = (pr.patterns||[]).find(x => x.id === patId); if (!pat) return;
+  let n = Math.max(1, Math.min(100, Math.round(Number(val)||1)));
+  pat.score = n;
+  // Update paired input value without full re-render for smoother slider feel
+  const row = document.querySelector(`.am-pattern-row[data-pat="${patId}"]`);
+  if (row) {
+    const slider = row.querySelector('.am-slider');
+    const num = row.querySelector('.am-score-input');
+    if (fromSlider && num && Number(num.value) !== n) num.value = n;
+    if (!fromSlider && slider && Number(slider.value) !== n) slider.value = n;
+    // Update practice maturity live
+    const pracEl = row.closest('.am-practice');
+    if (pracEl) {
+      const badge = pracEl.querySelector('.am-practice-maturity');
+      const m = amPracticeMaturity(pr);
+      if (badge) { badge.textContent = 'Maturity: ' + m; badge.style.color = amMaturityColor(m); }
+    }
+    // Update anchor card maturity
+    const card = row.closest('.am-card');
+    if (card) {
+      const am = amAnchorMaturity(a);
+      const bar = card.querySelector('.am-maturity-fill');
+      const num2 = card.querySelector('.am-maturity-num');
+      if (bar) { bar.style.width = am + '%'; bar.style.background = amMaturityColor(am); }
+      if (num2) { num2.textContent = am; num2.className = 'am-maturity-num ' + amMaturityBucket(am); }
+    }
+  }
+  scheduleAutoSave();
+}
+function amToggleBacklog(id) {
+  const a = anchors.find(x => x.id === id); if (!a) return;
+  a.inBacklog = !a.inBacklog;
+  if (a.inBacklog) amAddBacklogItemFor(a);
+  else amRemoveBacklogItemFor(a);
+  renderAnchorsPage();
+  renderCurrentBacklog && renderCurrentBacklog();
+  renderLibrary && renderLibrary();
+  scheduleAutoSave();
+}
+
+// Create (or refresh) an anti-pattern item in allItems + currentItems that represents an anchor
+function amAddBacklogItemFor(a) {
+  const mat = amAnchorMaturity(a);
+  const itemId = a.backlogItemId || ('anch_item_' + a.id);
+  a.backlogItemId = itemId;
+  // Replace existing
+  allItems = allItems.filter(i => i.id !== itemId);
+  const patternsN = (a.practices||[]).reduce((s,p) => s + (p.patterns||[]).length, 0);
+  allItems.push({
+    id: itemId,
+    type: 'antipattern',
+    name: a.name,
+    signal: a.description || 'Anchor from Nexus mapping',
+    impact: `Maturity ${mat}/100 · ${(a.practices||[]).length} practices · ${patternsN} patterns assessed`,
+    domain: a.domain || 'People, Culture & Governance',
+    _anchorRef: a.id
+  });
+  if (!currentItems.includes(itemId)) currentItems.push(itemId);
+}
+function amRemoveBacklogItemFor(a) {
+  const itemId = a.backlogItemId;
+  if (!itemId) return;
+  // Remove from backlog only if not placed on board; if placed, keep the hex but detach anchor ref
+  const placedOnBoard = Object.values(gridState).some(gid => gid === itemId || (boardInstances && boardInstances[gid] === itemId));
+  currentItems = currentItems.filter(id => id !== itemId);
+  if (!placedOnBoard) {
+    allItems = allItems.filter(i => i.id !== itemId);
+    delete a.backlogItemId;
+  }
+}
+function amSendSelectedToBacklog() {
+  let n = 0;
+  anchors.filter(a => a.inBacklog).forEach(a => { amAddBacklogItemFor(a); n++; });
+  showToast(`Synced ${n} anchor${n===1?'':'s'} to Backlog`, 'success');
+  renderCurrentBacklog && renderCurrentBacklog();
+  renderLibrary && renderLibrary();
+  scheduleAutoSave();
+}
+
+// New-game gate: block board with a soft modal until user maps anchors (or skips)
+function amShowGate() {
+  if (document.getElementById('amGate')) return;
+  const div = document.createElement('div');
+  div.id = 'amGate'; div.className = 'am-gate';
+  div.innerHTML = `<div class="am-gate-box">
+    <h2>🎯 Start with Anchor Mapping</h2>
+    <p>Nexus facilitators map organizational anchors first, assess their maturity against the Org Fitness Model, and choose which ones enter the backlog for the Möbius Loop. You can skip this and come back any time via the <b>Anchors</b> tab.</p>
+    <div class="am-gate-actions">
+      <button class="am-btn" onclick="amDismissGate(false)">Skip for now</button>
+      <button class="am-btn primary" onclick="amDismissGate(true)">Start Mapping →</button>
+    </div>
+  </div>`;
+  document.body.appendChild(div);
+}
+function amDismissGate(goToMapping) {
+  const g = document.getElementById('amGate'); if (g) g.remove();
+  if (goToMapping) switchBoardView('anchors');
+}
 
 function renderExperimentsPage() {
   const page = document.getElementById('expTrackerPage');
@@ -2831,9 +3318,13 @@ async function enterGame(gameId) {
   domainDefinitions = [];
   selectedDomainId = null;
   cyclePhase=0; cycleNumber=1; completedPhases.clear(); logEntries=[];
+  anchors = [];
+  _amExpandedId = null;
   // Ensure capabilities library is loaded
   if (capabilitiesLibrary.length === 0) await loadCapabilities();
   else syncCapabilitiesToItems();
+  // Always start on the Board tab; loadGame() will prompt Anchor Mapping if fresh
+  switchBoardView('board');
   await loadGame(gameId);
 }
 function timeAgo(date) {
@@ -2926,6 +3417,7 @@ function renderLibrary() {
   list.innerHTML = '';
   const q = searchQuery.toLowerCase();
   allItems.filter(item => {
+    if (item._anchorRef) return false; // anchor-backed items live in the Backlog only
     if (currentFilter!=='all' && item.type!==currentFilter) return false;
     if (activeDomain && item.domain!==activeDomain) return false;
     if (q) return item.name.toLowerCase().includes(q)||item.signal.toLowerCase().includes(q)||item.domain.toLowerCase().includes(q);
@@ -3676,12 +4168,15 @@ function addCustomPattern(){
   scheduleAutoSave();
 }
 function resetBoard(){
-  if(!confirm('Reset the entire board?'))return;
+  if(!confirm('Reset the entire board? (anchors will be kept — clear them from the Anchors tab if needed)'))return;
   gridState={};boardInstances={};agentAssignments={};driverAssignments={};connections=[];boardMarkers=[];domainDefinitions=[];experimentResults={};practiceRepetitions={};selectedDomainId=null;cyclePhase=0;cycleNumber=1;completedPhases.clear();logEntries=[];boardMilestones=[];boardRisks=[];window.loopSessions=[];window.activeLoop=null;
+  // Reset backlog-item refs; anchors keep their marker but the item ids are re-derived on next backlog sync
+  currentItems=[];
+  anchors.forEach(a => { if (a.inBacklog) amAddBacklogItemFor(a); });
   renderAll();if(window.renderLoopDock)window.renderLoopDock();addLog('Board reset','warning');scheduleAutoSave();
 }
 function exportSession(){
-  const data={timestamp:new Date().toISOString(),gameId:currentGameId,gridState,boardInstances,connections,agentAssignments,driverAssignments,domainDefinitions,experimentResults,practiceRepetitions,boardMilestones,boardRisks,loopSessions:window.loopSessions||[],cycleNumber,cyclePhase,fitness:document.getElementById('fitnessScore').textContent,log:logEntries.slice(0,30),customItems:allItems.filter(i=>i.id.startsWith('custom_'))};
+  const data={timestamp:new Date().toISOString(),gameId:currentGameId,gridState,boardInstances,connections,agentAssignments,driverAssignments,domainDefinitions,experimentResults,practiceRepetitions,boardMilestones,boardRisks,loopSessions:window.loopSessions||[],cycleNumber,cyclePhase,fitness:document.getElementById('fitnessScore').textContent,log:logEntries.slice(0,30),customItems:allItems.filter(i=>i.id.startsWith('custom_')),anchors};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`nexus-${new Date().toISOString().slice(0,10)}.json`;a.click();
   addLog('Session exported','success');
