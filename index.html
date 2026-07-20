@@ -618,35 +618,65 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .kanban-empty { font-size:10px; color:var(--text-muted); text-align:center; padding:18px 8px; font-style:italic; }
 .kanban-stage-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:6px; }
 .cap-page { display:flex; flex:1; overflow:hidden; min-height:0; }
-.cap-list { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px; min-height:0; }
-.cap-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; }
-.cap-card-hdr { padding:10px 12px; display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; }
-.cap-card-hdr:hover { background:rgba(255,255,255,.03); }
-.cap-card-chevron { font-size:10px; color:var(--text-muted); transition:transform .15s; }
-.cap-card.open .cap-card-chevron { transform:rotate(90deg); }
-.cap-card-name { font-size:12px; font-weight:700; flex:1; }
-.cap-card-count { font-size:9px; color:var(--text-muted); background:var(--surface2); padding:2px 7px; border-radius:8px; flex-shrink:0; }
-.cap-card-acts { display:flex; gap:4px; flex-shrink:0; }
-.cap-card-acts button { background:transparent; border:1px solid var(--border); border-radius:5px; color:var(--text-muted); padding:2px 8px; font-size:9px; cursor:pointer; }
-.cap-card-acts button:hover { border-color:var(--accent); color:var(--accent); }
-.cap-card-acts button.del:hover { border-color:var(--red); color:var(--red); }
-.cap-card-body { display:none; padding:0 12px 10px; border-top:1px solid var(--border); }
-.cap-card.open .cap-card-body { display:block; }
-.cap-card-desc { font-size:10px; color:var(--text-muted); margin:8px 0; line-height:1.5; }
-.prac-list { display:flex; flex-direction:column; gap:4px; margin-bottom:8px; }
-.prac-item { background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:6px 10px; display:flex; align-items:flex-start; gap:8px; }
-.prac-item-text { flex:1; min-width:0; }
-.prac-item-name { font-size:11px; font-weight:600; line-height:1.3; }
-.prac-item-desc { font-size:9px; color:var(--text-muted); line-height:1.4; margin-top:2px; }
-.prac-item-acts { display:flex; gap:3px; flex-shrink:0; margin-top:1px; }
-.prac-item-acts button { background:transparent; border:1px solid var(--border); border-radius:4px; color:var(--text-muted); padding:1px 6px; font-size:9px; cursor:pointer; }
-.prac-item-acts button:hover { border-color:var(--accent); color:var(--accent); }
-.prac-item-acts button.del:hover { border-color:var(--red); color:var(--red); }
 .cap-add-form { display:flex; flex-direction:column; gap:6px; background:var(--surface2); border:1px dashed var(--border); border-radius:7px; padding:8px 10px; margin-top:6px; }
 .cap-add-form input, .cap-add-form textarea { width:100%; padding:5px 8px; background:var(--bg); border:1px solid var(--border); border-radius:5px; color:var(--text); font-size:11px; font-family:inherit; }
 .cap-add-form input:focus, .cap-add-form textarea:focus { outline:none; border-color:var(--accent); }
 .cap-add-form textarea { resize:vertical; min-height:40px; line-height:1.4; }
 .cap-add-form-row { display:flex; gap:6px; justify-content:flex-end; }
+/* ══ CAPABILITIES LIBRARY — hex/circle visual ══ */
+.cl-wrap { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+.cl-toolbar { display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--border); flex-shrink:0; }
+.cl-title { font-size:14px; font-weight:700; flex:1; display:flex; flex-direction:column; gap:2px; }
+.cl-sub { font-size:10.5px; font-weight:400; color:var(--text-muted); }
+.cl-scroll { flex:1; overflow-y:auto; padding:16px; min-height:0; }
+.cl-empty { text-align:center; color:var(--text-muted); font-size:13px; padding:50px; border:1px dashed var(--border); border-radius:12px; }
+.cl-domain { margin-bottom:22px; }
+.cl-domain-hdr { display:flex; align-items:center; gap:8px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--text); margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+.cl-domain-dot { width:10px; height:10px; border-radius:50%; background:var(--dc); flex-shrink:0; box-shadow:0 0 8px var(--dc); }
+.cl-domain-count { font-size:9px; color:var(--text-muted); background:var(--surface2); border:1px solid var(--border); padding:2px 8px; border-radius:10px; font-weight:600; letter-spacing:0; }
+.cl-hexgrid { display:flex; flex-wrap:wrap; gap:14px 12px; }
+.cl-hex { position:relative; width:146px; height:128px; cursor:pointer; transition:transform .15s ease; }
+.cl-hex:hover { transform:translateY(-4px); }
+.cl-hex-shape { position:absolute; inset:0; clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); background:var(--dc); transition:filter .15s; }
+.cl-hex-fill { position:absolute; inset:3px; clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); background:var(--surface); }
+.cl-hex-tint { position:absolute; inset:3px; clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); background:var(--dc); opacity:.10; transition:opacity .15s; }
+.cl-hex:hover .cl-hex-tint { opacity:.20; }
+.cl-hex.sel .cl-hex-tint { opacity:.30; }
+.cl-hex.sel .cl-hex-shape { filter:drop-shadow(0 0 7px var(--dc)); }
+.cl-hex-content { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:0 22px; pointer-events:none; }
+.cl-hex-name { font-size:11px; font-weight:700; line-height:1.2; color:var(--text); max-height:40px; overflow:hidden; }
+.cl-hex-count { font-size:19px; font-weight:800; color:var(--dc); line-height:1; margin-top:5px; }
+.cl-hex-lbl { font-size:7px; text-transform:uppercase; letter-spacing:.7px; color:var(--text-muted); margin-top:1px; }
+/* Right drawer — practices as circles */
+.cl-drawer { width:0; flex-shrink:0; overflow:hidden; background:var(--surface2); border-left:1px solid var(--border); transition:width .22s ease; }
+.cl-drawer.open { width:372px; overflow-y:auto; }
+.cl-drawer-hdr { position:sticky; top:0; z-index:2; display:flex; align-items:flex-start; gap:10px; padding:16px 16px 14px; background:var(--surface); border-bottom:2px solid var(--dc); }
+.cl-drawer-titles { flex:1; min-width:0; }
+.cl-drawer-domain { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:var(--dc); margin-bottom:3px; }
+.cl-drawer-name { font-size:16px; font-weight:700; line-height:1.25; color:var(--text); }
+.cl-drawer-x { background:transparent; border:1px solid var(--border); border-radius:6px; color:var(--text-muted); width:26px; height:26px; cursor:pointer; font-size:13px; flex-shrink:0; }
+.cl-drawer-x:hover { border-color:var(--red); color:var(--red); }
+.cl-drawer-body { padding:14px 16px 24px; }
+.cl-drawer-desc { font-size:11.5px; color:var(--text-muted); line-height:1.55; margin-bottom:12px; }
+.cl-drawer-acts { display:flex; gap:6px; margin-bottom:14px; }
+.cl-del { color:var(--red); border-color:rgba(217,74,74,.4); }
+.cl-del:hover { background:rgba(217,74,74,.1); border-color:var(--red); }
+.cl-prac-hdr { font-size:10px; text-transform:uppercase; letter-spacing:.9px; color:var(--text-muted); font-weight:700; margin:6px 0 14px; display:flex; align-items:center; gap:8px; }
+.cl-prac-hdr span { background:var(--dc); color:#fff; border-radius:9px; padding:1px 8px; font-size:9px; }
+.cl-circle-grid { display:flex; flex-wrap:wrap; gap:16px 10px; align-items:flex-start; }
+.cl-circle { width:98px; display:flex; flex-direction:column; align-items:center; gap:7px; cursor:pointer; }
+.cl-circle-badge { width:54px; height:54px; border-radius:50%; background:var(--dc); color:#fff; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:800; box-shadow:0 2px 9px rgba(0,0,0,.28); border:3px solid transparent; transition:transform .15s, border-color .15s; }
+.cl-circle:hover .cl-circle-badge { transform:scale(1.09); border-color:rgba(255,255,255,.35); }
+.cl-circle.sel .cl-circle-badge { border-color:#fff; }
+.cl-circle-name { font-size:9.5px; text-align:center; line-height:1.25; color:var(--text); max-height:37px; overflow:hidden; }
+.cl-circle-add { width:98px; display:flex; flex-direction:column; align-items:center; gap:7px; cursor:pointer; }
+.cl-circle-add-plus { width:54px; height:54px; border-radius:50%; background:transparent; border:2px dashed var(--border); color:var(--text-muted); display:flex; align-items:center; justify-content:center; font-size:24px; transition:all .15s; }
+.cl-circle-add:hover .cl-circle-add-plus { border-color:var(--accent); color:var(--accent); }
+.cl-prac-detail { margin-top:16px; background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--dc); border-radius:9px; padding:12px 14px; }
+.cl-prac-detail-hdr { display:flex; align-items:center; gap:9px; margin-bottom:8px; }
+.cl-prac-detail-lvl { width:26px; height:26px; border-radius:50%; background:var(--dc); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0; }
+.cl-prac-detail-name { font-size:12.5px; font-weight:700; flex:1; line-height:1.3; }
+.cl-prac-detail-desc { font-size:11px; color:var(--text-muted); line-height:1.55; margin-bottom:10px; }
 /* Shared modal overlay style */
 #capSelectorModal,#capSimpleModal,#s2fPracticeModal,#transPickerModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:9999; align-items:center; justify-content:center; }
 #capSelectorModal.open,#capSimpleModal.open,#s2fPracticeModal.open,#transPickerModal.open { display:flex; }
@@ -2397,68 +2427,173 @@ function setExpField(id, field, value) {
   scheduleAutoSave();
 }
 
+// Domain metadata for the visual library (color per Nexus domain)
+const CAP_DOMAINS = [
+  { name:'Strategy & Portfolio',         color:'#4a90d9' },
+  { name:'Product & Delivery',           color:'#38b2a0' },
+  { name:'Technology & Architecture',    color:'#7b5ea7' },
+  { name:'People, Culture & Governance', color:'#e8943a' },
+  { name:'Operations',                   color:'#2d9d5e' },
+];
+let _capDrawerId = null;   // capability whose practice drawer is open
+let _capPracDetailId = null; // practice whose detail card is open (within drawer)
+function domainColor(d) {
+  const m = CAP_DOMAINS.find(x => x.name === d);
+  return m ? m.color : '#8b949e';
+}
+
 function renderCapabilitiesPage() {
   const page = document.getElementById('capLibPage');
   if (!page) return;
   const caps = capabilitiesLibrary;
-  page.innerHTML =
-    `<div class="cap-list">` +
-      `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">` +
-        `<span style="font-size:12px;font-weight:700;flex:1;">Capabilities & Practices</span>` +
-        `<button class="btn btn-sm btn-primary" onclick="showAddCapForm()">+ Add Capability</button>` +
-      `</div>` +
-      `<div id="addCapFormArea"></div>` +
-      (caps.length === 0
-        ? `<div style="font-size:12px;color:var(--text-muted);text-align:center;padding:30px;">No capabilities yet. Add one above.</div>`
-        : caps.map((cap, ci) => `
-          <div class="cap-card" id="capCard_${cap.id}">
-            <div class="cap-card-hdr" onclick="toggleCapCard('${cap.id}')">
-              <span class="cap-card-chevron">▶</span>
-              <span class="cap-card-name">${escHtml(cap.name)}</span>
-              <span class="cap-card-count">${cap.practices.length} practices</span>
-              <div class="cap-card-acts" onclick="event.stopPropagation()">
-                <button onclick="showEditCapForm('${cap.id}')">Edit</button>
-                <button class="del" onclick="deleteCap('${cap.id}')">Delete</button>
+  // Group capabilities by domain, in the canonical order, plus an "Other" bucket
+  const groups = CAP_DOMAINS.map(d => ({ ...d, caps: caps.filter(c => (c.domain||'') === d.name) }));
+  const otherCaps = caps.filter(c => !CAP_DOMAINS.some(d => d.name === (c.domain||'')));
+  if (otherCaps.length) groups.push({ name:'Other', color:'#8b949e', caps: otherCaps });
+  const totalPracs = caps.reduce((s,c) => s + c.practices.length, 0);
+  // If the open drawer's capability was removed, close it
+  if (_capDrawerId && !caps.some(c => c.id === _capDrawerId)) _capDrawerId = null;
+
+  page.innerHTML = `
+    <div class="cl-wrap">
+      <div class="cl-toolbar">
+        <div class="cl-title">◈ Capabilities Library
+          <span class="cl-sub">${caps.length} capabilities · ${totalPracs} practices · click a hexagon to explore its practices</span>
+        </div>
+        <button class="btn btn-sm btn-primary" onclick="showAddCapForm()">+ Add Capability</button>
+      </div>
+      <div id="addCapFormArea" style="padding:0 16px;"></div>
+      <div class="cl-scroll">
+        ${caps.length === 0
+          ? `<div class="cl-empty">No capabilities yet. Click <b>+ Add Capability</b> to begin building your library.</div>`
+          : groups.filter(g => g.caps.length).map(g => `
+            <div class="cl-domain">
+              <div class="cl-domain-hdr" style="--dc:${g.color}">
+                <span class="cl-domain-dot"></span>${escHtml(g.name)}
+                <span class="cl-domain-count">${g.caps.length}</span>
+              </div>
+              <div class="cl-hexgrid">
+                ${g.caps.map(c => capHexHtml(c, g.color)).join('')}
               </div>
             </div>
-            <div class="cap-card-body">
-              <div class="cap-card-desc">${escHtml(cap.description || '')}</div>
-              <div class="prac-list" id="pracList_${cap.id}">
-                ${cap.practices.map(p => `
-                  <div class="prac-item" id="pracItem_${p.id}">
-                    <div class="prac-item-text">
-                      <div class="prac-item-name">${escHtml(p.name)}</div>
-                      ${p.description ? `<div class="prac-item-desc">${escHtml(p.description)}</div>` : ''}
-                    </div>
-                    <div class="prac-item-acts">
-                      <button onclick="showEditPracForm('${p.id}','${cap.id}')">Edit</button>
-                      <button class="del" onclick="deletePrac('${p.id}','${cap.id}')">Del</button>
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
-              <div id="addPracFormArea_${cap.id}"></div>
-              <button class="btn btn-sm" style="margin-top:4px;width:100%;" onclick="showAddPracForm('${cap.id}')">+ Add Practice</button>
-            </div>
-          </div>
-        `).join('')) +
-    `</div>`;
+          `).join('')}
+      </div>
+    </div>
+    <div class="cl-drawer ${_capDrawerId ? 'open' : ''}" id="capDrawer">${_capDrawerId ? capDrawerHtml(_capDrawerId) : ''}</div>
+  `;
+}
+
+function capHexHtml(cap, color) {
+  const sel = _capDrawerId === cap.id;
+  return `
+    <div class="cl-hex ${sel ? 'sel' : ''}" style="--dc:${color}" onclick="openCapDrawer('${cap.id}')" title="${escHtml(cap.name)}">
+      <div class="cl-hex-shape"></div>
+      <div class="cl-hex-fill"></div>
+      <div class="cl-hex-tint"></div>
+      <div class="cl-hex-content">
+        <div class="cl-hex-name">${escHtml(cap.name)}</div>
+        <div class="cl-hex-count">${cap.practices.length}</div>
+        <div class="cl-hex-lbl">${cap.practices.length === 1 ? 'practice' : 'practices'}</div>
+      </div>
+    </div>`;
+}
+
+function capDrawerHtml(capId) {
+  const cap = capabilitiesLibrary.find(c => c.id === capId);
+  if (!cap) return '';
+  const color = domainColor(cap.domain);
+  return `
+    <div class="cl-drawer-hdr" style="--dc:${color}">
+      <div class="cl-drawer-titles">
+        <div class="cl-drawer-domain">${escHtml(cap.domain || '—')}</div>
+        <div class="cl-drawer-name">${escHtml(cap.name)}</div>
+      </div>
+      <button class="cl-drawer-x" onclick="closeCapDrawer()" title="Close">✕</button>
+    </div>
+    <div class="cl-drawer-body">
+      ${cap.description ? `<div class="cl-drawer-desc">${escHtml(cap.description)}</div>` : ''}
+      <div class="cl-drawer-acts">
+        <button class="btn btn-sm" onclick="showEditCapForm('${cap.id}')">Edit capability</button>
+        <button class="btn btn-sm cl-del" onclick="deleteCap('${cap.id}')">Delete</button>
+      </div>
+      <div id="editCapArea_${cap.id}"></div>
+      <div class="cl-prac-hdr" style="--dc:${color}">Practices <span>${cap.practices.length}</span></div>
+      <div class="cl-circle-grid">
+        ${cap.practices.map(p => capCircleHtml(p, cap.id, color)).join('')}
+        <div class="cl-circle-add" onclick="showAddPracForm('${cap.id}')" title="Add practice">
+          <div class="cl-circle-add-plus">+</div>
+          <div class="cl-circle-name" style="color:var(--text-muted)">Add</div>
+        </div>
+      </div>
+      <div id="addPracFormArea_${cap.id}"></div>
+      <div id="pracDetail_${cap.id}">${_capPracDetailId ? pracDetailHtml(_capPracDetailId, cap.id) : ''}</div>
+    </div>`;
+}
+
+function capCircleHtml(p, capId, color) {
+  const lvl = String(p.level || '').slice(0,2).toUpperCase() || '•';
+  const sel = _capPracDetailId === p.id;
+  return `
+    <div class="cl-circle ${sel ? 'sel' : ''}" style="--dc:${color}" onclick="showPracDetail('${p.id}','${capId}')" title="${escHtml(p.name)}">
+      <div class="cl-circle-badge">${escHtml(lvl)}</div>
+      <div class="cl-circle-name">${escHtml(p.name)}</div>
+    </div>`;
+}
+
+function pracDetailHtml(pracId, capId) {
+  const cap = capabilitiesLibrary.find(c => c.id === capId);
+  const p = cap?.practices.find(x => x.id === pracId);
+  if (!p) return '';
+  const color = domainColor(cap.domain);
+  return `
+    <div class="cl-prac-detail" style="--dc:${color}">
+      <div class="cl-prac-detail-hdr">
+        <span class="cl-prac-detail-lvl">${escHtml(String(p.level || '•').slice(0,2))}</span>
+        <span class="cl-prac-detail-name">${escHtml(p.name)}</span>
+        <button class="cl-drawer-x" onclick="closePracDetail('${capId}')" title="Close">✕</button>
+      </div>
+      <div class="cl-prac-detail-desc" ${p.description ? '' : 'style="opacity:.5"'}>${escHtml(p.description || 'No description yet.')}</div>
+      <div class="cap-add-form-row" style="justify-content:flex-start">
+        <button class="btn btn-sm" onclick="showEditPracForm('${p.id}','${capId}')">Edit</button>
+        <button class="btn btn-sm cl-del" onclick="deletePrac('${p.id}','${capId}')">Delete</button>
+      </div>
+      <div id="editPracArea_${p.id}"></div>
+    </div>`;
 }
 
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function toggleCapCard(capId) {
-  document.getElementById('capCard_' + capId)?.classList.toggle('open');
+function openCapDrawer(capId) {
+  _capDrawerId = capId;
+  _capPracDetailId = null;
+  renderCapabilitiesPage();
+}
+function closeCapDrawer() {
+  _capDrawerId = null;
+  _capPracDetailId = null;
+  renderCapabilitiesPage();
+}
+function showPracDetail(pracId, capId) {
+  _capPracDetailId = (_capPracDetailId === pracId) ? null : pracId;
+  renderCapabilitiesPage();
+}
+function closePracDetail(capId) {
+  _capPracDetailId = null;
+  renderCapabilitiesPage();
 }
 
 function showAddCapForm() {
   const area = document.getElementById('addCapFormArea');
   if (!area) return;
+  const domOpts = CAP_DOMAINS.map(d => `<option value="${escHtml(d.name)}">${escHtml(d.name)}</option>`).join('');
   area.innerHTML = `
-    <div class="cap-add-form" style="margin-bottom:8px;">
+    <div class="cap-add-form" style="margin:8px 0;">
       <input id="newCapName" placeholder="Capability name" />
+      <select id="newCapDomain" style="width:100%;padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:11px;">
+        <option value="">— Select domain —</option>${domOpts}
+      </select>
       <textarea id="newCapDesc" placeholder="Description (optional)" rows="2"></textarea>
       <div class="cap-add-form-row">
         <button class="btn btn-sm" onclick="document.getElementById('addCapFormArea').innerHTML=''">Cancel</button>
@@ -2471,10 +2606,14 @@ function showAddCapForm() {
 async function createCap() {
   const name = document.getElementById('newCapName')?.value.trim();
   const description = document.getElementById('newCapDesc')?.value.trim();
+  const domain = document.getElementById('newCapDomain')?.value || null;
   if (!name) return;
   try {
-    const cap = await api('POST', '/capabilities', { name, description });
+    const cap = await api('POST', '/capabilities', { name, description, domain });
+    if (!cap.practices) cap.practices = [];
     capabilitiesLibrary.push(cap);
+    syncCapabilitiesToItems();
+    _capDrawerId = cap.id; // open the new capability so the user can add practices
     renderCapabilitiesPage();
   } catch(e) { alert('Error: ' + (e.message || e)); }
 }
@@ -2482,36 +2621,34 @@ async function createCap() {
 function showEditCapForm(capId) {
   const cap = capabilitiesLibrary.find(c => c.id === capId);
   if (!cap) return;
-  const card = document.getElementById('capCard_' + capId);
-  if (!card) return;
-  // Open the card first
-  card.classList.add('open');
-  // Show inline edit form at top of body
-  const body = card.querySelector('.cap-card-body');
-  const formId = 'editCapForm_' + capId;
-  if (document.getElementById(formId)) return;
-  const form = document.createElement('div');
-  form.id = formId;
-  form.className = 'cap-add-form';
-  form.style.marginBottom = '8px';
-  form.innerHTML = `
-    <input id="editCapName_${capId}" value="${escHtml(cap.name)}" placeholder="Capability name" />
-    <textarea id="editCapDesc_${capId}" rows="2" placeholder="Description">${escHtml(cap.description||'')}</textarea>
-    <div class="cap-add-form-row">
-      <button class="btn btn-sm" onclick="document.getElementById('${formId}').remove()">Cancel</button>
-      <button class="btn btn-sm btn-primary" onclick="updateCap('${capId}')">Save</button>
+  const area = document.getElementById('editCapArea_' + capId);
+  if (!area) return;
+  const domOpts = CAP_DOMAINS.map(d => `<option value="${escHtml(d.name)}" ${d.name === cap.domain ? 'selected' : ''}>${escHtml(d.name)}</option>`).join('');
+  area.innerHTML = `
+    <div class="cap-add-form" style="margin-bottom:12px;">
+      <input id="editCapName_${capId}" value="${escHtml(cap.name)}" placeholder="Capability name" />
+      <select id="editCapDomain_${capId}" style="width:100%;padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:11px;">
+        <option value="">— No domain —</option>${domOpts}
+      </select>
+      <textarea id="editCapDesc_${capId}" rows="3" placeholder="Description">${escHtml(cap.description||'')}</textarea>
+      <div class="cap-add-form-row">
+        <button class="btn btn-sm" onclick="document.getElementById('editCapArea_${capId}').innerHTML=''">Cancel</button>
+        <button class="btn btn-sm btn-primary" onclick="updateCap('${capId}')">Save</button>
+      </div>
     </div>`;
-  body.insertBefore(form, body.firstChild);
+  document.getElementById('editCapName_' + capId)?.focus();
 }
 
 async function updateCap(capId) {
   const name = document.getElementById('editCapName_' + capId)?.value.trim();
   const description = document.getElementById('editCapDesc_' + capId)?.value.trim();
+  const domain = document.getElementById('editCapDomain_' + capId)?.value || null;
   if (!name) return;
   try {
-    await api('PUT', '/capabilities/' + capId, { name, description });
+    await api('PUT', '/capabilities/' + capId, { name, description, domain });
     const cap = capabilitiesLibrary.find(c => c.id === capId);
-    if (cap) { cap.name = name; cap.description = description; }
+    if (cap) { cap.name = name; cap.description = description; cap.domain = domain; }
+    syncCapabilitiesToItems();
     renderCapabilitiesPage();
   } catch(e) { alert('Error: ' + (e.message || e)); }
 }
@@ -2521,8 +2658,10 @@ async function deleteCap(capId) {
   try {
     await api('DELETE', '/capabilities/' + capId);
     capabilitiesLibrary = capabilitiesLibrary.filter(c => c.id !== capId);
+    if (_capDrawerId === capId) { _capDrawerId = null; _capPracDetailId = null; }
     // Remove from any boardMarkers
     boardMarkers = boardMarkers.map(m => m.capabilityId === capId ? {...m, capabilityId: null, practiceIds: []} : m);
+    syncCapabilitiesToItems();
     renderCapabilitiesPage();
     renderFitnessPanel(); updateStats(); scheduleAutoSave();
   } catch(e) { alert('Error: ' + (e.message || e)); }
@@ -2532,8 +2671,9 @@ function showAddPracForm(capId) {
   const area = document.getElementById('addPracFormArea_' + capId);
   if (!area) return;
   area.innerHTML = `
-    <div class="cap-add-form" style="margin-bottom:4px;">
+    <div class="cap-add-form" style="margin:12px 0 4px;">
       <input id="newPracName_${capId}" placeholder="Practice name" />
+      <input id="newPracLevel_${capId}" maxlength="2" placeholder="Level badge (e.g. F, D) — optional" />
       <textarea id="newPracDesc_${capId}" placeholder="Description (optional)" rows="2"></textarea>
       <div class="cap-add-form-row">
         <button class="btn btn-sm" onclick="document.getElementById('addPracFormArea_${capId}').innerHTML=''">Cancel</button>
@@ -2546,13 +2686,14 @@ function showAddPracForm(capId) {
 async function createPrac(capId) {
   const name = document.getElementById('newPracName_' + capId)?.value.trim();
   const description = document.getElementById('newPracDesc_' + capId)?.value.trim();
+  const level = document.getElementById('newPracLevel_' + capId)?.value.trim() || null;
   if (!name) return;
   try {
-    const prac = await api('POST', '/capabilities/' + capId + '/practices', { name, description });
+    const prac = await api('POST', '/capabilities/' + capId + '/practices', { name, description, level });
     const cap = capabilitiesLibrary.find(c => c.id === capId);
     if (cap) cap.practices.push(prac);
+    syncCapabilitiesToItems();
     renderCapabilitiesPage();
-    document.getElementById('capCard_' + capId)?.classList.add('open');
   } catch(e) { alert('Error: ' + (e.message || e)); }
 }
 
@@ -2560,32 +2701,33 @@ function showEditPracForm(pracId, capId) {
   const cap = capabilitiesLibrary.find(c => c.id === capId);
   const prac = cap?.practices.find(p => p.id === pracId);
   if (!prac) return;
-  const item = document.getElementById('pracItem_' + pracId);
-  if (!item) return;
-  const formId = 'editPracForm_' + pracId;
-  if (document.getElementById(formId)) return;
-  item.insertAdjacentHTML('afterend', `
-    <div id="${formId}" class="cap-add-form" style="margin:4px 0;">
+  const area = document.getElementById('editPracArea_' + pracId);
+  if (!area) return;
+  area.innerHTML = `
+    <div class="cap-add-form" style="margin:10px 0 0;">
       <input id="editPracName_${pracId}" value="${escHtml(prac.name)}" placeholder="Practice name" />
+      <input id="editPracLevel_${pracId}" maxlength="2" value="${escHtml(prac.level||'')}" placeholder="Level badge (e.g. F, D) — optional" />
       <textarea id="editPracDesc_${pracId}" rows="2" placeholder="Description">${escHtml(prac.description||'')}</textarea>
       <div class="cap-add-form-row">
-        <button class="btn btn-sm" onclick="document.getElementById('${formId}').remove()">Cancel</button>
+        <button class="btn btn-sm" onclick="document.getElementById('editPracArea_${pracId}').innerHTML=''">Cancel</button>
         <button class="btn btn-sm btn-primary" onclick="updatePrac('${pracId}','${capId}')">Save</button>
       </div>
-    </div>`);
+    </div>`;
+  document.getElementById('editPracName_' + pracId)?.focus();
 }
 
 async function updatePrac(pracId, capId) {
   const name = document.getElementById('editPracName_' + pracId)?.value.trim();
   const description = document.getElementById('editPracDesc_' + pracId)?.value.trim();
+  const level = document.getElementById('editPracLevel_' + pracId)?.value.trim() || null;
   if (!name) return;
   try {
-    await api('PUT', '/practices/' + pracId, { name, description });
+    await api('PUT', '/practices/' + pracId, { name, description, level });
     const cap = capabilitiesLibrary.find(c => c.id === capId);
     const prac = cap?.practices.find(p => p.id === pracId);
-    if (prac) { prac.name = name; prac.description = description; }
+    if (prac) { prac.name = name; prac.description = description; prac.level = level; }
+    syncCapabilitiesToItems();
     renderCapabilitiesPage();
-    document.getElementById('capCard_' + capId)?.classList.add('open');
   } catch(e) { alert('Error: ' + (e.message || e)); }
 }
 
@@ -2595,10 +2737,11 @@ async function deletePrac(pracId, capId) {
     await api('DELETE', '/practices/' + pracId);
     const cap = capabilitiesLibrary.find(c => c.id === capId);
     if (cap) cap.practices = cap.practices.filter(p => p.id !== pracId);
+    if (_capPracDetailId === pracId) _capPracDetailId = null;
     // Remove from any boardMarkers
     boardMarkers = boardMarkers.map(m => ({...m, practiceIds: (m.practiceIds||[]).filter(id => id !== pracId)}));
+    syncCapabilitiesToItems();
     renderCapabilitiesPage();
-    document.getElementById('capCard_' + capId)?.classList.add('open');
     renderFitnessPanel(); updateStats(); scheduleAutoSave();
   } catch(e) { alert('Error: ' + (e.message || e)); }
 }

@@ -976,24 +976,29 @@ app.get('/api/capabilities', async (req, res) => {
 });
 
 app.post('/api/capabilities', async (req, res) => {
-  const { name, description } = req.body;
+  const { name, description, domain } = req.body;
   if (!name) return res.status(400).json({ error: 'name required' });
   try {
+    await db.query('ALTER TABLE capabilities ADD COLUMN IF NOT EXISTS domain TEXT');
     const { rows } = await db.query(
-      'INSERT INTO capabilities (name, description) VALUES ($1, $2) RETURNING *',
-      [name, description || null]
+      'INSERT INTO capabilities (name, description, domain) VALUES ($1, $2, $3) RETURNING *',
+      [name, description || null, domain || null]
     );
     res.status(201).json({ ...rows[0], practices: [] });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.put('/api/capabilities/:id', async (req, res) => {
-  const { name, description } = req.body;
+  const { name, description, domain } = req.body;
   try {
-    const { rows } = await db.query(
-      'UPDATE capabilities SET name=$1, description=$2 WHERE id=$3 RETURNING *',
-      [name, description || null, req.params.id]
-    );
+    await db.query('ALTER TABLE capabilities ADD COLUMN IF NOT EXISTS domain TEXT');
+    // domain is only overwritten when the key is present in the body (undefined = leave as-is)
+    const setDomain = Object.prototype.hasOwnProperty.call(req.body, 'domain');
+    const { rows } = setDomain
+      ? await db.query('UPDATE capabilities SET name=$1, description=$2, domain=$3 WHERE id=$4 RETURNING *',
+          [name, description || null, domain || null, req.params.id])
+      : await db.query('UPDATE capabilities SET name=$1, description=$2 WHERE id=$3 RETURNING *',
+          [name, description || null, req.params.id]);
     if (!rows.length) return res.status(404).json({ error: 'Not found' });
     res.json(rows[0]);
   } catch (err) { res.status(500).json({ error: err.message }); }
@@ -1008,24 +1013,28 @@ app.delete('/api/capabilities/:id', async (req, res) => {
 });
 
 app.post('/api/capabilities/:capId/practices', async (req, res) => {
-  const { name, description } = req.body;
+  const { name, description, level } = req.body;
   if (!name) return res.status(400).json({ error: 'name required' });
   try {
+    await db.query('ALTER TABLE practices ADD COLUMN IF NOT EXISTS level TEXT');
     const { rows } = await db.query(
-      'INSERT INTO practices (capability_id, name, description) VALUES ($1, $2, $3) RETURNING *',
-      [req.params.capId, name, description || null]
+      'INSERT INTO practices (capability_id, name, description, level) VALUES ($1, $2, $3, $4) RETURNING *',
+      [req.params.capId, name, description || null, level || null]
     );
     res.status(201).json(rows[0]);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.put('/api/practices/:id', async (req, res) => {
-  const { name, description } = req.body;
+  const { name, description, level } = req.body;
   try {
-    const { rows } = await db.query(
-      'UPDATE practices SET name=$1, description=$2 WHERE id=$3 RETURNING *',
-      [name, description || null, req.params.id]
-    );
+    await db.query('ALTER TABLE practices ADD COLUMN IF NOT EXISTS level TEXT');
+    const setLevel = Object.prototype.hasOwnProperty.call(req.body, 'level');
+    const { rows } = setLevel
+      ? await db.query('UPDATE practices SET name=$1, description=$2, level=$3 WHERE id=$4 RETURNING *',
+          [name, description || null, level || null, req.params.id])
+      : await db.query('UPDATE practices SET name=$1, description=$2 WHERE id=$3 RETURNING *',
+          [name, description || null, req.params.id]);
     if (!rows.length) return res.status(404).json({ error: 'Not found' });
     res.json(rows[0]);
   } catch (err) { res.status(500).json({ error: err.message }); }
