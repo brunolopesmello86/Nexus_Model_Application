@@ -589,7 +589,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 
 /* ══ CAPABILITIES LIBRARY PAGE ══ */
 .bvt-bar { display:flex; gap:0; padding:0; background:var(--surface); border-bottom:1px solid var(--border); flex-shrink:0; }
-.bvt-btn { padding:7px 14px; font-size:11px; font-weight:600; border:none; border-bottom:2px solid transparent; background:transparent; color:var(--text-muted); cursor:pointer; transition:all .15s; }
+.bvt-btn { padding:11px 20px; font-size:13px; font-weight:600; border:none; border-bottom:2px solid transparent; background:transparent; color:var(--text-muted); cursor:pointer; transition:all .15s; }
 .bvt-btn.active { border-bottom-color:var(--cyan); color:var(--text); }
 .bvt-btn:hover:not(.active) { color:var(--text); background:rgba(255,255,255,.03); }
 /* ══ EXPERIMENT TRACKER (Kanban) ══ */
@@ -1301,11 +1301,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
       <div class="board-map" id="boardMap">
         <!-- View tabs -->
         <div class="bvt-bar">
-          <button class="bvt-btn active" id="bvtBoard" onclick="switchBoardView('board')">⬡ Board</button>
-          <button class="bvt-btn" id="bvtAnchors" onclick="switchBoardView('anchors')">🎯 Anchors</button>
-          <button class="bvt-btn" id="bvtExps" onclick="switchBoardView('experiments')">🧪 Experiments</button>
           <button class="bvt-btn" id="bvtCaps" onclick="switchBoardView('capabilities')">◈ Capabilities Library</button>
-          <button class="bvt-btn" id="bvtReport" onclick="switchBoardView('report')">📋 Cycle Report</button>
+          <button class="bvt-btn" id="bvtAnchors" onclick="switchBoardView('anchors')">🎯 Anchors</button>
+          <button class="bvt-btn active" id="bvtBoard" onclick="switchBoardView('board')">⬡ Board</button>
+          <button class="bvt-btn" id="bvtExps" onclick="switchBoardView('experiments')">🧪 Experiments</button>
+          <button class="bvt-btn" id="bvtReport" onclick="switchBoardView('report')">📋 Org Fit Report</button>
         </div>
         <!-- Anchor Mapping page (hidden until tab active) -->
         <div id="anchorsPage" class="anchors-page" style="display:none;"></div>
