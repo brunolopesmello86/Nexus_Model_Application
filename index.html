@@ -151,7 +151,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .gs-pw-error { color:#d94a4a; font-size:12px; margin-bottom:8px; display:none; }
 
 /* ══ ANCHOR MAPPING ══ */
-.anchors-page { flex:1; overflow-y:auto; background:var(--bg); padding:20px 24px; display:none; }
+.anchors-page { flex:1; flex-direction:column; overflow-y:auto; background:var(--bg); padding:20px 24px; display:none; }
+.am-inner { max-width:1200px; width:100%; margin:0 auto; }
 .am-hdr { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px; gap:20px; }
 .am-title { font-size:20px; font-weight:700; color:var(--text); margin-bottom:4px; }
 .am-subtitle { font-size:12px; color:var(--text-muted); max-width:640px; line-height:1.5; }
@@ -1926,6 +1927,7 @@ function renderAnchorsPage() {
     .map(c => `<option value="${c.id}">${c.name}${c.domain?' — '+c.domain:''}</option>`).join('');
 
   page.innerHTML = `
+    <div class="am-inner">
     <div class="am-hdr">
       <div>
         <div class="am-title">🎯 Anchor Mapping &amp; Org-Fitness Assessment</div>
@@ -1975,6 +1977,7 @@ function renderAnchorsPage() {
       ${total === 0
         ? `<div class="am-empty">No anchors mapped yet. Start by adding one above — either from the capabilities library or as freeform.</div>`
         : anchors.map(a => amRenderCard(a)).join('')}
+    </div>
     </div>
   `;
 }
