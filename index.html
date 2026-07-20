@@ -5007,7 +5007,7 @@ function renderReportPage() {
 function generateCyclePDF() {
   if (!window.jspdf || !window.jspdf.jsPDF) { alert('PDF library loading — please try again in a moment.'); return; }
   const { jsPDF } = window.jspdf;
-  const W = 297, H = 210, CY = 38;
+  const W = 297, H = 210, CY = 36;
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
   // ── data ───────────────────────────────────────────────────────────────
@@ -5018,7 +5018,6 @@ function generateCyclePDF() {
   const dateStr  = now.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
   const monthYear = now.toLocaleDateString('en-US', { month:'long', year:'numeric' });
   const fitTier = f>=80?'Antifragile':f>=60?'Resilient':f>=40?'Stable':f>=20?'Emerging':'Fragile';
-  const fitHex  = f>=80?'#38b2a0':f>=60?'#2d9d5e':f>=40?'#e8943a':f>=20?'#e8943a':'#d94a4a';
 
   const boardItems = Object.values(gridState).map(id => resolveItem(id)).filter(Boolean);
   const pCount = boardItems.filter(i => i.type==='pattern').length;
@@ -5047,317 +5046,280 @@ function generateCyclePDF() {
     return { name:d.name, dp:di.filter(i=>i.type==='pattern').length, da:di.filter(i=>i.type==='antipattern').length, dt:di.filter(i=>i.type==='transition').length, de:expE.filter(([k]) => dHex.some(h=>k===h||k.startsWith(h))).length };
   });
 
-  // ── Theme detection ─────────────────────────────────────────────────────
-  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-  // Color palette — dark (PPTX original) vs light
-  const T = isLight ? {
-    bg: '#eef1f6', surface: '#ffffff', surface2: '#e4e8ef', card: '#ffffff',
-    cardAlt: '#f5f7fa', rowEven: '#f5f7fa', rowOdd: '#eef1f6',
-    border: '#c4c9d4', barTrack: '#d8dce4', separator: '#d8dce4',
-    text: '#1a1e26', textMuted: '#5a6370', textSub: '#6b7280',
-    footer: '#8890a0', hexDeco: '#d0d5de',
-    panelA: '#e4e8ef', panelB: '#f0f2f7',
-    phaseDoneBg: '#e8f5ee', phaseActiveBg: '#e0ecf8', phaseNextBg: '#f5f7fa',
-    totalRow: '#dce2ec',
-  } : {
-    bg: '#0f1218', surface: '#171c24', surface2: '#1a1f2a', card: '#1e2430',
-    cardAlt: '#171c24', rowEven: '#1a1f2a', rowOdd: '#171c24',
-    border: '#2a3140', barTrack: '#2a3140', separator: '#1e2430',
-    text: '#e8ecf1', textMuted: '#7d8694', textSub: '#aab0bc',
-    footer: '#4c525c', hexDeco: '#2a3140',
-    panelA: '#171c24', panelB: '#1e2430',
-    phaseDoneBg: '#162a1e', phaseActiveBg: '#1a2a45', phaseNextBg: '#1e2430',
-    totalRow: '#232940',
-  };
+  // ── Executive palette — matches the Org Fit Report tab (navy / orange) ──
+  const NAVY='#0a2a66', NAVY2='#123c86', NAVY3='#0a5bb5', BLUE='#0072ce', BRIGHT='#0091da';
+  const ORANGE='#f5821f', GREEN='#2e9e4f', GRAY='#7c8aa5';
+  const PAGE='#eef2f8', CARD='#ffffff', LINE='#e3eaf5', TRACK='#e6ecf6', ROWBG='#f6f9fd';
+  const MUT='#5a6b84', SUB='#8698b5', DARK='#1d2b45', LBLUE='#8fb4e8';
+  const tierHex = f>=80?'#00b5ad':f>=60?GREEN:f>=40?BLUE:f>=20?ORANGE:'#d94a4a';
 
-  // ── PPTX-style helpers ─────────────────────────────────────────────────
+  // ── helpers ─────────────────────────────────────────────────────────────
   const F = h => doc.setFillColor(h);
   const C = h => doc.setTextColor(h);
   const P = h => doc.setDrawColor(h);
-  const BG = () => { F(T.bg); doc.rect(0,0,W,H,'F'); };
-  const card = (x,y,w,h,c) => { F(c||T.card); doc.roundedRect(x,y,w,h,2,2,'F'); };
-  const cardTop = (x,y,w,h,topC,bodyC) => { card(x,y,w,h,bodyC||T.card); F(topC); doc.rect(x+0.5,y,w-1,1.2,'F'); };
-  const bar  = (x,y,w,h,pct,c) => { F(T.barTrack); doc.roundedRect(x,y,w,h,1,1,'F'); if(pct>0){ F(c); doc.roundedRect(x,y,w*Math.min(1,pct/100),h,1,1,'F'); } };
-  const footer = () => { doc.setFont('helvetica','normal'); doc.setFontSize(9); C(T.footer); doc.text('Nexus Transformation Board \u2014 Confidential', W/2, H-5, { align:'center' }); };
+  const BG = () => { F(PAGE); doc.rect(0,0,W,H,'F'); };
+  const NAVYBG = () => { F('#071e4d'); doc.rect(0,0,W,H,'F'); F('#0d3a8f'); doc.circle(W+10, 30, 90, 'F'); F('#0a2a66'); doc.circle(W-60, H+40, 80, 'F'); F('#0c3579'); doc.circle(-20, H-10, 60, 'F'); };
+  const card = (x,y,w,h,c) => { F(c||CARD); P(LINE); doc.setLineWidth(0.3); doc.roundedRect(x,y,w,h,2.5,2.5,'FD'); };
+  const pill = (x,y,w,h,c,label,fs) => { F(c); doc.roundedRect(x,y,w,h,h/2,h/2,'F'); doc.setFont('helvetica','bold'); doc.setFontSize(fs||7); C('#ffffff'); doc.text(label, x+w/2, y+h/2+(fs||7)*0.155, { align:'center' }); };
+  const track = (x,y,w,h,pct,c) => { F(TRACK); doc.roundedRect(x,y,w,h,h/2,h/2,'F'); if(pct>0){ F(c); doc.roundedRect(x,y,Math.max(h,w*Math.min(1,pct/100)),h,h/2,h/2,'F'); } };
+  const footer = () => { doc.setFont('helvetica','normal'); doc.setFontSize(8); C(SUB); doc.text('Nexus Transformation Board — Org Fitness Model · Confidential', W/2, H-5, { align:'center' }); };
 
-  // Decorative hexagon (outline only)
-  function drawHex(cx, cy, r, color, alpha) {
-    P(color); doc.setLineWidth(0.5);
-    const pts = [];
-    for (let i = 0; i < 6; i++) { const a = Math.PI/6 + i*Math.PI/3; pts.push([cx+r*Math.cos(a), cy+r*Math.sin(a)]); }
-    doc.line(pts[0][0],pts[0][1],pts[1][0],pts[1][1]);
-    doc.line(pts[1][0],pts[1][1],pts[2][0],pts[2][1]);
-    doc.line(pts[2][0],pts[2][1],pts[3][0],pts[3][1]);
-    doc.line(pts[3][0],pts[3][1],pts[4][0],pts[4][1]);
-    doc.line(pts[4][0],pts[4][1],pts[5][0],pts[5][1]);
-    doc.line(pts[5][0],pts[5][1],pts[0][0],pts[0][1]);
-  }
-
-  // PPTX-style content page header
+  // Content page header — navy strip with orange rule (deck style)
   function hdr(title, sub) {
     BG();
-    // Small accent bar (left side, teal)
-    F('#38b2a0'); doc.rect(10, 8, 1.5, 14, 'F');
-    // Badge text
-    doc.setFont('helvetica','bold'); doc.setFontSize(9); C('#38b2a0'); doc.text('NEXUS TRANSFORMATION BOARD', 15, 12);
-    // Title — 20pt bold
-    doc.setFont('helvetica','bold'); doc.setFontSize(20); C(T.text); doc.text(title, 15, 24);
-    // Subtitle — 10pt
-    doc.setFont('helvetica','normal'); doc.setFontSize(10); C(T.textMuted); doc.text(sub, 15, 31);
-    // Right-side meta
-    doc.setFont('helvetica','normal'); doc.setFontSize(9); C(T.textMuted);
-    doc.text(`Cycle ${cycleNumber}  \u00b7  ${monthYear}`, W-10, 14, { align:'right' });
-    doc.text(`Phase ${cyclePhase+1}/5  \u00b7  ${ph.n}`, W-10, 22, { align:'right' });
-    // Thin separator
-    P(T.separator); doc.setLineWidth(0.3); doc.line(10, 34, W-10, 34);
+    F(NAVY); doc.rect(0, 0, W, 20, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(15); C('#ffffff'); doc.text(title, 12, 13);
+    doc.setFont('helvetica','bold'); doc.setFontSize(7); C('#5a8fd6'); doc.text('NEXUS TRANSFORMATION BOARD', W-12, 12.5, { align:'right' });
+    F(ORANGE); doc.rect(0, 20, W, 1.8, 'F');
+    doc.setFont('helvetica','italic'); doc.setFontSize(9); C(MUT); doc.text(sub, 12, 29.5);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8); C(SUB);
+    doc.text('Cycle ' + cycleNumber + ' · ' + monthYear + ' · Phase ' + (cyclePhase+1) + '/5 (' + ph.n + ')', W-12, 29.5, { align:'right' });
     footer();
   }
 
   // ══════════════════════════════════════════════════════════════════════
-  // PAGE 1 — COVER (PPTX Slide 1 style)
+  // PAGE 1 — COVER (deck slide 1 style)
   // ══════════════════════════════════════════════════════════════════════
-  BG();
-  // Right panel overlays
-  F(T.panelA); doc.rect(W*0.52, 0, W*0.48, H, 'F');
-  F(T.panelB); doc.rect(W*0.56, 0, W*0.44, H, 'F');
-  // Decorative hexagons on right panel
-  drawHex(W*0.68, 30, 14, T.hexDeco);
-  drawHex(W*0.82, 22, 10, T.hexDeco);
-  drawHex(W*0.90, 55, 8, T.hexDeco);
-  drawHex(W*0.62, H-40, 11, T.hexDeco);
-  drawHex(W*0.78, H-30, 16, T.hexDeco);
-  drawHex(W*0.92, H-55, 9, T.hexDeco);
-  // Teal dot accent
-  F('#38b2a0'); doc.circle(32, 68, 2.5, 'F');
-  // Left content
-  doc.setFont('helvetica','bold'); doc.setFontSize(9); C('#38b2a0'); doc.text('NEXUS TRANSFORMATION BOARD', 32, 58);
-  doc.setFont('helvetica','bold'); doc.setFontSize(36); C(T.text); doc.text('Cycle Report', 32, 88);
-  doc.setFont('helvetica','normal'); doc.setFontSize(14); C(T.textMuted); doc.text(`Cycle ${cycleNumber} \u2014 ${dateStr}`, 32, 100);
-  doc.setFont('helvetica','normal'); doc.setFontSize(11); C(T.textMuted); doc.text(`Phase ${cyclePhase+1}/5 \u2014 ${ph.n}`, 32, 110);
-  // Stats row on right panel
-  [{ l:'Fitness', v:`${f} pts`, c:fitHex }, { l:'Status', v:fitTier, c:fitHex }, { l:'Phase', v:ph.n, c:'#4a90d9' }].forEach((k,i) => {
-    const x = W*0.59+i*40, y = H/2-14;
-    cardTop(x, y, 36, 28, k.c);
-    doc.setFont('helvetica','normal'); doc.setFontSize(7); C(T.textMuted); doc.text(k.l, x+18, y+10, { align:'center' });
-    doc.setFont('helvetica','bold'); doc.setFontSize(13); C(k.c); doc.text(k.v, x+18, y+22, { align:'center' });
-  });
-  footer();
+  NAVYBG();
+  const badge = 'CYCLE ' + cycleNumber + ' REVIEW  ·  NEXUS TRANSFORMATION BOARD';
+  doc.setFont('helvetica','bold'); doc.setFontSize(8);
+  const bw = doc.getTextWidth(badge) + 16;
+  F(ORANGE); doc.roundedRect(24, 42, bw, 11, 5.5, 5.5, 'F');
+  C('#ffffff'); doc.text(badge, 32, 49);
+  doc.setFont('helvetica','bold'); doc.setFontSize(38); C('#ffffff');
+  doc.text('Transformation', 24, 82);
+  doc.text('Cycle Report', 24, 100);
+  F(ORANGE); doc.rect(24, 110, 70, 1.6, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(13); C('#63b3ff');
+  doc.text('Governance & Progress Review  ·  Org Fitness Model', 24, 122);
+  doc.setFont('helvetica','normal'); doc.setFontSize(10); C('#9db4d8');
+  doc.text('Nexus Transformation Board · Enterprise Transformation Codex', 24, 131);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); C('#5a7db3');
+  doc.text('Cycle ' + cycleNumber + ' · ' + monthYear + ' · Confidential', 24, H-16);
+  // fitness chip (right)
+  F('#0d3a8f'); doc.roundedRect(W-102, H-64, 82, 36, 3, 3, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7); C(LBLUE); doc.text('ORGANIZATIONAL FITNESS', W-61, H-55, { align:'center' });
+  doc.setFont('helvetica','bold'); doc.setFontSize(19); C('#ffffff'); doc.text(f + ' / 100', W-61, H-44, { align:'center' });
+  pill(W-84, H-40, 46, 7, tierHex, fitTier.toUpperCase(), 6.5);
 
   // ══════════════════════════════════════════════════════════════════════
   // PAGE 2 — AT A GLANCE
   // ══════════════════════════════════════════════════════════════════════
   doc.addPage();
-  hdr(`Cycle ${cycleNumber} \u2014 At a Glance`, 'Executive dashboard: fitness, phase, experiments, board composition');
-  const kpis = [
-    { l:'Org Fitness Score',  v:`${f}`,              d:`/ 100 pts \u00b7 ${fitTier}`,                      c:fitHex    },
-    { l:'M\u00f6bius Phase',       v:ph.n,                d:ph.d.substring(0,42),                          c:'#4a90d9' },
-    { l:'S2F Experiments',    v:`${expE.length}`,    d:`${expPassed} passed  \u00b7  ${expRunning} running`,c:'#e8943a' },
-    { l:'Patterns on Board',  v:`${pCount}`,         d:`${aCount} anti  \u00b7  ${tCount} trans  \u00b7  ${cCount} caps`,    c:'#2d9d5e' },
-    { l:'Agents & Drivers',   v:`${agTotal+drTotal}`,d:`${agTotal} agents  \u00b7  ${drTotal} drivers`,    c:'#7b5ea7' },
+  hdr('Cycle ' + cycleNumber + ' At a Glance', 'Executive dashboard — current fitness, phase, and key indicators');
+  // Left navy score card
+  F(NAVY); doc.roundedRect(10, CY, 88, 158, 3, 3, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); C(LBLUE);
+  doc.text('ORGANIZATIONAL', 54, CY+16, { align:'center' });
+  doc.text('FITNESS SCORE', 54, CY+23, { align:'center' });
+  doc.setFont('helvetica','bold'); doc.setFontSize(64); C('#ffffff'); doc.text(String(f), 54, CY+72, { align:'center' });
+  doc.setFont('helvetica','normal'); doc.setFontSize(12); C(LBLUE); doc.text('/ 100', 54, CY+84, { align:'center' });
+  P('#3d5a96'); doc.setLineWidth(0.4); doc.line(24, CY+94, 84, CY+94);
+  pill(29, CY+102, 50, 10, tierHex, fitTier.toUpperCase(), 8);
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); C(LBLUE);
+  doc.text(bd.expRan + ' experiments run · ' + bd.expAdopted + ' adopted', 54, CY+126, { align:'center' });
+  doc.text(bd.totalReps + ' practice repetitions', 54, CY+133, { align:'center' });
+  // Phase card
+  card(104, CY, W-114, 42);
+  F(BLUE); doc.roundedRect(110, CY+8, 26, 26, 3, 3, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(20); C('#ffffff'); doc.text(String(cyclePhase+1), 123, CY+26, { align:'center' });
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5); C(MUT); doc.text('CURRENT MÖBIUS PHASE', 144, CY+13);
+  doc.setFont('helvetica','bold'); doc.setFontSize(16); C(NAVY); doc.text(ph.n, 144, CY+23);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); C(MUT); doc.text(doc.splitTextToSize(ph.d, W-170)[0]||'', 144, CY+31);
+  // 4 stat tiles
+  const tiles = [
+    { v:String(expE.length), n:'Active', n2:'Experiments', d:expPassed + ' passed · ' + expRunning + ' running · ' + expPending + ' pending', c:NAVY },
+    { v:String(pCount), n:'Patterns', n2:'on Board', d:aCount + ' anti · ' + tCount + ' trans · ' + cCount + ' caps', c:NAVY2 },
+    { v:String(agTotal), n:'Agents', n2:'Assigned', d:'across board hexes', c:NAVY3 },
+    { v:String(drTotal), n:'Drivers', n2:'& Links', d:nexusL + ' nexus lines', c:BLUE },
   ];
-  kpis.forEach((k,i) => {
-    const x = 10+i*56, y = CY+2, kW = 52, kH = 58;
-    cardTop(x, y, kW, kH, k.c);
-    doc.setFont('helvetica','normal'); doc.setFontSize(8); C(T.textMuted); doc.text(k.l, x+kW/2, y+12, { align:'center' });
-    doc.setFont('helvetica','bold'); doc.setFontSize(22); C(k.c); doc.text(k.v, x+kW/2, y+32, { align:'center' });
-    doc.setFont('helvetica','normal'); doc.setFontSize(7); C(T.textMuted);
-    const dl = doc.splitTextToSize(k.d, kW-6);
-    doc.text(dl[0]||k.d, x+kW/2, y+42, { align:'center' });
-    if (dl[1]) doc.text(dl[1], x+kW/2, y+49, { align:'center' });
-  });
-  // Board Composition card
-  cardTop(10, 106, W-20, 94, '#4a90d9');
-  doc.setFont('helvetica','bold'); doc.setFontSize(12); C(T.text); doc.text('Board Composition', 18, 118);
-  doc.setFont('helvetica','normal'); doc.setFontSize(8); C(T.textMuted); doc.text('Hex types distribution across the Nexus board', 18, 126);
-  const total = pCount+aCount+tCount+cCount||1;
-  [{ l:'Patterns', n:pCount, c:'#4a90d9' }, { l:'Anti-Patterns', n:aCount, c:'#d94a4a' }, { l:'Transitions', n:tCount, c:'#7b8794' }, { l:'Capabilities', n:cCount, c:'#38b2a0' }].forEach((b,i) => {
-    const by = 134+i*15;
-    doc.setFont('helvetica','normal'); doc.setFontSize(9); C(T.text); doc.text(b.l, 18, by+5);
-    doc.setFont('helvetica','bold'); doc.setFontSize(9); C(T.text); doc.text(String(b.n), 68, by+5, { align:'right' });
-    bar(72, by, 190, 8, (b.n/total)*100, b.c);
-    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); C(T.textMuted); doc.text(`${Math.round(b.n/total*100)}%`, 266, by+5);
+  const tW = (W-114-24)/4;
+  tiles.forEach((t,i) => {
+    const x = 104 + i*(tW+8), y = CY+50;
+    card(x, y, tW, 108);
+    F(t.c); doc.roundedRect(x+tW/2-14, y+12, 28, 18, 2.5, 2.5, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(15); C('#ffffff'); doc.text(t.v, x+tW/2, y+24.5, { align:'center' });
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); C(NAVY);
+    doc.text(t.n, x+tW/2, y+44, { align:'center' });
+    doc.text(t.n2, x+tW/2, y+51, { align:'center' });
+    doc.setFont('helvetica','normal'); doc.setFontSize(7); C(MUT);
+    doc.splitTextToSize(t.d, tW-8).slice(0,3).forEach((ln,li)=>doc.text(ln, x+tW/2, y+64+li*6.5, { align:'center' }));
   });
 
   // ══════════════════════════════════════════════════════════════════════
-  // PAGE 3 — FITNESS SCORE BREAKDOWN
+  // PAGE 3 — FITNESS SCORE
   // ══════════════════════════════════════════════════════════════════════
   doc.addPage();
-  hdr('Organizational Fitness Score', `Score components and tier progress \u2014 Cycle ${cycleNumber}`);
-  // Left card: Score Components
-  cardTop(10, CY, 134, 158, '#4a90d9');
-  doc.setFont('helvetica','bold'); doc.setFontSize(12); C(T.text); doc.text('Score Components', 18, CY+14);
+  hdr('Organizational Fitness Score', 'Composite adaptive capacity score — components and tier trajectory · Cycle ' + cycleNumber);
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); C(NAVY); doc.text('Score Components — Cycle ' + cycleNumber, 10, CY+8);
   const comps = [
-    { l:'S2F Experiments Run',  d:`${bd.expRan} x 5 pts`,         s:bd.expRan*5,      max:40 },
-    { l:'Experiments Adopted',  d:`${bd.expAdopted} x 10 pts`,    s:bd.expAdopted*10, max:50 },
-    { l:'Practice Repetitions', d:`${bd.totalReps} reps x 2 pts`, s:bd.repScore,      max:30 },
+    { l:'S2F Experiments Run',  d:bd.expRan + ' experiments × 5 pts',  s:bd.expRan*5,      max:40 },
+    { l:'Experiments Adopted',  d:bd.expAdopted + ' adopted × 10 pts', s:bd.expAdopted*10, max:50 },
+    { l:'Practice Repetitions', d:bd.totalReps + ' reps × 2 pts',      s:bd.repScore,      max:30 },
   ];
-  let sy = CY+26;
-  comps.forEach(r => {
-    doc.setFont('helvetica','normal'); doc.setFontSize(10); C(T.text); doc.text(r.l, 18, sy+5);
-    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); C(T.textMuted); doc.text(r.d, 18, sy+13);
-    bar(18, sy+16, 110, 5, r.max ? Math.round(r.s/r.max*100) : 0, '#4a90d9');
-    doc.setFont('helvetica','bold'); doc.setFontSize(11); C('#4a90d9'); doc.text(`+${r.s}`, 130, sy+12, { align:'right' });
-    sy += 36;
+  comps.forEach((r,i) => {
+    const y = CY+14+i*30;
+    card(10, y, 138, 25);
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); C(NAVY); doc.text(r.l, 16, y+10);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); C(MUT); doc.text(r.d, 16, y+18);
+    track(90, y+9.5, 32, 6, r.max?Math.round(r.s/r.max*100):0, NAVY);
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); C(NAVY); doc.text(r.s + '/' + r.max, 142, y+15, { align:'right' });
   });
-  P(T.border); doc.setLineWidth(0.3); doc.line(18, sy, 134, sy);
-  doc.setFont('helvetica','bold'); doc.setFontSize(11); C(T.text); doc.text('Total Fitness Score', 18, sy+10);
-  doc.setFont('helvetica','bold'); doc.setFontSize(18); C(fitHex); doc.text(`${f} pts`, 130, sy+12, { align:'right' });
-
-  // Right card: Tier Progress
-  cardTop(150, CY, 137, 158, fitHex);
-  doc.setFont('helvetica','bold'); doc.setFontSize(12); C(T.text); doc.text('Fitness Tier Progress', 158, CY+14);
-  doc.setFont('helvetica','bold'); doc.setFontSize(42); C(fitHex); doc.text(String(f), 158, CY+48);
-  doc.setFont('helvetica','bold'); doc.setFontSize(14); C(fitHex); doc.text(fitTier, 158, CY+60);
-  bar(158, CY+65, 121, 10, f, fitHex);
-  ['Fragile','Emerging','Stable','Resilient','Antifragile'].forEach((t,i) => {
-    doc.setFont('helvetica','normal'); doc.setFontSize(6.5); C(T.textMuted); doc.text(t, 158+i*24, CY+84);
+  F(NAVY); doc.roundedRect(10, CY+106, 138, 15, 2.5, 2.5, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); C(LBLUE); doc.text('TOTAL THIS CYCLE', 16, CY+115.5);
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); C(ORANGE); doc.text(f + ' / 100 pts possible', 142, CY+115.8, { align:'right' });
+  // Right: tier card
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); C(NAVY); doc.text('Fitness Tier Progress', 156, CY+8);
+  card(156, CY+14, W-166, 128);
+  doc.setFont('helvetica','bold'); doc.setFontSize(34); C(NAVY);
+  const fw = doc.getTextWidth(String(f));
+  doc.text(String(f), 164, CY+38);
+  doc.setFontSize(13); C(tierHex); doc.text(fitTier, 168+fw, CY+38);
+  track(164, CY+46, W-190, 6, f, ORANGE);
+  ['Fragile 0-19','Emerging 20-39','Stable 40-59','Resilient 60-79','Antifragile 80+'].forEach((t,i) => {
+    doc.setFont('helvetica','bold'); doc.setFontSize(6.5); C(MUT);
+    doc.text(t, 164 + (W-190)/5*i + (W-190)/10, CY+56, { align:'center' });
   });
-  [{ k:'Experiments run', v:bd.expRan }, { k:'Experiments adopted', v:bd.expAdopted }, { k:'Practice reps', v:bd.totalReps }, { k:'Nexus lines', v:nexusL }].forEach((s,i) => {
-    const sy2 = CY+96+i*13;
-    doc.setFont('helvetica','normal'); doc.setFontSize(9); C(T.textMuted); doc.text(s.k, 158, sy2);
-    doc.setFont('helvetica','bold'); doc.setFontSize(9); C(T.text); doc.text(String(s.v), 279, sy2, { align:'right' });
+  P(TRACK); doc.setLineWidth(0.4); doc.line(164, CY+64, W-18, CY+64);
+  [{k:'Experiments run',v:bd.expRan},{k:'Experiments adopted',v:bd.expAdopted},{k:'Practice reps',v:bd.totalReps},{k:'Nexus lines',v:nexusL}].forEach((s,i) => {
+    const y2 = CY+76+i*13;
+    doc.setFont('helvetica','normal'); doc.setFontSize(9.5); C(MUT); doc.text(s.k, 164, y2);
+    doc.setFont('helvetica','bold'); doc.setFontSize(9.5); C(NAVY); doc.text(String(s.v), W-18, y2, { align:'right' });
   });
 
   // ══════════════════════════════════════════════════════════════════════
-  // PAGE 4 — MOBIUS CYCLE STATUS
+  // PAGE 4 — MÖBIUS CYCLE STATUS
   // ══════════════════════════════════════════════════════════════════════
   doc.addPage();
-  hdr(`M\u00f6bius Cycle Status \u2014 Cycle ${cycleNumber}`, `Five-phase transformation loop  \u00b7  Phase ${cyclePhase+1} (${ph.n}) active`);
-  const phW = 53, phH = 155, phY = CY+4;
+  hdr('Möbius Cycle Status — Cycle ' + cycleNumber, 'Five-phase transformation loop · Phase ' + (cyclePhase+1) + ' (' + ph.n + ') active');
+  const NAVSH = [NAVY, NAVY2, NAVY3, BLUE, '#64748f'];
+  const phW = 53, phH = 136, phY = CY+2;
   PHASES.forEach((p,i) => {
     const isDone = completedPhases.has(i) || cyclePhase > i;
     const isAct  = i === cyclePhase;
-    const bg2 = isAct ? T.phaseActiveBg : isDone ? T.phaseDoneBg : T.phaseNextBg;
-    const bdr = isAct ? '#4a90d9' : isDone ? '#2d9d5e' : T.border;
-    const tc  = isAct ? '#4a90d9' : isDone ? '#2d9d5e' : T.textMuted;
+    const headBg = isAct ? BRIGHT : isDone ? NAVSH[i] : '#8494ac';
     const x = 10+i*56;
-    card(x, phY, phW, phH, bg2);
-    // colored top bar
-    F(bdr); doc.rect(x+0.5, phY, phW-1, 1.5, 'F');
-    // 1-pt border
-    P(bdr); doc.setLineWidth(0.4); doc.roundedRect(x, phY, phW, phH, 2, 2, 'S');
-    doc.setFont('helvetica','bold'); doc.setFontSize(10); C(T.textMuted); doc.text(String(i+1), x+phW/2, phY+14, { align:'center' });
-    doc.setFont('helvetica','bold'); doc.setFontSize(28); C(tc); doc.text(['S','F','E','St','D'][i], x+phW/2, phY+38, { align:'center' });
-    doc.setFont('helvetica','bold'); doc.setFontSize(11); C(T.text); doc.text(p.n, x+phW/2, phY+52, { align:'center' });
-    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); C(T.textMuted);
-    doc.splitTextToSize(p.d, phW-8).slice(0,4).forEach((line,li) => { doc.text(line, x+phW/2, phY+64+li*9, { align:'center' }); });
-    const bt = isDone ? 'Done' : isAct ? 'Active' : 'Next';
-    const bc = isDone ? '#2d9d5e' : isAct ? '#4a90d9' : T.border;
-    F(bc); doc.roundedRect(x+10, phY+phH-18, phW-20, 12, 2, 2, 'F');
-    doc.setFont('helvetica','bold'); doc.setFontSize(8); C('#ffffff'); doc.text(bt, x+phW/2, phY+phH-10, { align:'center' });
+    card(x, phY, phW, phH);
+    F(headBg); doc.roundedRect(x, phY, phW, 22, 2.5, 2.5, 'F'); doc.rect(x, phY+11, phW, 11, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(15); C('#ffffff'); doc.text(String(i+1), x+7, phY+15);
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.text(p.n, x+15, phY+14.6);
+    const st = isDone?{c:GREEN,t:'DONE',pct:100}:isAct?{c:ORANGE,t:'ACTIVE',pct:50}:{c:GRAY,t:'NEXT',pct:0};
+    pill(x+6, phY+29, 28, 8, st.c, st.t, 6.5);
+    track(x+6, phY+43, phW-12, 4, st.pct, st.c===GRAY?'#dbe4f2':st.c);
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5); C(st.c===GRAY?SUB:st.c); doc.text(st.pct + '%', x+phW-6, phY+53, { align:'right' });
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); C(MUT);
+    doc.splitTextToSize(p.d, phW-12).slice(0,5).forEach((ln,li)=>doc.text(ln, x+6, phY+63+li*7));
   });
+  F(NAVY); doc.roundedRect(10, phY+phH+8, W-20, 13, 2.5, 2.5, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); C('#ffffff');
+  doc.text('Nexus Cycle ' + cycleNumber + ' · Phase ' + (cyclePhase+1) + ' of 5 active · Fitness this cycle: ' + f + ' pts (' + fitTier + ')', W/2, phY+phH+16.5, { align:'center' });
 
   // ══════════════════════════════════════════════════════════════════════
   // PAGE 5 — BOARD SNAPSHOT
   // ══════════════════════════════════════════════════════════════════════
   doc.addPage();
   hdr('Nexus Board Snapshot', 'Active patterns, transitions, and anti-patterns across all five transformation domains');
-  const tX = 10, tY = CY+2, cW = [80,34,34,34,28,56], rH = 14;
-  const cX = []; let cx2 = tX; cW.forEach(w => { cX.push(cx2); cx2 += w; });
-  // Table header row
-  F(T.card); doc.roundedRect(tX, tY, cx2-tX, rH, 1, 1, 'F');
-  F('#4a90d9'); doc.rect(tX+0.5, tY, cx2-tX-1, 1.2, 'F');
-  ['Domain','Anti-Patterns','Transitions','Patterns','Exp.','Status'].forEach((l,i) => {
-    doc.setFont('helvetica','bold'); doc.setFontSize(8.5); C(T.textMuted); doc.text(l, cX[i]+3, tY+10);
+  const cWn = [86,36,34,32,34,55]; const cX=[]; let cx2=10; cWn.forEach(w=>{cX.push(cx2);cx2+=w;});
+  const rH = 17, tY = CY+2;
+  F(NAVY); doc.roundedRect(10, tY, cx2-10, 12, 2, 2, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5); C('#ffffff');
+  ['DOMAIN','ANTI-PATTERNS','TRANSITIONS','PATTERNS','EXPERIMENTS','HEALTH'].forEach((l,i) => {
+    if (i===0) doc.text(l, cX[i]+5, tY+8); else doc.text(l, cX[i]+cWn[i]/2, tY+8, { align:'center' });
   });
-  domRows.forEach(({ name,dp,da,dt,de },ri) => {
-    const ry = tY+rH*(ri+1);
-    F(ri%2 ? T.rowOdd : T.rowEven); doc.rect(tX,ry,cx2-tX,rH,'F');
-    doc.setFont('helvetica','bold'); doc.setFontSize(9); C(T.text); doc.text(name.length>30 ? name.substring(0,28)+'..' : name, cX[0]+3, ry+9.5);
-    doc.setFont('helvetica','bold'); doc.setFontSize(10); C('#d94a4a'); doc.text(String(da), cX[1]+17, ry+9.5, { align:'center' });
-    doc.setFont('helvetica','bold'); doc.setFontSize(10); C('#4a90d9'); doc.text(String(dt), cX[2]+17, ry+9.5, { align:'center' });
-    doc.setFont('helvetica','bold'); doc.setFontSize(10); C('#2d9d5e'); doc.text(String(dp), cX[3]+17, ry+9.5, { align:'center' });
-    doc.setFont('helvetica','normal'); doc.setFontSize(9); C(T.text); doc.text(String(de), cX[4]+14, ry+9.5, { align:'center' });
-    const stl = da>dp ? 'At Risk' : dp>0 ? 'Active' : 'Not Started';
-    const sc  = da>dp ? '#d94a4a' : dp>0 ? '#2d9d5e' : T.border;
-    F(sc); doc.roundedRect(cX[5]+4, ry+3, 48, 9, 1.5,1.5,'F');
-    doc.setFont('helvetica','bold'); doc.setFontSize(7.5); C('#ffffff'); doc.text(stl, cX[5]+28, ry+9, { align:'center' });
+  domRows.forEach((r,ri) => {
+    const ry = tY+14+ri*rH;
+    F(ROWBG); P(LINE); doc.setLineWidth(0.3); doc.roundedRect(10, ry, cx2-10, rH-2, 2, 2, 'FD');
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); C(NAVY); doc.text(r.name.length>32?r.name.substring(0,30)+'..':r.name, 15, ry+9.5);
+    doc.setFont('helvetica','bold'); doc.setFontSize(13);
+    C(ORANGE); doc.text(String(r.da), cX[1]+cWn[1]/2, ry+10, { align:'center' });
+    C(BRIGHT); doc.text(String(r.dt), cX[2]+cWn[2]/2, ry+10, { align:'center' });
+    C(NAVY);   doc.text(String(r.dp), cX[3]+cWn[3]/2, ry+10, { align:'center' });
+    C(NAVY2);  doc.text(String(r.de), cX[4]+cWn[4]/2, ry+10, { align:'center' });
+    const st = r.da>r.dp ? {c:ORANGE,t:'AT RISK'} : r.dp>0 ? {c:BLUE,t:'ACTIVE'} : {c:GRAY,t:'NOT STARTED'};
+    pill(cX[5]+4, ry+3.5, cWn[5]-10, 8, st.c, st.t, 6.5);
   });
-  const totY = tY+rH*(domRows.length+1);
-  F(T.totalRow); doc.rect(tX,totY,cx2-tX,rH,'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(9); C(T.text); doc.text('TOTAL', cX[0]+3, totY+9.5);
-  doc.setFont('helvetica','bold'); doc.setFontSize(10);
-  C('#d94a4a'); doc.text(String(aCount), cX[1]+17, totY+9.5, { align:'center' });
-  C('#4a90d9'); doc.text(String(tCount), cX[2]+17, totY+9.5, { align:'center' });
-  C('#2d9d5e'); doc.text(String(pCount), cX[3]+17, totY+9.5, { align:'center' });
-  C(T.text); doc.text(String(expE.length), cX[4]+14, totY+9.5, { align:'center' });
+  const totY = tY+14+domRows.length*rH;
+  F(NAVY); doc.roundedRect(10, totY, cx2-10, 13, 2, 2, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); C('#ffffff'); doc.text('TOTALS', 15, totY+8.5);
+  doc.setFontSize(11);
+  doc.text(String(aCount), cX[1]+cWn[1]/2, totY+8.8, { align:'center' });
+  doc.text(String(tCount), cX[2]+cWn[2]/2, totY+8.8, { align:'center' });
+  doc.text(String(pCount), cX[3]+cWn[3]/2, totY+8.8, { align:'center' });
+  doc.text(String(expE.length), cX[4]+cWn[4]/2, totY+8.8, { align:'center' });
 
   // ══════════════════════════════════════════════════════════════════════
   // PAGE 6 — S2F EXPERIMENTS
   // ══════════════════════════════════════════════════════════════════════
   doc.addPage();
-  hdr('Safe-to-Fail Experiment Tracker', 'All S2F experiments this cycle \u2014 hypothesis, status, and fitness impact');
+  hdr('Safe-to-Fail Experiment Tracker', 'All active S2F experiments this cycle — hypothesis, status, and fitness impact');
   if (expE.length === 0) {
-    doc.setFont('helvetica','normal'); doc.setFontSize(11); C(T.textMuted); doc.text('No experiments registered yet.', W/2, H/2, { align:'center' });
+    doc.setFont('helvetica','italic'); doc.setFontSize(11); C(SUB); doc.text('No experiments registered yet.', W/2, H/2, { align:'center' });
   } else {
-    const eY = CY+2, eCW = [18,92,62,30,22]; const eCX = []; let ex2 = 10; eCW.forEach(w => { eCX.push(ex2); ex2 += w; });
-    F(T.card); doc.roundedRect(10, eY, ex2-10, 12, 1, 1, 'F');
-    F('#e8943a'); doc.rect(10.5, eY, ex2-11, 1.2, 'F');
-    ['ID','Hypothesis','Domain','Status','Pts'].forEach((l,i) => { doc.setFont('helvetica','bold'); doc.setFontSize(8.5); C(T.textMuted); doc.text(l, eCX[i]+2, eY+9); });
-    const eRH = 14, maxR = Math.floor((H-60)/eRH);
-    expE.slice(0,maxR).forEach(([k,e],ri) => {
-      const ery = eY+12+ri*eRH;
-      F(ri%2 ? T.rowOdd : T.rowEven); doc.rect(10, ery, ex2-10, eRH, 'F');
-      const hi  = resolveItem(k.split('::')[0]);
-      const st  = e.stage||e.status||'pending';
-      const iP  = st==='adopted'||st==='passed';
-      const iR  = st==='running'||st==='testing';
-      const sc2 = iP ? '#2d9d5e' : iR ? '#4a90d9' : T.border;
-      const sl  = iP ? 'Passed' : iR ? 'Running' : 'Pending';
-      const pts = iP ? '+10' : iR ? '+5' : '0';
-      const hyp = String(e.hypothesis||e.notes||hi?.signal||'\u2014').substring(0,58);
-      const dom = String(hi?.domain||'\u2014').substring(0,30);
-      doc.setFont('helvetica','bold'); doc.setFontSize(8); C(T.textMuted); doc.text(`EXP-${String(ri+1).padStart(2,'0')}`, eCX[0]+2, ery+10);
-      doc.setFont('helvetica','normal'); doc.setFontSize(8.5); C(T.text); doc.text(hyp, eCX[1]+2, ery+10);
-      doc.setFont('helvetica','normal'); doc.setFontSize(8); C(T.textMuted); doc.text(dom, eCX[2]+2, ery+10);
-      F(sc2); doc.roundedRect(eCX[3]+2, ery+3, 24, 9, 1.5,1.5,'F');
-      doc.setFont('helvetica','bold'); doc.setFontSize(7.5); C('#ffffff'); doc.text(sl, eCX[3]+14, ery+9, { align:'center' });
-      doc.setFont('helvetica','bold'); doc.setFontSize(9); C('#4a90d9'); doc.text(pts, eCX[4]+11, ery+10, { align:'center' });
+    const eW = (W-28)/2, eH = 30, maxCards = 8;
+    expE.slice(0,maxCards).forEach(([k,e],i) => {
+      const col = i%2, row = Math.floor(i/2);
+      const x = 10 + col*(eW+8), y = CY+2 + row*(eH+4);
+      card(x, y, eW, eH);
+      const hi = resolveItem(k.split('::')[0]);
+      const st = e.stage||e.status||'pending';
+      const iP = st==='adopted'||st==='passed', iR = st==='running'||st==='testing';
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); C(NAVY3); doc.text('EXP-' + String(i+1).padStart(2,'0'), x+6, y+8.5);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); C(MUT); doc.text(String(hi?.domain||'—').substring(0,30), x+27, y+8.5);
+      const stp = iP?{c:GREEN,t:'PASSED'}:iR?{c:BLUE,t:'RUNNING'}:{c:GRAY,t:'PENDING'};
+      pill(x+eW-29, y+3.5, 24, 7.5, stp.c, stp.t, 6);
+      P(TRACK); doc.setLineWidth(0.4); doc.line(x+6, y+12, x+eW-6, y+12);
+      const hyp = String(e.hypothesis||e.notes||hi?.signal||'—');
+      doc.setFont('helvetica','normal'); doc.setFontSize(8); C(DARK);
+      doc.splitTextToSize(hyp, eW-14).slice(0,2).forEach((ln,li)=>doc.text(ln, x+6, y+17.5+li*4.8));
+      doc.setFont('helvetica','italic'); doc.setFontSize(7); C(SUB);
+      doc.text(iP?'Confirmed — pattern locked.':iR?'Running — check pending.':'Pending — awaiting kickoff.', x+6, y+27.5);
+      const pts = iP?'+10 pts':iR?'+5 pts':'0 pts';
+      F(iP?NAVY:'#e2eefb'); doc.roundedRect(x+eW-25, y+22, 20, 6.5, 3.25, 3.25, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(6.5); C(iP?'#ffffff':NAVY3); doc.text(pts, x+eW-15, y+26.3, { align:'center' });
     });
-    const sfY = eY+12+Math.min(maxR,expE.length)*eRH+6;
-    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); C(T.textMuted);
-    doc.text(`${expPassed} passed (+${expPassed*10} pts)  \u00b7  ${expRunning} running (+${expRunning*5} pts)  \u00b7  ${expPending} pending  \u00b7  Total: ${bd.expScore} pts`, 10, sfY);
+    const rows = Math.ceil(Math.min(expE.length,maxCards)/2);
+    const stripY = CY+2+rows*(eH+4)+4;
+    F(NAVY); doc.roundedRect(10, stripY, W-20, 13, 2.5, 2.5, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); C('#ffffff');
+    const moreTxt = expE.length>maxCards ? ' · showing ' + maxCards + '/' + expE.length : '';
+    doc.text(expPassed + ' PASSED (+' + (expPassed*10) + ' pts) · ' + expRunning + ' RUNNING (+' + (expRunning*5) + ' pts) · ' + expPending + ' PENDING · Total: ' + bd.expScore + ' pts' + moreTxt, W/2, stripY+8.5, { align:'center' });
   }
 
   // ══════════════════════════════════════════════════════════════════════
   // PAGE 7 — MILESTONES & TIMELINE
   // ══════════════════════════════════════════════════════════════════════
   doc.addPage();
-  hdr('Milestones & Timeline', `Key transformation milestones and cycle timeline — Cycle ${cycleNumber}`);
-  // Cycle timeline strip
-  const tlY = CY+2, tlH = 28, tlW = W-20;
-  cardTop(10, tlY, tlW, tlH, '#38b2a0');
-  doc.setFont('helvetica','bold'); doc.setFontSize(8); C(T.textMuted); doc.text('TRANSFORMATION CYCLE TIMELINE', 18, tlY+10);
-  const phStep = (tlW-16)/(PHASES.length);
-  PHASES.forEach((p,i) => {
-    const isDone = completedPhases.has(i) || cyclePhase > i;
-    const isAct  = i === cyclePhase;
-    const tc2 = isAct ? '#4a90d9' : isDone ? '#2d9d5e' : T.border;
-    const px = 18 + i*phStep + phStep/2;
-    F(tc2); doc.circle(px, tlY+20, 4, 'F');
-    doc.setFont('helvetica','bold'); doc.setFontSize(6.5); C('#ffffff'); doc.text(String(i+1), px, tlY+21.5, { align:'center' });
-    doc.setFont('helvetica','normal'); doc.setFontSize(6); C(isAct ? '#4a90d9' : T.textMuted);
-    doc.text(p.n.substring(0,10), px, tlY+28, { align:'center' });
-    if (i < PHASES.length-1) { P(isDone ? '#2d9d5e' : T.border); doc.setLineWidth(0.4); doc.line(px+4, tlY+20, px+phStep-4, tlY+20); }
-  });
-  // Milestones grid
-  const msY = tlY+tlH+8;
-  doc.setFont('helvetica','bold'); doc.setFontSize(12); C(T.text); doc.text('Milestones', 12, msY+8);
+  hdr('Milestones & Timeline', 'Transformation journey across Möbius cycles — past, present, and ahead');
+  const numCyc = Math.max(cycleNumber+2, 5);
+  const step = (W-40)/numCyc;
+  const tlY2 = CY+16;
+  P('#dbe4f2'); doc.setLineWidth(1); doc.line(20+step/2, tlY2, 20+step*numCyc-step/2, tlY2);
+  for (let i=0;i<numCyc;i++) {
+    const cn=i+1, isDone=cn<cycleNumber, isAct=cn===cycleNumber;
+    const px = 20+i*step+step/2;
+    const pc = isDone?{c:GREEN,t:'COMPLETE'}:isAct?{c:ORANGE,t:'ACTIVE'}:{c:GRAY,t:'PLANNED'};
+    pill(px-13, tlY2-13, 26, 7.5, pc.c, pc.t, 6);
+    F(isDone?GREEN:isAct?ORANGE:'#dbe4f2'); doc.circle(px, tlY2, isAct?3.4:2.6, 'F');
+    if (isAct) { P(ORANGE); doc.setLineWidth(0.6); doc.circle(px, tlY2, 4.6, 'S'); }
+    doc.setFont('helvetica','bold'); doc.setFontSize(9); C(NAVY); doc.text('Cycle ' + cn, px, tlY2+10, { align:'center' });
+    if (isAct) { doc.setFont('helvetica','normal'); doc.setFontSize(7); C(MUT); doc.text(ph.n, px, tlY2+16, { align:'center' }); }
+  }
+  const msY = tlY2+28;
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); C(NAVY); doc.text('Milestones', 10, msY);
   if (!boardMilestones || boardMilestones.length === 0) {
-    cardTop(10, msY+12, W-20, 22, '#7b5ea7');
-    doc.setFont('helvetica','normal'); doc.setFontSize(9); C(T.textMuted); doc.text('No milestones recorded for this cycle.', W/2, msY+26, { align:'center' });
+    doc.setFont('helvetica','italic'); doc.setFontSize(9); C(SUB); doc.text('No milestones recorded for this cycle.', 10, msY+10);
   } else {
-    const msColW = (W-24)/2, msRH = 30;
-    boardMilestones.slice(0, 8).forEach((m, mi) => {
-      const mcol = mi % 2, mrow = Math.floor(mi/2);
-      const mx = 10 + mcol*(msColW+4), my = msY+14 + mrow*(msRH+4);
-      cardTop(mx, my, msColW, msRH, '#7b5ea7');
-      doc.setFont('helvetica','bold'); doc.setFontSize(9); C(T.text); doc.text(String(m.title||'Untitled').substring(0,38), mx+5, my+12);
-      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); C('#7b5ea7'); doc.text(String(m.date||''), mx+5, my+20);
-      if (m.description) {
-        doc.setFont('helvetica','normal'); doc.setFontSize(7); C(T.textMuted);
-        doc.text(String(m.description).substring(0,55), mx+5, my+27);
-      }
+    const msW = (W-28)/2, msH = 24;
+    boardMilestones.slice(0,8).forEach((m,mi) => {
+      const col=mi%2, row=Math.floor(mi/2);
+      const x=10+col*(msW+8), y=msY+5+row*(msH+4);
+      card(x, y, msW, msH);
+      F(NAVY); doc.roundedRect(x, y, 26, msH, 2.5, 2.5, 'F'); doc.rect(x+13, y, 13, msH, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(7.5); C('#ffffff');
+      doc.splitTextToSize(String(m.date||'TBD'), 22).slice(0,2).forEach((ln,li)=>doc.text(ln, x+13, y+11+li*5, { align:'center' }));
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); C(NAVY); doc.text(String(m.title||'Untitled').substring(0,42), x+31, y+9);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); C(MUT);
+      doc.splitTextToSize(String(m.description||''), msW-38).slice(0,2).forEach((ln,li)=>doc.text(ln, x+31, y+15+li*5));
     });
   }
 
@@ -5365,82 +5327,54 @@ function generateCyclePDF() {
   // PAGE 8 — RISKS & BLOCKERS
   // ══════════════════════════════════════════════════════════════════════
   doc.addPage();
-  hdr('Risks & Blockers', `Identified risks, severity, and mitigation strategies \u2014 Cycle ${cycleNumber}`);
-  const sevColor = s => s==='critical'||s==='high' ? '#d94a4a' : s==='medium' ? '#e8943a' : '#2d9d5e';
+  hdr('Risks & Blockers', 'Current impediments to transformation progress and recommended mitigations');
   if (!boardRisks || boardRisks.length === 0) {
-    doc.setFont('helvetica','normal'); doc.setFontSize(11); C(T.textMuted); doc.text('No risks or blockers recorded for this cycle.', W/2, H/2, { align:'center' });
+    doc.setFont('helvetica','italic'); doc.setFontSize(11); C(SUB); doc.text('No risks or blockers recorded for this cycle.', W/2, H/2, { align:'center' });
   } else {
-    const rkRH = 38, rkW = W-20;
-    boardRisks.slice(0, 4).forEach((r, ri) => {
-      const ry = CY + ri*(rkRH+4);
-      const sc3 = sevColor(r.severity||'low');
-      cardTop(10, ry, rkW, rkRH, sc3);
-      // Left accent bar
-      F(sc3); doc.rect(10, ry+1.2, 2.5, rkRH-1.2, 'F');
-      // severity badge
-      F(sc3); doc.roundedRect(16, ry+5, 28, 9, 1.5,1.5,'F');
-      doc.setFont('helvetica','bold'); doc.setFontSize(7); C('#ffffff'); doc.text(String(r.severity||'low').toUpperCase(), 30, ry+11, { align:'center' });
-      // title + domain
-      doc.setFont('helvetica','bold'); doc.setFontSize(10); C(T.text); doc.text(String(r.title||'Untitled').substring(0,48), 48, ry+11);
-      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); C(T.textMuted); doc.text(String(r.domain||''), 48, ry+19);
-      // description
-      if (r.description) {
-        const dl2 = doc.splitTextToSize(String(r.description).substring(0,120), rkW/2-16);
-        doc.setFont('helvetica','normal'); doc.setFontSize(8); C(T.textSub);
-        dl2.slice(0,2).forEach((ln,li) => doc.text(ln, 48, ry+27+li*8));
-      }
-      // mitigation
-      if (r.mitigation) {
-        doc.setFont('helvetica','bold'); doc.setFontSize(7.5); C('#4a90d9'); doc.text('MITIGATION:', rkW/2+14, ry+19);
-        const ml = doc.splitTextToSize(String(r.mitigation).substring(0,120), rkW/2-18);
-        doc.setFont('helvetica','normal'); doc.setFontSize(8); C(T.textSub);
-        ml.slice(0,2).forEach((ln,li) => doc.text(ln, rkW/2+14, ry+27+li*8));
-      }
-      // owner
-      if (r.owner) {
-        doc.setFont('helvetica','normal'); doc.setFontSize(7.5); C(T.textMuted); doc.text(`Owner: ${String(r.owner)}`, W-14, ry+35, { align:'right' });
-      }
+    const rkH = 36, rkW = W-20;
+    boardRisks.slice(0,4).forEach((r,ri) => {
+      const y = CY + 2 + ri*(rkH+4);
+      card(10, y, rkW, rkH);
+      const isAR = r.severity==='at-risk';
+      const sc = isAR ? ORANGE : NAVY3;
+      F(sc); doc.roundedRect(10, y, 24, rkH, 2.5, 2.5, 'F'); doc.rect(22, y, 12, rkH, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(10); C('#ffffff'); doc.text('R-' + String(ri+1).padStart(2,'0'), 22, y+15, { align:'center' });
+      doc.setFontSize(6); doc.text(isAR?'AT RISK':'WATCH', 22, y+22, { align:'center' });
+      if (r.domain) { doc.setFont('helvetica','bold'); doc.setFontSize(6.5); C(NAVY3); doc.text(String(r.domain).toUpperCase(), 40, y+8); }
+      doc.setFont('helvetica','bold'); doc.setFontSize(10); C(NAVY); doc.text(String(r.title||'Untitled').substring(0,52), 40, y+15.5);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); C(MUT);
+      doc.splitTextToSize(String(r.description||''), rkW/2-40).slice(0,2).forEach((ln,li)=>doc.text(ln, 40, y+22+li*5.5));
+      P(TRACK); doc.setLineWidth(0.5); doc.line(10+rkW/2+8, y+5, 10+rkW/2+8, y+rkH-5);
+      const mx = 10+rkW/2+14;
+      doc.setFont('helvetica','bold'); doc.setFontSize(7); C(NAVY3); doc.text('MITIGATION', mx, y+9);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); C(DARK);
+      doc.splitTextToSize(String(r.mitigation||'—'), rkW/2-24).slice(0,2).forEach((ln,li)=>doc.text(ln, mx, y+16+li*5.5));
+      doc.setFont('helvetica','italic'); doc.setFontSize(7); C(SUB); doc.text('Owner: ' + String(r.owner||'—'), W-16, y+rkH-5, { align:'right' });
     });
   }
 
   // ══════════════════════════════════════════════════════════════════════
-  // PAGE 9 — CLOSING (PPTX Slide 15 style)
+  // PAGE 9 — CLOSING
   // ══════════════════════════════════════════════════════════════════════
   doc.addPage();
-  BG();
-  // Decorative hexagons
-  drawHex(30, 28, 12, T.hexDeco);
-  drawHex(52, 18, 8, T.hexDeco);
-  drawHex(W-40, 25, 10, T.hexDeco);
-  drawHex(W-60, 38, 7, T.hexDeco);
-  drawHex(25, H-35, 9, T.hexDeco);
-  drawHex(50, H-25, 13, T.hexDeco);
-  drawHex(W-35, H-30, 11, T.hexDeco);
-  drawHex(W-55, H-42, 6, T.hexDeco);
-  // Quote section
-  doc.setFont('helvetica','bold'); doc.setFontSize(22); C(T.text);
-  doc.text('"Transformation in Motion"', W/2, 72, { align:'center' });
-  doc.setFont('helvetica','normal'); doc.setFontSize(14); C('#38b2a0');
-  doc.text('Evolving through deliberate practice and experimentation', W/2, 86, { align:'center' });
-  // Insight pills
-  const pills = [
-    { l:'Fitness', v:`${f} pts`, c:fitHex },
-    { l:'Phase', v:ph.n, c:'#4a90d9' },
-    { l:'Patterns', v:String(pCount), c:'#2d9d5e' },
-    { l:'Experiments', v:String(expE.length), c:'#e8943a' },
-  ];
-  pills.forEach((p,i) => {
-    const px = W/2 - (pills.length*50)/2 + i*50;
-    cardTop(px, 100, 44, 30, p.c);
-    doc.setFont('helvetica','normal'); doc.setFontSize(7); C(T.textMuted); doc.text(p.l, px+22, 110, { align:'center' });
-    doc.setFont('helvetica','bold'); doc.setFontSize(13); C(T.text); doc.text(p.v, px+22, 123, { align:'center' });
+  NAVYBG();
+  F(ORANGE); doc.rect(0, 0, 3, H, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(8.5); C('#63b3ff'); doc.text('NEXUS TRANSFORMATION BOARD', W/2, 58, { align:'center' });
+  doc.setFont('helvetica','bold'); doc.setFontSize(30); C('#ffffff');
+  doc.text('Cycle ' + cycleNumber + ' · ' + fitTier, W/2, 82, { align:'center' });
+  doc.setFont('helvetica','normal'); doc.setFontSize(12); C(LBLUE);
+  doc.text('Fitness: ' + f + ' / 100 · Phase ' + (cyclePhase+1) + ' of 5 (' + ph.n + ') · ' + monthYear, W/2, 96, { align:'center' });
+  F(ORANGE); doc.rect(W/2-35, 106, 70, 1.4, 'F');
+  [{l:'FITNESS', v:f + ' pts'},{l:'PHASE', v:ph.n},{l:'PATTERNS', v:String(pCount)},{l:'EXPERIMENTS', v:String(expE.length)}].forEach((s,i)=>{
+    const x = W/2 - 106 + i*55;
+    F('#0d3a8f'); doc.roundedRect(x, 118, 49, 26, 3, 3, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(6.5); C(LBLUE); doc.text(s.l, x+24.5, 127, { align:'center' });
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); C('#ffffff'); doc.text(String(s.v).substring(0,14), x+24.5, 137, { align:'center' });
   });
-  // CTA
-  doc.setFont('helvetica','normal'); doc.setFontSize(10); C(T.textMuted);
-  doc.text(`Cycle ${cycleNumber} report generated on ${dateStr}`, W/2, 148, { align:'center' });
-  doc.setFont('helvetica','bold'); doc.setFontSize(11); C('#38b2a0');
-  doc.text('Continue the transformation journey \u2014 start the next cycle', W/2, 160, { align:'center' });
-  footer();
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); C('#5a7db3');
+  doc.text('Generated ' + dateStr, W/2, 160, { align:'center' });
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5); C('#5a7db3');
+  doc.text('NEXUS TRANSFORMATION BOARD · ORG FITNESS MODEL · CONFIDENTIAL', W/2, H-12, { align:'center' });
 
   // save
   const fn = `NTB-Cycle-${cycleNumber}-Report-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.pdf`;
