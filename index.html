@@ -208,6 +208,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .am-source-badge { display:inline-block; padding:2px 8px; border-radius:6px; font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; margin-right:6px; }
 .am-source-badge.library { background:rgba(245,130,31,.15); color:var(--accent); }
 .am-source-badge.freeform { background:rgba(232,148,58,.15); color:#e8943a; }
+.am-source-badge.codex { background:rgba(255,0,102,.12); color:var(--anti-hex); }
+.am-source-badge.kind-cap { background:rgba(56,178,160,.15); color:var(--cap-hex); }
+.am-source-badge.kind-anti { background:rgba(255,0,102,.12); color:var(--anti-hex); }
 .am-maturity { display:flex; align-items:center; gap:10px; min-width:160px; }
 .am-maturity-bar { flex:1; height:8px; background:var(--surface2); border-radius:4px; overflow:hidden; position:relative; }
 .am-maturity-fill { height:100%; border-radius:4px; transition:width .3s; }
@@ -1904,20 +1907,24 @@ async function loadGame(gameId) {
   logEntries = g.log_entries || [];
   (g.custom_items||[]).forEach(ci => { if (!allItems.find(i=>i.id===ci.id)) allItems.push(ci); });
   anchors = g.anchors || [];
-  // Rehydrate anchor-backed anti-pattern items so the Backlog rendering can resolve them
+  // Rehydrate anchor-backed hex items so the Backlog rendering can resolve them.
+  // Capability anchors become capability hexes (green); codex/custom become anti-patterns.
   anchors.filter(a => a.inBacklog && a.backlogItemId).forEach(a => {
     if (!allItems.find(i => i.id === a.backlogItemId)) {
       const mat = amAnchorMaturity(a);
+      const kind = amAnchorKind(a);
       const patternsN = (a.practices||[]).reduce((s,p) => s + (p.patterns||[]).length, 0);
-      allItems.push({
+      const item = {
         id: a.backlogItemId,
-        type: 'antipattern',
+        type: kind,
         name: a.name,
         signal: a.description || 'Anchor from Nexus mapping',
         impact: `Maturity ${mat}/100 · ${(a.practices||[]).length} practices · ${patternsN} patterns assessed`,
         domain: a.domain || 'People, Culture & Governance',
         _anchorRef: a.id
-      });
+      };
+      if (kind === 'capability' && a.capabilityId) item._capRef = a.capabilityId;
+      allItems.push(item);
     }
   });
   document.getElementById('gameNameTag').textContent = g.name;
@@ -2043,13 +2050,16 @@ function renderAnchorsPage() {
   const capOptions = capabilitiesLibrary
     .filter(c => !anchors.some(a => a.source==='library' && a.capabilityId===c.id))
     .map(c => `<option value="${c.id}">${c.name}${c.domain?' — '+c.domain:''}</option>`).join('');
+  const codexOptions = allItems
+    .filter(i => i.type==='antipattern' && !i._anchorRef && !i.id.startsWith('anch_item_') && !anchors.some(a => a.antipatternId===i.id))
+    .map(i => `<option value="${i.id}">${amEsc(i.name)}${i.domain?' — '+amEsc(i.domain):''}</option>`).join('');
 
   page.innerHTML = `
     <div class="am-inner">
     <div class="am-hdr">
       <div>
         <div class="am-title">🎯 Anchor Mapping &amp; Org-Fitness Assessment</div>
-        <div class="am-subtitle">Map organizational anchors (capabilities the team needs to improve), assess each practice by listing the good patterns teams should follow, and score each pattern from 1 to 100. Anchors marked <b>Move to Backlog</b> will appear in the Current Reality Backlog ready for the Möbius Loop.</div>
+        <div class="am-subtitle">Map organizational anchors — <b style="color:var(--cap-hex)">capabilities</b> the team needs to improve (green hexes on the board) or <b style="color:var(--anti-hex)">anti-patterns</b> observed by the Nexus Facilitators (from the codex or custom). Assess each practice by listing the good patterns teams should follow and score each 1–100. Anchors marked <b>+ Backlog</b> appear in the Current Reality Backlog ready for the Möbius Loop.</div>
       </div>
       <div class="am-actions">
         <button class="am-btn" onclick="amSendSelectedToBacklog()">Sync Backlog Now</button>
@@ -2066,8 +2076,9 @@ function renderAnchorsPage() {
 
     <div class="am-add-panel">
       <div class="am-add-tabs">
-        <div class="am-add-tab ${_amAddMode==='library'?'active':''}" onclick="amSetAddMode('library')">From Capabilities Library</div>
-        <div class="am-add-tab ${_amAddMode==='freeform'?'active':''}" onclick="amSetAddMode('freeform')">Freeform</div>
+        <div class="am-add-tab ${_amAddMode==='library'?'active':''}" onclick="amSetAddMode('library')">◈ Capability (Library)</div>
+        <div class="am-add-tab ${_amAddMode==='codex'?'active':''}" onclick="amSetAddMode('codex')">⬡ Anti-Pattern (Codex)</div>
+        <div class="am-add-tab ${_amAddMode==='freeform'?'active':''}" onclick="amSetAddMode('freeform')">✎ Custom Anti-Pattern</div>
       </div>
       ${_amAddMode==='library' ? `
         <div class="am-form-row">
@@ -2077,23 +2088,33 @@ function renderAnchorsPage() {
           </select>
           <button class="am-btn primary" onclick="amAddFromLibrary()">Add Anchor</button>
         </div>
+        <div class="am-form-row wide" style="margin-top:2px"><span style="font-size:10.5px;color:var(--text-muted)">Capability anchors enter the Backlog as <b style="color:var(--cap-hex)">capability hexes</b> (green).</span></div>
+      ` : _amAddMode==='codex' ? `
+        <div class="am-form-row">
+          <select class="am-select" id="amCodexSelect" style="grid-column:span 2">
+            <option value="">${codexOptions? '— Select an anti-pattern from the codex —' : 'All codex anti-patterns already added'}</option>
+            ${codexOptions}
+          </select>
+          <button class="am-btn primary" onclick="amAddFromCodex()">Add Anchor</button>
+        </div>
+        <div class="am-form-row wide" style="margin-top:2px"><span style="font-size:10.5px;color:var(--text-muted)">Codex anchors enter the Backlog as <b style="color:var(--anti-hex)">anti-pattern hexes</b>.</span></div>
       ` : `
         <div class="am-form-row">
-          <input class="am-input" id="amFfName" placeholder="Anchor name (e.g. Deployment reliability)">
+          <input class="am-input" id="amFfName" placeholder="Custom anti-pattern name (e.g. Release bottleneck)">
           <select class="am-select" id="amFfDomain">
             ${AM_DOMAINS.map(d => `<option value="${d}">${d}</option>`).join('')}
           </select>
           <button class="am-btn primary" onclick="amAddFreeform()">Add Anchor</button>
         </div>
         <div class="am-form-row wide">
-          <textarea class="am-textarea" id="amFfDesc" placeholder="Description — what makes this anchor important? (optional)"></textarea>
+          <textarea class="am-textarea" id="amFfDesc" placeholder="Describe the anti-pattern — what signal did the facilitators observe? (optional)"></textarea>
         </div>
       `}
     </div>
 
     <div id="amList">
       ${total === 0
-        ? `<div class="am-empty">No anchors mapped yet. Start by adding one above — either from the capabilities library or as freeform.</div>`
+        ? `<div class="am-empty">No anchors mapped yet. Add one above — a capability from the library, an anti-pattern from the codex, or a custom anti-pattern.</div>`
         : anchors.map(a => amRenderCard(a)).join('')}
     </div>
     </div>
@@ -2111,7 +2132,8 @@ function amRenderCard(a) {
         <div class="am-card-chevron">▶</div>
         <div class="am-card-main">
           <div class="am-card-name">
-            <span class="am-source-badge ${a.source}">${a.source}</span>${amEsc(a.name)}
+            <span class="am-source-badge ${amAnchorKind(a)==='capability'?'kind-cap':'kind-anti'}">${amAnchorKind(a)==='capability'?'◈ Capability':'⬡ Anti-Pattern'}</span>
+            <span class="am-source-badge ${a.source}">${a.source==='library'?'library':a.source==='codex'?'codex':'custom'}</span>${amEsc(a.name)}
           </div>
           <div class="am-card-meta">${amEsc(a.domain||'—')} · ${(a.practices||[]).length} practices · ${patternsN} patterns</div>
         </div>
@@ -2194,22 +2216,47 @@ function amAddFromLibrary() {
   scheduleAutoSave();
 }
 
+function amAddFromCodex() {
+  const sel = document.getElementById('amCodexSelect');
+  const apId = sel && sel.value;
+  if (!apId) { showToast('Pick an anti-pattern from the codex','warning'); return; }
+  const ap = allItems.find(i => i.id === apId && i.type === 'antipattern');
+  if (!ap) return;
+  const newId = 'anch_'+Date.now();
+  anchors.push({
+    id: newId,
+    source: 'codex',
+    kind: 'antipattern',
+    antipatternId: ap.id,
+    name: ap.name,
+    description: ap.signal || '',
+    domain: ap.domain || 'People, Culture & Governance',
+    practices: [],
+    inBacklog: false
+  });
+  _amExpandedId = newId;
+  addLog(`Added anti-pattern anchor from codex: "${ap.name}"`,'success');
+  renderAnchorsPage();
+  scheduleAutoSave();
+}
+
 function amAddFreeform() {
   const name = document.getElementById('amFfName').value.trim();
   const domain = document.getElementById('amFfDomain').value;
   const desc = document.getElementById('amFfDesc').value.trim();
-  if (!name) { showToast('Enter an anchor name','warning'); return; }
+  if (!name) { showToast('Enter an anti-pattern name','warning'); return; }
   const newId = 'anch_'+Date.now();
   anchors.push({
     id: newId,
     source: 'freeform',
+    kind: 'antipattern',
     name, domain,
     description: desc,
     practices: [],
     inBacklog: false
   });
   _amExpandedId = newId;
-  addLog(`Added freeform anchor: "${name}"`,'success');
+  addLog(`Added custom anti-pattern anchor: "${name}"`,'success');
   renderAnchorsPage();
   scheduleAutoSave();
 }
@@ -2311,23 +2358,33 @@ function amToggleBacklog(id) {
   scheduleAutoSave();
 }
 
-// Create (or refresh) an anti-pattern item in allItems + currentItems that represents an anchor
+// An anchor's board identity: capability anchors become capability hexes (green),
+// codex / custom anchors become anti-pattern hexes.
+function amAnchorKind(a) {
+  return a.kind || (a.source === 'library' ? 'capability' : 'antipattern');
+}
+// Create (or refresh) the hex item in allItems + currentItems that represents an anchor
 function amAddBacklogItemFor(a) {
   const mat = amAnchorMaturity(a);
+  const kind = amAnchorKind(a);
   const itemId = a.backlogItemId || ('anch_item_' + a.id);
   a.backlogItemId = itemId;
   // Replace existing
   allItems = allItems.filter(i => i.id !== itemId);
   const patternsN = (a.practices||[]).reduce((s,p) => s + (p.patterns||[]).length, 0);
-  allItems.push({
+  const item = {
     id: itemId,
-    type: 'antipattern',
+    type: kind,
     name: a.name,
     signal: a.description || 'Anchor from Nexus mapping',
     impact: `Maturity ${mat}/100 · ${(a.practices||[]).length} practices · ${patternsN} patterns assessed`,
     domain: a.domain || 'People, Culture & Governance',
     _anchorRef: a.id
-  });
+  };
+  // Capability anchors keep their library link so the board treats them as
+  // full capability hexes (auto C-marker, Möbius Loop anchor, green hex)
+  if (kind === 'capability' && a.capabilityId) item._capRef = a.capabilityId;
+  allItems.push(item);
   if (!currentItems.includes(itemId)) currentItems.push(itemId);
 }
 function amRemoveBacklogItemFor(a) {
@@ -3159,7 +3216,7 @@ function saveCapabilityLink() {
 function renderCurrentBacklog() {
   const panel = document.getElementById('crBacklog');
   if (!panel) return;
-  const typeColor = {antipattern:'var(--anti-hex)', pattern:'var(--pattern-hex)', transition:'var(--trans-hex)'};
+  const typeColor = {antipattern:'var(--anti-hex)', pattern:'var(--pattern-hex)', transition:'var(--trans-hex)', capability:'var(--cap-hex)'};
   const items = currentItems.map(hexId => {
     const item = allItems.find(i=>i.id===hexId);
     if (!item) return '';
