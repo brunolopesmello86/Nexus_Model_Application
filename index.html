@@ -2177,7 +2177,7 @@ function amRenderPractice(anchorId, pr) {
           <button class="am-icon-btn" onclick="amDeletePattern('${anchorId}','${pr.id}','${pat.id}')" title="Remove pattern">✕</button>
         </div>
       `).join('')}
-      <button class="am-add-mini" onclick="amAddPattern('${anchorId}','${pr.id}')">+ Add good pattern</button>
+      <button class="am-add-mini" onclick="amAddPattern('${anchorId}','${pr.id}')">+ New Good Habit</button>
     </div>
   `;
 }
@@ -2297,7 +2297,7 @@ function amAddPattern(anchorId, pracId) {
   const a = anchors.find(x => x.id === anchorId); if (!a) return;
   const pr = (a.practices||[]).find(p => p.id === pracId); if (!pr) return;
   pr.patterns = pr.patterns || [];
-  pr.patterns.push({ id:'pat_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), name:'New good pattern', score: 50 });
+  pr.patterns.push({ id:'pat_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), name:'New Good Habit', score: 50 });
   renderAnchorsPage();
   scheduleAutoSave();
 }
