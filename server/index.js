@@ -223,11 +223,29 @@ app.delete('/api/games/:gameId', async (req, res) => {
     const { rows } = await db.query('SELECT password_hash FROM games WHERE id = $1', [req.params.gameId]);
     if (!rows.length) return res.status(404).json({ error: 'Game not found' });
     if (rows[0].password_hash) {
-      const pw = req.headers['x-game-password'] || '';
+      // Prefer JSON body (UTF-8 safe); fall back to header for older clients
+      const pw = (req.body && req.body.password) || req.headers['x-game-password'] || '';
       if (hashPassword(pw) !== rows[0].password_hash) return res.status(401).json({ error: 'Wrong password' });
     }
     await db.query('DELETE FROM games WHERE id = $1', [req.params.gameId]);
     res.json({ deleted: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Rename a game. Body: { name, password }. Password required only if the game has one.
+app.patch('/api/games/:gameId/rename', async (req, res) => {
+  const { name, password } = req.body || {};
+  if (!name || !name.trim()) return res.status(400).json({ error: 'name required' });
+  try {
+    const { rows } = await db.query('SELECT password_hash FROM games WHERE id = $1', [req.params.gameId]);
+    if (!rows.length) return res.status(404).json({ error: 'Game not found' });
+    if (rows[0].password_hash) {
+      if (hashPassword(password || '') !== rows[0].password_hash) return res.status(401).json({ error: 'Wrong password' });
+    }
+    const upd = await db.query('UPDATE games SET name = $1, updated_at = NOW() WHERE id = $2 RETURNING id, name', [name.trim(), req.params.gameId]);
+    res.json(upd.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

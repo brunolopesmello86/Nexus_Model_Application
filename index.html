@@ -3578,6 +3578,7 @@ async function renderContinueFlow() {
           <div class="gs-fitness">
             <div><div class="gs-fitness-score">${g.fitness_score}</div><div class="gs-fitness-label">fitness</div></div>
           </div>
+          <button class="gs-delete-btn" onclick="event.stopPropagation();tryRenameGame('${g.id}','${g.name.replace(/'/g,"\\'")}',${!!g.has_password})" title="Rename board">✎</button>
           <button class="gs-delete-btn" onclick="event.stopPropagation();tryChangePassword('${g.id}','${g.name.replace(/'/g,"\\'")}',${!!g.has_password})" title="${g.has_password?'Change or remove password':'Set password'}">🔑</button>
           <button class="gs-delete-btn" onclick="event.stopPropagation();tryDeleteGame('${g.id}','${g.name.replace(/'/g,"\\'")}',${!!g.has_password})" title="Delete game">🗑</button>
           <div class="gs-arrow">→</div>
@@ -3647,7 +3648,7 @@ function showPasswordPrompt(title, message, onConfirm, opts={}) {
     </div>
   </div>`;
   document.body.appendChild(div);
-  div.querySelector('.gs-pw-modal').addEventListener('click', e => { if (e.target === div) div.remove(); });
+  div.addEventListener('click', e => { if (e.target === div) div.remove(); });
   const inp = document.getElementById('gsPwInput');
   inp.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('gsPwSubmit').click(); });
   document.getElementById('gsPwSubmit').addEventListener('click', () => {
@@ -3679,9 +3680,7 @@ async function tryDeleteGame(gameId, gameName, hasPassword) {
   if (hasPassword) {
     showPasswordPrompt('🗑 Delete "' + gameName + '"', 'Enter the game password to confirm deletion. This cannot be undone.', async (pw) => {
       try {
-        const opts = { method:'DELETE', headers:{'Content-Type':'application/json','X-Game-Password':pw} };
-        const r = await fetch('/api/games/' + gameId, opts);
-        if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e.error || r.statusText); }
+        await api('DELETE', `/games/${gameId}`, { password: pw });
         document.getElementById('gsPwModal').remove();
         showToast('Game deleted','success');
         renderContinueFlow();
@@ -3732,6 +3731,47 @@ function tryChangePassword(gameId, gameName, hasPassword) {
     } catch(e) {
       const err = document.getElementById('gsPwError');
       err.textContent = e.message || 'Update failed';
+      err.style.display = 'block';
+    }
+  });
+}
+
+// ── Rename a board ──
+function tryRenameGame(gameId, gameName, hasPassword) {
+  const existing = document.getElementById('gsPwModal');
+  if (existing) existing.remove();
+  const div = document.createElement('div');
+  div.id = 'gsPwModal';
+  div.className = 'gs-pw-modal';
+  div.innerHTML = `<div class="gs-pw-box">
+    <h3>✎ Rename board</h3>
+    <p>Enter a new name for "${gameName}".${hasPassword ? ' This board is password protected — enter its password to confirm.' : ''}</p>
+    <input id="gsRenameInput" type="text" placeholder="New board name" value="${gameName.replace(/"/g,'&quot;')}" autofocus>
+    ${hasPassword ? '<input id="gsRenamePw" type="password" placeholder="Board password">' : ''}
+    <div class="gs-pw-error" id="gsPwError"></div>
+    <div class="gs-pw-btns">
+      <button class="gs-pw-cancel" onclick="document.getElementById('gsPwModal').remove()">Cancel</button>
+      <button class="gs-pw-confirm" id="gsRenameSubmit">Save</button>
+    </div>
+  </div>`;
+  document.body.appendChild(div);
+  div.addEventListener('click', e => { if (e.target === div) div.remove(); });
+  const nameInp = document.getElementById('gsRenameInput');
+  setTimeout(() => { nameInp.focus(); nameInp.select(); }, 100);
+  document.getElementById('gsRenameSubmit').addEventListener('click', async () => {
+    const name = nameInp.value.trim();
+    const password = hasPassword ? (document.getElementById('gsRenamePw').value || '') : undefined;
+    if (!name) { const err = document.getElementById('gsPwError'); err.textContent = 'Enter a board name'; err.style.display = 'block'; return; }
+    try {
+      await api('PATCH', `/games/${gameId}/rename`, { name, password });
+      document.getElementById('gsPwModal').remove();
+      showToast('Board renamed', 'success');
+      // keep header tag in sync if this is the open game
+      if (gameId === currentGameId) { const tag = document.getElementById('gameNameTag'); if (tag) tag.textContent = name; }
+      renderContinueFlow();
+    } catch(e) {
+      const err = document.getElementById('gsPwError');
+      err.textContent = e.message || 'Rename failed';
       err.style.display = 'block';
     }
   });
