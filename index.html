@@ -790,6 +790,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .rp-slide-hdr { background:#0a2a66; padding:14px 24px; display:flex; align-items:center; justify-content:space-between; gap:14px; border-bottom:4px solid #f5821f; }
 .rp-slide-title { font-size:16px; font-weight:800; color:#fff; letter-spacing:-.2px; }
 .rp-slide-brand { font-size:8.5px; font-weight:800; letter-spacing:1.4px; color:#5a8fd6; text-transform:uppercase; white-space:nowrap; }
+.rp-ntt { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:800; letter-spacing:1.4px; color:#fff; white-space:nowrap; }
+.rp-ntt::before { content:''; width:10px; height:10px; border-radius:50%; border:2px solid #fff; flex-shrink:0; }
+.rp-ntt.sm { font-size:9.5px; letter-spacing:1px; }
+.rp-ntt.sm::before { width:8px; height:8px; border-width:1.5px; }
 .rp-slide-hdr-btn { background:#f5821f; color:#fff; border:none; padding:6px 14px; border-radius:6px; font-size:10.5px; font-weight:800; cursor:pointer; white-space:nowrap; }
 .rp-slide-body { padding:20px 24px 24px; }
 .rp-slide-sub { font-size:11.5px; font-style:italic; color:#5a6b84; margin-bottom:16px; }
@@ -4924,7 +4928,7 @@ function renderReportPage() {
     </div>
   </div>`;
 
-  const brand = `<span class="rp-slide-brand">Nexus Transformation Board</span>`;
+  const brand = `<span class="rp-ntt sm">NTT DATA</span>`;
 
   page.innerHTML = `
   <div class="rp-canvas">
@@ -4933,6 +4937,7 @@ function renderReportPage() {
     <div class="rp-hero">
       <div class="rp-hero-row">
         <div>
+          <div class="rp-ntt" style="margin-bottom:16px">NTT DATA</div>
           <div class="rp-hero-badge">Cycle ${cycleNumber} Review · Nexus Transformation Board</div>
           <div class="rp-hero-title">Transformation<br>Cycle Report</div>
           <div class="rp-hero-rule"></div>
@@ -5137,6 +5142,7 @@ function renderReportPage() {
 
     <!-- ── Closing ── -->
     <div class="rp-closing">
+      <div style="display:flex;justify-content:center;margin-bottom:14px"><span class="rp-ntt">NTT DATA</span></div>
       <div class="rp-closing-title">Cycle ${cycleNumber} · ${fitTier}</div>
       <div class="rp-closing-sub">Fitness: ${f} / 100 · Phase ${cyclePhase+1} of 5 (${phase.n}) · ${monthYear}</div>
       <div class="rp-closing-rule"></div>
@@ -5208,13 +5214,23 @@ function generateCyclePDF() {
   const pill = (x,y,w,h,c,label,fs) => { F(c); doc.roundedRect(x,y,w,h,h/2,h/2,'F'); doc.setFont('helvetica','bold'); doc.setFontSize(fs||7); C('#ffffff'); doc.text(label, x+w/2, y+h/2+(fs||7)*0.155, { align:'center' }); };
   const track = (x,y,w,h,pct,c) => { F(TRACK); doc.roundedRect(x,y,w,h,h/2,h/2,'F'); if(pct>0){ F(c); doc.roundedRect(x,y,Math.max(h,w*Math.min(1,pct/100)),h,h/2,h/2,'F'); } };
   const footer = () => { doc.setFont('helvetica','normal'); doc.setFontSize(8); C(SUB); doc.text('Nexus Transformation Board — Org Fitness Model · Confidential', W/2, H-5, { align:'center' }); };
+  // NTT DATA wordmark (white) — small ring + text, right-aligned ending at xRight
+  const nttMark = (xRight, yBase, fs) => {
+    const sz = fs || 8;
+    doc.setFont('helvetica','bold'); doc.setFontSize(sz); C('#ffffff');
+    doc.text('NTT DATA', xRight, yBase, { align:'right' });
+    const tw = doc.getTextWidth('NTT DATA');
+    const r = sz * 0.19;
+    P('#ffffff'); doc.setLineWidth(sz*0.045);
+    doc.circle(xRight - tw - r - 1.4, yBase - sz*0.17, r, 'S');
+  };
 
   // Content page header — navy strip with orange rule (deck style)
   function hdr(title, sub) {
     BG();
     F(NAVY); doc.rect(0, 0, W, 20, 'F');
     doc.setFont('helvetica','bold'); doc.setFontSize(15); C('#ffffff'); doc.text(title, 12, 13);
-    doc.setFont('helvetica','bold'); doc.setFontSize(7); C('#5a8fd6'); doc.text('NEXUS TRANSFORMATION BOARD', W-12, 12.5, { align:'right' });
+    nttMark(W-12, 12.5, 8);
     F(ORANGE); doc.rect(0, 20, W, 1.8, 'F');
     doc.setFont('helvetica','italic'); doc.setFontSize(9); C(MUT); doc.text(sub, 12, 29.5);
     doc.setFont('helvetica','normal'); doc.setFontSize(8); C(SUB);
@@ -5226,6 +5242,9 @@ function generateCyclePDF() {
   // PAGE 1 — COVER (deck slide 1 style)
   // ══════════════════════════════════════════════════════════════════════
   NAVYBG();
+  // NTT DATA wordmark top-left (white)
+  P('#ffffff'); doc.setLineWidth(0.6); doc.circle(26, 23.4, 2.4, 'S');
+  doc.setFont('helvetica','bold'); doc.setFontSize(13); C('#ffffff'); doc.text('NTT DATA', 31, 25);
   const badge = 'CYCLE ' + cycleNumber + ' REVIEW  ·  NEXUS TRANSFORMATION BOARD';
   doc.setFont('helvetica','bold'); doc.setFontSize(8);
   const bw = doc.getTextWidth(badge) + 16;
@@ -5504,6 +5523,13 @@ function generateCyclePDF() {
   doc.addPage();
   NAVYBG();
   F(ORANGE); doc.rect(0, 0, 3, H, 'F');
+  // NTT DATA wordmark top-center (white)
+  (() => {
+    doc.setFont('helvetica','bold'); doc.setFontSize(13); C('#ffffff');
+    const tw = doc.getTextWidth('NTT DATA'); const cx = W/2;
+    doc.text('NTT DATA', cx + 3, 34, { align:'center' });
+    P('#ffffff'); doc.setLineWidth(0.6); doc.circle(cx + 3 - tw/2 - 4, 32.6, 2.4, 'S');
+  })();
   doc.setFont('helvetica','bold'); doc.setFontSize(8.5); C('#63b3ff'); doc.text('NEXUS TRANSFORMATION BOARD', W/2, 58, { align:'center' });
   doc.setFont('helvetica','bold'); doc.setFontSize(30); C('#ffffff');
   doc.text('Cycle ' + cycleNumber + ' · ' + fitTier, W/2, 82, { align:'center' });
