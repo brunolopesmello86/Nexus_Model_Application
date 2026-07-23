@@ -29,6 +29,7 @@ async function ensureSchema() {
       "ALTER TABLE games ADD COLUMN IF NOT EXISTS board_instances JSONB NOT NULL DEFAULT '{}'",
       "ALTER TABLE games ADD COLUMN IF NOT EXISTS password_hash TEXT",
       "ALTER TABLE games ADD COLUMN IF NOT EXISTS anchors JSONB NOT NULL DEFAULT '[]'",
+      "ALTER TABLE games ADD COLUMN IF NOT EXISTS practice_maturity JSONB NOT NULL DEFAULT '{}'",
     ];
     for (const s of stmts) {
       try { await db.query(s); } catch (e) { console.warn('bootstrap ALTER failed (non-fatal):', s, e.message); }
@@ -176,7 +177,8 @@ app.put('/api/games/:gameId', async (req, res) => {
     log_entries, custom_items, fitness_score,
     connections, board_markers, domain_definitions,
     experiment_results, practice_repetitions, transformation_horizons,
-    board_milestones, board_risks, loop_sessions, board_instances, anchors
+    board_milestones, board_risks, loop_sessions, board_instances, anchors,
+    practice_maturity
   } = req.body;
   try {
     await db.query('ALTER TABLE games ADD COLUMN IF NOT EXISTS board_milestones JSONB NOT NULL DEFAULT \'[]\'');
@@ -184,6 +186,7 @@ app.put('/api/games/:gameId', async (req, res) => {
     await db.query('ALTER TABLE games ADD COLUMN IF NOT EXISTS loop_sessions JSONB NOT NULL DEFAULT \'[]\'');
     await db.query('ALTER TABLE games ADD COLUMN IF NOT EXISTS board_instances JSONB NOT NULL DEFAULT \'{}\'');
     await db.query('ALTER TABLE games ADD COLUMN IF NOT EXISTS anchors JSONB NOT NULL DEFAULT \'[]\'');
+    await db.query('ALTER TABLE games ADD COLUMN IF NOT EXISTS practice_maturity JSONB NOT NULL DEFAULT \'{}\'');
     const { rows } = await db.query(`
       UPDATE games SET
         board_state = $1, agent_assignments = $2, active_drivers = $3,
@@ -192,8 +195,9 @@ app.put('/api/games/:gameId', async (req, res) => {
         connections = $10, board_markers = $11, domain_definitions = $12,
         experiment_results = $13, practice_repetitions = $14,
         transformation_horizons = $15, board_milestones = $16, board_risks = $17,
-        loop_sessions = $18, board_instances = $19, anchors = $20, updated_at = NOW()
-      WHERE id = $21
+        loop_sessions = $18, board_instances = $19, anchors = $20,
+        practice_maturity = $21, updated_at = NOW()
+      WHERE id = $22
       RETURNING id, updated_at
     `, [
       JSON.stringify(board_state), JSON.stringify(agent_assignments),
@@ -208,6 +212,7 @@ app.put('/api/games/:gameId', async (req, res) => {
       JSON.stringify(loop_sessions || []),
       JSON.stringify(board_instances || {}),
       JSON.stringify(anchors || []),
+      JSON.stringify(practice_maturity || {}),
       req.params.gameId
     ]);
     if (!rows.length) return res.status(404).json({ error: 'Game not found' });

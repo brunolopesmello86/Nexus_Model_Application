@@ -249,6 +249,24 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .am-gate-box h2 { font-size:22px; margin-bottom:10px; }
 .am-gate-box p { color:var(--text-muted); font-size:13px; line-height:1.6; margin-bottom:24px; }
 .am-gate-actions { display:flex; gap:10px; justify-content:center; }
+/* Practice Maturity Tracker (reuses .am-* card styles) */
+.pm-cap-badge { display:inline-block; padding:2px 8px; border-radius:6px; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; background:rgba(56,178,160,.15); color:var(--cap-hex); margin-right:6px; }
+.pm-metrics { display:flex; gap:16px; align-items:center; margin-right:12px; flex-shrink:0; }
+.pm-metric { text-align:center; min-width:46px; }
+.pm-metric-val { font-size:16px; font-weight:800; color:var(--text); line-height:1; }
+.pm-metric-val.fit { color:var(--accent); }
+.pm-metric-lbl { font-size:8px; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); margin-top:3px; white-space:nowrap; }
+.pm-counter { display:inline-flex; align-items:center; gap:5px; justify-content:center; }
+.pm-counter button { width:19px; height:19px; border-radius:5px; border:1px solid var(--border); background:var(--surface2); color:var(--text); cursor:pointer; font-size:12px; line-height:1; padding:0; }
+.pm-counter button:hover { border-color:var(--accent); color:var(--accent); }
+.pm-counter span { min-width:16px; text-align:center; font-weight:800; font-size:15px; }
+.pm-exp-row { display:flex; align-items:center; gap:10px; padding:9px 12px; background:var(--surface); border:1px solid var(--border); border-radius:8px; margin-bottom:6px; }
+.pm-exp-id { font-size:10px; font-weight:800; color:var(--accent); font-family:monospace; flex-shrink:0; }
+.pm-exp-hyp { flex:1; font-size:12px; color:var(--text); line-height:1.4; }
+.pm-exp-pill { font-size:9px; font-weight:700; padding:3px 10px; border-radius:999px; color:#fff; flex-shrink:0; }
+.pm-exp-pts { font-size:11px; font-weight:800; min-width:44px; text-align:right; flex-shrink:0; }
+.pm-addbar { display:flex; gap:10px; align-items:center; }
+.pm-addbar select { flex:1; }
 
 /* ══ HEADER ══ */
 .app-header { background:linear-gradient(135deg,#0e0e10,#161618); border-bottom:2px solid var(--accent); padding:10px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
@@ -1432,6 +1450,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
           <button class="bvt-btn active" id="bvtBoard" onclick="switchBoardView('board')">⬡ Board</button>
           <button class="bvt-btn" id="bvtExps" onclick="switchBoardView('experiments')">🧪 Experiments</button>
           <button class="bvt-btn" id="bvtReport" onclick="switchBoardView('report')">📋 Org Fit Report</button>
+          <button class="bvt-btn" id="bvtPractices" onclick="switchBoardView('practices')">📈 Practices</button>
         </div>
         <!-- Anchor Mapping page (hidden until tab active) -->
         <div id="anchorsPage" class="anchors-page" style="display:none;"></div>
@@ -1441,6 +1460,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
         <div id="capLibPage" class="cap-page" style="display:none;"></div>
         <!-- Cycle Report page -->
         <div id="reportPage" class="report-page" style="display:none;"></div>
+        <!-- Practice Maturity Tracker page -->
+        <div id="practicesPage" class="anchors-page" style="display:none;"></div>
         <div style="display:flex;flex:1;overflow:hidden;" id="boardContent">
           <!-- Hex board: has its own zone header + scrollable content -->
           <div id="hexBoardArea" style="flex:7;display:flex;flex-direction:column;overflow:hidden;">
@@ -1754,6 +1775,7 @@ function getConnExpKeys(connId) {
   return Object.keys(experimentResults).filter(k => k === connId || k.startsWith(prefix));
 }
 let practiceRepetitions = {}; // {hexId: number}
+let practiceMaturity = {}; // {practiceId: {habits:[{id,name,score}]}} — per-game maturity tracker
 let transformationHorizons = {h3m:'', h1y:'', h2y:'', h5y:''}; // fitness goals per time horizon
 let boardMilestones = []; // [{id, title, date, description}]
 let boardRisks = [];      // [{id, title, domain, severity, description, mitigation, owner}]
@@ -1829,6 +1851,7 @@ async function saveGame() {
       domain_definitions: domainDefinitions,
       experiment_results: experimentResults,
       practice_repetitions: practiceRepetitions,
+      practice_maturity: practiceMaturity,
       transformation_horizons: transformationHorizons,
       board_milestones: boardMilestones,
       board_risks: boardRisks,
@@ -1912,6 +1935,7 @@ async function loadGame(gameId) {
   domainDefinitions = g.domain_definitions || [];
   experimentResults = g.experiment_results || {};
   practiceRepetitions = g.practice_repetitions || {};
+  practiceMaturity = g.practice_maturity || {};
   transformationHorizons = g.transformation_horizons || {h3m:'', h1y:'', h2y:'', h5y:''};
   boardMilestones = g.board_milestones || [];
   boardRisks = g.board_risks || [];
@@ -1998,20 +2022,24 @@ function switchBoardView(view) {
   const expPage = document.getElementById('expTrackerPage');
   const reportPage = document.getElementById('reportPage');
   const anchorsPage = document.getElementById('anchorsPage');
+  const practicesPage = document.getElementById('practicesPage');
   document.getElementById('bvtBoard').classList.toggle('active', view === 'board');
   document.getElementById('bvtAnchors').classList.toggle('active', view === 'anchors');
   document.getElementById('bvtExps').classList.toggle('active', view === 'experiments');
   document.getElementById('bvtCaps').classList.toggle('active', view === 'capabilities');
   document.getElementById('bvtReport').classList.toggle('active', view === 'report');
+  document.getElementById('bvtPractices').classList.toggle('active', view === 'practices');
   boardContent.style.display = view === 'board' ? 'flex' : 'none';
   expPage.style.display = view === 'experiments' ? 'flex' : 'none';
   capPage.style.display = view === 'capabilities' ? 'flex' : 'none';
   reportPage.style.display = view === 'report' ? 'flex' : 'none';
   if (anchorsPage) anchorsPage.style.display = view === 'anchors' ? 'flex' : 'none';
+  if (practicesPage) practicesPage.style.display = view === 'practices' ? 'flex' : 'none';
   if (view === 'capabilities') renderCapabilitiesPage();
   if (view === 'experiments') renderExperimentsPage();
   if (view === 'report') renderReportPage();
   if (view === 'anchors') renderAnchorsPage();
+  if (view === 'practices') renderPracticesPage();
 }
 
 // ══════════════════════════════════════════
@@ -2441,6 +2469,267 @@ function amShowGate() {
 function amDismissGate(goToMapping) {
   const g = document.getElementById('amGate'); if (g) g.remove();
   if (goToMapping) switchBoardView('anchors');
+}
+
+// ══════════════════════════════════════════
+// PRACTICE MATURITY TRACKER
+// ══════════════════════════════════════════
+let _pmExpandedId = null;
+
+function pmFindPractice(pid) {
+  for (const c of capabilitiesLibrary) {
+    const p = (c.practices || []).find(x => x.id === pid);
+    if (p) return { prac: p, cap: c };
+  }
+  return null;
+}
+function pmHabits(pid) { return (practiceMaturity[pid] && practiceMaturity[pid].habits) || []; }
+function pmScore(pid) {
+  const h = pmHabits(pid);
+  if (!h.length) return 0;
+  return Math.round(h.reduce((s, x) => s + (Number(x.score) || 0), 0) / h.length);
+}
+// All experiments linked to a practice: er.practiceId or key suffix connId::pracId
+function pmExperimentsFor(pid) {
+  const out = [];
+  Object.entries(experimentResults).forEach(([key, er]) => {
+    if (!er) return;
+    const linked = er.practiceId === pid || (key.includes('::') && key.split('::')[1] === pid);
+    if (linked) out.push({ key, er });
+  });
+  return out;
+}
+function pmExpState(er) {
+  const stage = er.stage || er.status || 'pending';
+  const adopted = stage === 'adopted' || stage === 'passed' || er.status === 'passed';
+  const running = stage === 'running' || stage === 'testing' || stage === 'review' || er.status === 'running';
+  const ran = adopted || running || (er.stage && er.stage !== 'pending') || (er.status && er.status !== '' && er.status !== 'pending');
+  return { adopted, running, ran };
+}
+function pmStats(pid) {
+  const exps = pmExperimentsFor(pid);
+  let ran = 0, adopted = 0;
+  exps.forEach(({ er }) => { const s = pmExpState(er); if (s.ran) ran++; if (s.adopted) adopted++; });
+  const reps = practiceRepetitions[pid] || 0;
+  const fitness = ran * 5 + adopted * 10 + reps * 2; // same components as org fitness
+  return { expCount: exps.length, ran, adopted, reps, fitness };
+}
+// Practice ids "in play" for this game
+function pmEngagedIds() {
+  const ids = new Set();
+  Object.entries(experimentResults).forEach(([key, er]) => {
+    if (er && er.practiceId) ids.add(er.practiceId);
+    else if (key.includes('::')) ids.add(key.split('::')[1]);
+  });
+  Object.entries(practiceRepetitions).forEach(([id, n]) => { if (n > 0) ids.add(id); });
+  (boardMarkers || []).filter(m => m.type === 'capability').forEach(mk => {
+    (typeof getCapabilityLinks === 'function' ? getCapabilityLinks(mk) : []).forEach(link => (link.practiceIds || []).forEach(pid => ids.add(pid)));
+  });
+  Object.keys(practiceMaturity).forEach(id => ids.add(id));
+  return [...ids].filter(id => pmFindPractice(id));
+}
+
+function renderPracticesPage() {
+  const page = document.getElementById('practicesPage');
+  if (!page) return;
+  const ids = pmEngagedIds();
+  // Sort by capability name, then practice name
+  const rows = ids.map(id => { const f = pmFindPractice(id); return { id, prac: f.prac, cap: f.cap }; })
+    .sort((a, b) => (a.cap.name || '').localeCompare(b.cap.name || '') || (a.prac.name || '').localeCompare(b.prac.name || ''));
+
+  const scored = rows.filter(r => pmScore(r.id) > 0);
+  const avgMat = scored.length ? Math.round(scored.reduce((s, r) => s + pmScore(r.id), 0) / scored.length) : 0;
+  const totRan = rows.reduce((s, r) => s + pmStats(r.id).ran, 0);
+  const totReps = rows.reduce((s, r) => s + (practiceRepetitions[r.id] || 0), 0);
+  const totFit = rows.reduce((s, r) => s + pmStats(r.id).fitness, 0);
+
+  // Add-practice select: all library practices grouped by capability, excluding already-listed
+  const listedSet = new Set(ids);
+  const addOpts = capabilitiesLibrary.map(c => {
+    const opts = (c.practices || []).filter(p => !listedSet.has(p.id))
+      .map(p => `<option value="${p.id}">${amEsc(p.name)}</option>`).join('');
+    return opts ? `<optgroup label="${amEsc(c.name)}">${opts}</optgroup>` : '';
+  }).join('');
+
+  page.innerHTML = `
+    <div class="am-inner">
+    <div class="am-hdr">
+      <div>
+        <div class="am-title">📈 Practice Maturity Tracker</div>
+        <div class="am-subtitle">Track how each practice matures as Nexus Facilitators drive adoption. Expand a practice to score its <b>good habits</b> (1–100), log <b>repetitions</b>, and review the <b>experiments</b> run against it. Each practice shows its capability and its contribution to the Organizational Fitness score.</div>
+      </div>
+      <div class="am-actions">
+        <button class="am-btn primary" onclick="switchBoardView('report')">Open Org Fit Report →</button>
+      </div>
+    </div>
+
+    <div class="am-summary" style="grid-template-columns:repeat(5,1fr)">
+      <div class="am-summary-card"><div class="am-summary-label">Practices tracked</div><div class="am-summary-value blue">${rows.length}</div></div>
+      <div class="am-summary-card"><div class="am-summary-label">Avg. maturity</div><div class="am-summary-value" style="color:${amMaturityColor(avgMat)}">${avgMat}</div></div>
+      <div class="am-summary-card"><div class="am-summary-label">Experiments run</div><div class="am-summary-value orange">${totRan}</div></div>
+      <div class="am-summary-card"><div class="am-summary-label">Total repetitions</div><div class="am-summary-value teal">${totReps}</div></div>
+      <div class="am-summary-card"><div class="am-summary-label">Fitness contribution</div><div class="am-summary-value" style="color:var(--accent)">${totFit}</div></div>
+    </div>
+
+    <div class="am-add-panel">
+      <div class="pm-addbar">
+        <select class="am-select" id="pmAddSelect">
+          <option value="">${addOpts ? '— Add a practice to track —' : 'All library practices already listed'}</option>
+          ${addOpts}
+        </select>
+        <button class="am-btn primary" onclick="pmAddPractice()">Add Practice</button>
+      </div>
+    </div>
+
+    <div id="pmList">
+      ${rows.length === 0
+        ? `<div class="am-empty">No practices in play yet. Link a capability or run an S2F experiment against a practice on the board, or add one above to start tracking its maturity.</div>`
+        : rows.map(r => pmRenderCard(r)).join('')}
+    </div>
+    </div>
+  `;
+}
+
+function pmRenderCard(r) {
+  const pid = r.id;
+  const mat = pmScore(pid);
+  const st = pmStats(pid);
+  const isExp = _pmExpandedId === pid;
+  const habitsN = pmHabits(pid).length;
+  const cls = r.cap.domain || '—';
+  return `
+    <div class="am-card ${isExp ? 'expanded' : ''}" data-pid="${pid}">
+      <div class="am-card-hdr" onclick="pmToggle('${pid}')">
+        <div class="am-card-chevron">▶</div>
+        <div class="am-card-main">
+          <div class="am-card-name"><span class="pm-cap-badge">${amEsc(r.cap.name)}</span>${amEsc(r.prac.name)}</div>
+          <div class="am-card-meta">${amEsc(cls)} · ${habitsN} habit${habitsN===1?'':'s'} · ${st.expCount} experiment${st.expCount===1?'':'s'} · ${st.reps} rep${st.reps===1?'':'s'}</div>
+        </div>
+        <div class="pm-metrics" onclick="event.stopPropagation()">
+          <div class="pm-metric"><div class="pm-metric-val">${st.ran}</div><div class="pm-metric-lbl">Exp. run</div></div>
+          <div class="pm-metric">
+            <div class="pm-counter"><button onclick="pmAdjustReps('${pid}',-1)">−</button><span>${st.reps}</span><button onclick="pmAdjustReps('${pid}',1)">+</button></div>
+            <div class="pm-metric-lbl">Repetitions</div>
+          </div>
+          <div class="pm-metric"><div class="pm-metric-val fit">${st.fitness}</div><div class="pm-metric-lbl">Fitness pts</div></div>
+        </div>
+        <div class="am-maturity">
+          <div class="am-maturity-bar"><div class="am-maturity-fill" style="width:${mat}%;background:${amMaturityColor(mat)}"></div></div>
+          <div class="am-maturity-num ${amMaturityBucket(mat)}">${mat}</div>
+        </div>
+        <div class="am-card-actions" onclick="event.stopPropagation()">
+          <button class="am-icon-btn" onclick="pmUntrack('${pid}')" title="Remove from tracker">✕</button>
+        </div>
+      </div>
+      <div class="am-body">
+        ${r.prac.description ? `<div class="am-desc">${amEsc(r.prac.description)}</div>` : ''}
+        <div class="am-patterns-lbl">Maturity levers — good habits teams should follow (score each 1–100)</div>
+        ${pmHabits(pid).map(h => pmRenderHabit(pid, h)).join('')}
+        <button class="am-add-mini" onclick="pmAddHabit('${pid}')">+ New Good Habit</button>
+        ${pmRenderExperiments(pid)}
+      </div>
+    </div>
+  `;
+}
+
+function pmRenderHabit(pid, h) {
+  return `
+    <div class="am-pattern-row" data-hid="${h.id}">
+      <div class="am-pattern-name"><input value="${amEscAttr(h.name)}" onchange="pmUpdateHabitName('${pid}','${h.id}',this.value)"></div>
+      <input type="range" min="1" max="100" value="${h.score||1}" class="am-slider" oninput="pmUpdateHabitScore('${pid}','${h.id}',this.value,true)">
+      <input type="number" min="1" max="100" value="${h.score||1}" class="am-score-input" onchange="pmUpdateHabitScore('${pid}','${h.id}',this.value,false)">
+      <button class="am-icon-btn" onclick="pmDeleteHabit('${pid}','${h.id}')" title="Remove habit">✕</button>
+    </div>`;
+}
+
+function pmRenderExperiments(pid) {
+  const exps = pmExperimentsFor(pid);
+  if (!exps.length) return `<div class="am-patterns-lbl" style="margin-top:16px">Experiment results</div><div class="am-desc" style="opacity:.6">No experiments linked to this practice yet.</div>`;
+  const rows = exps.map(({ key, er }, i) => {
+    const s = pmExpState(er);
+    const pill = s.adopted ? `<span class="pm-exp-pill" style="background:#2e9e4f">✓ PASSED</span>`
+      : s.running ? `<span class="pm-exp-pill" style="background:#0072ce">▶ RUNNING</span>`
+      : `<span class="pm-exp-pill" style="background:#7c8aa5">○ PENDING</span>`;
+    const pts = s.adopted ? '+10' : s.running ? '+5' : '0';
+    const hi = resolveItem(key.split('::')[0]);
+    const hyp = er.hypothesis || er.notes || (hi ? hi.signal : '') || '—';
+    return `<div class="pm-exp-row">
+      <span class="pm-exp-id">EXP-${String(i+1).padStart(2,'0')}</span>
+      <span class="pm-exp-hyp">${amEsc(hyp)}</span>
+      ${pill}
+      <span class="pm-exp-pts" style="color:${s.adopted?'#2e9e4f':s.running?'#0072ce':'var(--text-muted)'}">${pts} pts</span>
+    </div>`;
+  }).join('');
+  return `<div class="am-patterns-lbl" style="margin-top:16px">Experiment results</div><div class="pm-exp-list">${rows}</div>`;
+}
+
+function pmToggle(pid) { _pmExpandedId = _pmExpandedId === pid ? null : pid; renderPracticesPage(); }
+
+function pmEnsure(pid) { if (!practiceMaturity[pid]) practiceMaturity[pid] = { habits: [] }; return practiceMaturity[pid]; }
+
+function pmAddPractice() {
+  const sel = document.getElementById('pmAddSelect');
+  const pid = sel && sel.value;
+  if (!pid) { showToast('Pick a practice from the list', 'warning'); return; }
+  pmEnsure(pid);
+  _pmExpandedId = pid;
+  const f = pmFindPractice(pid);
+  addLog(`Tracking practice: "${f?.prac.name || pid}"`, 'success');
+  renderPracticesPage();
+  scheduleAutoSave();
+}
+function pmUntrack(pid) {
+  const f = pmFindPractice(pid);
+  const hasData = pmHabits(pid).length > 0;
+  if (hasData && !confirm(`Remove "${f?.prac.name || 'this practice'}" from the tracker? Its maturity habits will be deleted.`)) return;
+  delete practiceMaturity[pid];
+  if (_pmExpandedId === pid) _pmExpandedId = null;
+  renderPracticesPage();
+  scheduleAutoSave();
+}
+function pmAddHabit(pid) {
+  const p = pmEnsure(pid);
+  p.habits.push({ id: 'hab_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7), name: 'New Good Habit', score: 50 });
+  renderPracticesPage();
+  scheduleAutoSave();
+}
+function pmDeleteHabit(pid, hid) {
+  const p = practiceMaturity[pid]; if (!p) return;
+  p.habits = (p.habits || []).filter(h => h.id !== hid);
+  renderPracticesPage();
+  scheduleAutoSave();
+}
+function pmUpdateHabitName(pid, hid, val) {
+  const h = (practiceMaturity[pid]?.habits || []).find(x => x.id === hid); if (!h) return;
+  h.name = val; scheduleAutoSave();
+}
+function pmUpdateHabitScore(pid, hid, val, fromSlider) {
+  const h = (practiceMaturity[pid]?.habits || []).find(x => x.id === hid); if (!h) return;
+  const n = Math.max(1, Math.min(100, Math.round(Number(val) || 1)));
+  h.score = n;
+  // Live in-place DOM update (avoid full re-render so the slider keeps focus)
+  const row = document.querySelector(`.am-pattern-row[data-hid="${hid}"]`);
+  if (row) {
+    const slider = row.querySelector('.am-slider'), num = row.querySelector('.am-score-input');
+    if (fromSlider && num && Number(num.value) !== n) num.value = n;
+    if (!fromSlider && slider && Number(slider.value) !== n) slider.value = n;
+    const card = row.closest('.am-card');
+    if (card) {
+      const m = pmScore(pid);
+      const bar = card.querySelector('.am-maturity-fill'), num2 = card.querySelector('.am-maturity-num');
+      if (bar) { bar.style.width = m + '%'; bar.style.background = amMaturityColor(m); }
+      if (num2) { num2.textContent = m; num2.className = 'am-maturity-num ' + amMaturityBucket(m); }
+    }
+  }
+  scheduleAutoSave();
+}
+function pmAdjustReps(pid, delta) {
+  practiceRepetitions[pid] = Math.max(0, (practiceRepetitions[pid] || 0) + delta);
+  // reps feed org fitness — keep everything in sync
+  updateStats();
+  if (typeof renderFitnessPanel === 'function') renderFitnessPanel();
+  renderPracticesPage();
+  scheduleAutoSave();
 }
 
 function renderExperimentsPage() {
@@ -3629,6 +3918,7 @@ async function enterGame(gameId) {
   selectedDomainId = null;
   cyclePhase=0; cycleNumber=1; completedPhases.clear(); logEntries=[];
   anchors = [];
+  practiceMaturity = {};
   _amExpandedId = null;
   // Ensure capabilities library is loaded
   if (capabilitiesLibrary.length === 0) await loadCapabilities();
@@ -4555,14 +4845,14 @@ function addCustomPattern(){
 }
 function resetBoard(){
   if(!confirm('Reset the entire board? (anchors will be kept — clear them from the Anchors tab if needed)'))return;
-  gridState={};boardInstances={};agentAssignments={};driverAssignments={};connections=[];boardMarkers=[];domainDefinitions=[];experimentResults={};practiceRepetitions={};selectedDomainId=null;cyclePhase=0;cycleNumber=1;completedPhases.clear();logEntries=[];boardMilestones=[];boardRisks=[];window.loopSessions=[];window.activeLoop=null;
+  gridState={};boardInstances={};agentAssignments={};driverAssignments={};connections=[];boardMarkers=[];domainDefinitions=[];experimentResults={};practiceRepetitions={};practiceMaturity={};selectedDomainId=null;cyclePhase=0;cycleNumber=1;completedPhases.clear();logEntries=[];boardMilestones=[];boardRisks=[];window.loopSessions=[];window.activeLoop=null;
   // Reset backlog-item refs; anchors keep their marker but the item ids are re-derived on next backlog sync
   currentItems=[];
   anchors.forEach(a => { if (a.inBacklog) amAddBacklogItemFor(a); });
   renderAll();if(window.renderLoopDock)window.renderLoopDock();addLog('Board reset','warning');scheduleAutoSave();
 }
 function exportSession(){
-  const data={timestamp:new Date().toISOString(),gameId:currentGameId,gridState,boardInstances,connections,agentAssignments,driverAssignments,domainDefinitions,experimentResults,practiceRepetitions,boardMilestones,boardRisks,loopSessions:window.loopSessions||[],cycleNumber,cyclePhase,fitness:document.getElementById('fitnessScore').textContent,log:logEntries.slice(0,30),customItems:allItems.filter(i=>i.id.startsWith('custom_')),anchors};
+  const data={timestamp:new Date().toISOString(),gameId:currentGameId,gridState,boardInstances,connections,agentAssignments,driverAssignments,domainDefinitions,experimentResults,practiceRepetitions,boardMilestones,boardRisks,loopSessions:window.loopSessions||[],cycleNumber,cyclePhase,fitness:document.getElementById('fitnessScore').textContent,log:logEntries.slice(0,30),customItems:allItems.filter(i=>i.id.startsWith('custom_')),anchors,practiceMaturity};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`nexus-${new Date().toISOString().slice(0,10)}.json`;a.click();
   addLog('Session exported','success');
@@ -4944,6 +5234,41 @@ function renderReportPage() {
 
   const brand = `<img src="${NTT_LOGO}" alt="NTT DATA" style="height:15px;display:block">`;
 
+  // ── Practice Maturity dashboard rows ──
+  const pmRows = (typeof pmEngagedIds === 'function' ? pmEngagedIds() : []).map(id => {
+    const pf = pmFindPractice(id); const st = pmStats(id);
+    return { name: pf.prac.name, cap: pf.cap.name, cls: pf.cap.domain || '—', maturity: pmScore(id), ran: st.ran, adopted: st.adopted, reps: st.reps, fitness: st.fitness };
+  }).sort((a,b) => (a.cap||'').localeCompare(b.cap||'') || (a.name||'').localeCompare(b.name||''));
+  const pmScoredRows = pmRows.filter(r => r.maturity > 0);
+  const pmAvg = pmScoredRows.length ? Math.round(pmScoredRows.reduce((s,r)=>s+r.maturity,0)/pmScoredRows.length) : 0;
+  const pmTotFit = pmRows.reduce((s,r)=>s+r.fitness,0);
+  const pmMatColor = n => n>=70?'#2e9e4f':n>=40?'#f5821f':'#d94a4a';
+  const practiceDashHtml = pmRows.length === 0
+    ? `<div class="rp-empty">No practices are being tracked yet. Use the Practices tab to score maturity as adoption progresses.</div>`
+    : `<table class="rp-domain-table">
+        <thead><tr>
+          <th>Practice</th><th>Capability</th><th>Class</th><th>Maturity</th><th>Exp. Run</th><th>Reps</th><th>Fitness</th>
+        </tr></thead>
+        <tbody>
+          ${pmRows.map(r => `<tr>
+            <td>${escHtml(r.name)}</td>
+            <td>${escHtml(r.cap)}</td>
+            <td style="font-size:10px;color:#5a6b84">${escHtml(r.cls)}</td>
+            <td class="num" style="color:${pmMatColor(r.maturity)}">${r.maturity}</td>
+            <td class="num">${r.ran}</td>
+            <td class="num">${r.reps}</td>
+            <td class="num" style="color:#0072ce">${r.fitness}</td>
+          </tr>`).join('')}
+          <tr class="total">
+            <td>TOTALS</td><td></td><td></td>
+            <td class="num">${pmAvg}</td>
+            <td class="num">${pmRows.reduce((s,r)=>s+r.ran,0)}</td>
+            <td class="num">${pmRows.reduce((s,r)=>s+r.reps,0)}</td>
+            <td class="num">${pmTotFit}</td>
+          </tr>
+        </tbody>
+      </table>`;
+
   page.innerHTML = `
   <div class="rp-canvas">
 
@@ -5151,6 +5476,21 @@ function renderReportPage() {
         <div class="rp-slide-sub">Current impediments to transformation progress and recommended mitigations</div>
         ${_rpRiskForm ? riskFormHtml : ''}
         ${risksHtml}
+      </div>
+    </div>
+
+    <!-- ── Practice Maturity ── -->
+    <div class="rp-slide">
+      <div class="rp-slide-hdr"><div class="rp-slide-title">Practice Maturity Tracker</div>${brand}</div>
+      <div class="rp-slide-body">
+        <div class="rp-slide-sub">Adoption maturity per practice — habits scored 1–100, experiments run, repetitions, and each practice's contribution to Organizational Fitness</div>
+        <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+          <div class="rp-stat" style="flex:1;min-width:120px"><div class="rp-stat-chip" style="background:#0a2a66">${pmRows.length}</div><div class="rp-stat-name">Practices<br>Tracked</div></div>
+          <div class="rp-stat" style="flex:1;min-width:120px"><div class="rp-stat-chip" style="background:${pmMatColor(pmAvg)}">${pmAvg}</div><div class="rp-stat-name">Avg.<br>Maturity</div></div>
+          <div class="rp-stat" style="flex:1;min-width:120px"><div class="rp-stat-chip" style="background:#123c86">${pmRows.reduce((s,r)=>s+r.ran,0)}</div><div class="rp-stat-name">Experiments<br>Run</div></div>
+          <div class="rp-stat" style="flex:1;min-width:120px"><div class="rp-stat-chip" style="background:#0072ce">${pmTotFit}</div><div class="rp-stat-name">Fitness<br>Contribution</div></div>
+        </div>
+        ${practiceDashHtml}
       </div>
     </div>
 
@@ -5528,7 +5868,52 @@ function generateCyclePDF() {
   }
 
   // ══════════════════════════════════════════════════════════════════════
-  // PAGE 9 — CLOSING
+  // PAGE 9 — PRACTICE MATURITY TRACKER
+  // ══════════════════════════════════════════════════════════════════════
+  doc.addPage();
+  hdr('Practice Maturity Tracker', 'Adoption maturity per practice — habits, experiments, repetitions, and fitness contribution');
+  {
+    const pmr = (typeof pmEngagedIds === 'function' ? pmEngagedIds() : []).map(id => {
+      const pf = pmFindPractice(id); const st = pmStats(id);
+      return { name: pf.prac.name, cap: pf.cap.name, cls: pf.cap.domain || '—', mat: pmScore(id), ran: st.ran, reps: st.reps, fit: st.fitness };
+    }).sort((a,b) => (a.cap||'').localeCompare(b.cap||'') || (a.name||'').localeCompare(b.name||''));
+    if (!pmr.length) {
+      doc.setFont('helvetica','italic'); doc.setFontSize(11); C(SUB);
+      doc.text('No practices are being tracked yet — score maturity in the Practices tab as adoption progresses.', W/2, H/2, { align:'center' });
+    } else {
+      const cw = [86,58,34,26,24,20]; const cx=[]; let x2=10; cw.forEach(w=>{cx.push(x2);x2+=w;});
+      const rH2 = 12, tY2 = CY+2, maxR = Math.floor((H-CY-24)/rH2);
+      F(NAVY); doc.roundedRect(10, tY2, x2-10, 11, 2, 2, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(7); C('#ffffff');
+      ['PRACTICE','CAPABILITY','MATURITY','EXP. RUN','REPS','FITNESS'].forEach((l,i)=>{ if(i<2) doc.text(l, cx[i]+4, tY2+7); else doc.text(l, cx[i]+cw[i]/2, tY2+7, {align:'center'}); });
+      const pmColor = n => n>=70?GREEN:n>=40?ORANGE:'#d94a4a';
+      pmr.slice(0,maxR).forEach((r,ri)=>{
+        const ry = tY2+11+ri*rH2;
+        F(ri%2?ROWBG:'#ffffff'); P(LINE); doc.setLineWidth(0.2); doc.rect(10,ry,x2-10,rH2,'FD');
+        doc.setFont('helvetica','bold'); doc.setFontSize(8); C(NAVY); doc.text((r.name.length>34?r.name.substring(0,32)+'..':r.name), cx[0]+4, ry+7.8);
+        doc.setFont('helvetica','normal'); doc.setFontSize(7.5); C(MUT); doc.text((r.cap.length>26?r.cap.substring(0,24)+'..':r.cap), cx[1]+4, ry+7.8);
+        doc.setFont('helvetica','bold'); doc.setFontSize(9);
+        C(pmColor(r.mat)); doc.text(String(r.mat), cx[2]+cw[2]/2, ry+7.8, {align:'center'});
+        C(NAVY); doc.text(String(r.ran), cx[3]+cw[3]/2, ry+7.8, {align:'center'});
+        C(NAVY); doc.text(String(r.reps), cx[4]+cw[4]/2, ry+7.8, {align:'center'});
+        C(BLUE); doc.text(String(r.fit), cx[5]+cw[5]/2, ry+7.8, {align:'center'});
+      });
+      const scored = pmr.filter(r=>r.mat>0);
+      const avg = scored.length?Math.round(scored.reduce((s,r)=>s+r.mat,0)/scored.length):0;
+      const totY = tY2+11+Math.min(pmr.length,maxR)*rH2;
+      F(NAVY); doc.roundedRect(10, totY, x2-10, 11, 2, 2, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(8); C('#ffffff'); doc.text('TOTALS', cx[0]+4, totY+7.3);
+      doc.setFontSize(9);
+      doc.text(String(avg), cx[2]+cw[2]/2, totY+7.3, {align:'center'});
+      doc.text(String(pmr.reduce((s,r)=>s+r.ran,0)), cx[3]+cw[3]/2, totY+7.3, {align:'center'});
+      doc.text(String(pmr.reduce((s,r)=>s+r.reps,0)), cx[4]+cw[4]/2, totY+7.3, {align:'center'});
+      C(ORANGE); doc.text(String(pmr.reduce((s,r)=>s+r.fit,0)), cx[5]+cw[5]/2, totY+7.3, {align:'center'});
+      if (pmr.length>maxR) { doc.setFont('helvetica','italic'); doc.setFontSize(7); C(SUB); doc.text('Showing '+maxR+' of '+pmr.length+' practices', 10, totY+18); }
+    }
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  // PAGE 10 — CLOSING
   // ══════════════════════════════════════════════════════════════════════
   doc.addPage();
   NAVYBG();
