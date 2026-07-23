@@ -2499,20 +2499,44 @@ function pmExperimentsFor(pid) {
   });
   return out;
 }
+// ── Practice fitness scoring model ──────────────────────────────────────
+// Each practice earns a 0–100 Fitness Score. The Organizational Fitness score
+// is the AVERAGE of these across every practice on the board.
+//   maturity  = avg of good-habit scores (0–100) — how well the habits are done
+//   repProg   = min(1, reps / PM_REP_TARGET)     — habit-formation progress
+//   repMult   = 0.4 + 0.6 * repProg              — lack of repetition halves value
+//   score     = maturity * repMult               (habits gated by repetition)
+//             + adopted * PM_ADOPT_BONUS          (validated experiments = evidence)
+//             - failed  * PM_FAIL_PENALTY         (failed experiments cost 1 each)
+//   clamped to 0–100. Deliberately hard to progress: you need real repetition
+//   AND habit depth AND validated experiments to score well.
+const PM_REP_TARGET = 5;     // repetitions to fully "form" a habit
+const PM_ADOPT_BONUS = 6;    // points per adopted/passed experiment
+const PM_FAIL_PENALTY = 1;   // points lost per failed/abandoned experiment
 function pmExpState(er) {
   const stage = er.stage || er.status || 'pending';
   const adopted = stage === 'adopted' || stage === 'passed' || er.status === 'passed';
-  const running = stage === 'running' || stage === 'testing' || stage === 'review' || er.status === 'running';
-  const ran = adopted || running || (er.stage && er.stage !== 'pending') || (er.status && er.status !== '' && er.status !== 'pending');
-  return { adopted, running, ran };
+  const failed = stage === 'abandoned' || stage === 'failed' || er.status === 'abandoned' || er.status === 'failed';
+  const running = !adopted && !failed && (stage === 'running' || stage === 'testing' || stage === 'review' || er.status === 'running');
+  const ran = adopted || failed || running || (er.stage && er.stage !== 'pending') || (er.status && er.status !== '' && er.status !== 'pending');
+  return { adopted, failed, running, ran };
 }
 function pmStats(pid) {
   const exps = pmExperimentsFor(pid);
-  let ran = 0, adopted = 0;
-  exps.forEach(({ er }) => { const s = pmExpState(er); if (s.ran) ran++; if (s.adopted) adopted++; });
+  let ran = 0, adopted = 0, failed = 0;
+  exps.forEach(({ er }) => { const s = pmExpState(er); if (s.ran) ran++; if (s.adopted) adopted++; if (s.failed) failed++; });
   const reps = practiceRepetitions[pid] || 0;
-  const fitness = ran * 5 + adopted * 10 + reps * 2; // same components as org fitness
-  return { expCount: exps.length, ran, adopted, reps, fitness };
+  const maturity = pmScore(pid);
+  const repMult = 0.4 + 0.6 * Math.min(1, reps / PM_REP_TARGET);
+  const fitness = Math.max(0, Math.min(100, Math.round(maturity * repMult + adopted * PM_ADOPT_BONUS - failed * PM_FAIL_PENALTY)));
+  return { expCount: exps.length, ran, adopted, failed, reps, maturity, fitness };
+}
+// Organizational Fitness = average of every board practice's fitness score
+function pmOrgFitness() {
+  const ids = pmEngagedIds();
+  if (!ids.length) return { avg: 0, count: 0 };
+  const sum = ids.reduce((s, id) => s + pmStats(id).fitness, 0);
+  return { avg: Math.round(sum / ids.length), count: ids.length };
 }
 // Practice ids "in play" for this game
 function pmEngagedIds() {
@@ -2541,7 +2565,8 @@ function renderPracticesPage() {
   const avgMat = scored.length ? Math.round(scored.reduce((s, r) => s + pmScore(r.id), 0) / scored.length) : 0;
   const totRan = rows.reduce((s, r) => s + pmStats(r.id).ran, 0);
   const totReps = rows.reduce((s, r) => s + (practiceRepetitions[r.id] || 0), 0);
-  const totFit = rows.reduce((s, r) => s + pmStats(r.id).fitness, 0);
+  // Org Fitness = AVERAGE of all board practices' fitness scores
+  const orgAvg = rows.length ? Math.round(rows.reduce((s, r) => s + pmStats(r.id).fitness, 0) / rows.length) : 0;
 
   // Add-practice select: all library practices grouped by capability, excluding already-listed
   const listedSet = new Set(ids);
@@ -2556,7 +2581,7 @@ function renderPracticesPage() {
     <div class="am-hdr">
       <div>
         <div class="am-title">📈 Practice Maturity Tracker</div>
-        <div class="am-subtitle">Track how each practice matures as Nexus Facilitators drive adoption. Expand a practice to score its <b>good habits</b> (1–100), log <b>repetitions</b>, and review the <b>experiments</b> run against it. Each practice shows its capability and its contribution to the Organizational Fitness score.</div>
+        <div class="am-subtitle">Track how each practice matures as Nexus Facilitators drive adoption. Expand a practice to score its <b>good habits</b> (1–100), log <b>repetitions</b>, and review the <b>experiments</b> run against it. Each practice earns a <b>Fitness Score /100</b> = maturity × repetition-multiplier + adopted experiments − failed experiments. The <b>Organizational Fitness</b> is the average across all board practices — repetition and validated experiments are required to progress.</div>
       </div>
       <div class="am-actions">
         <button class="am-btn primary" onclick="switchBoardView('report')">Open Org Fit Report →</button>
@@ -2568,7 +2593,7 @@ function renderPracticesPage() {
       <div class="am-summary-card"><div class="am-summary-label">Avg. maturity</div><div class="am-summary-value" style="color:${amMaturityColor(avgMat)}">${avgMat}</div></div>
       <div class="am-summary-card"><div class="am-summary-label">Experiments run</div><div class="am-summary-value orange">${totRan}</div></div>
       <div class="am-summary-card"><div class="am-summary-label">Total repetitions</div><div class="am-summary-value teal">${totReps}</div></div>
-      <div class="am-summary-card"><div class="am-summary-label">Fitness contribution</div><div class="am-summary-value" style="color:var(--accent)">${totFit}</div></div>
+      <div class="am-summary-card"><div class="am-summary-label">Org Fitness (avg)</div><div class="am-summary-value" style="color:${amMaturityColor(orgAvg)}">${orgAvg}</div></div>
     </div>
 
     <div class="am-add-panel">
@@ -2611,7 +2636,7 @@ function pmRenderCard(r) {
             <div class="pm-counter"><button onclick="pmAdjustReps('${pid}',-1)">−</button><span>${st.reps}</span><button onclick="pmAdjustReps('${pid}',1)">+</button></div>
             <div class="pm-metric-lbl">Repetitions</div>
           </div>
-          <div class="pm-metric"><div class="pm-metric-val fit">${st.fitness}</div><div class="pm-metric-lbl">Fitness pts</div></div>
+          <div class="pm-metric"><div class="pm-metric-val fit">${st.fitness}</div><div class="pm-metric-lbl">Fitness /100</div></div>
         </div>
         <div class="am-maturity">
           <div class="am-maturity-bar"><div class="am-maturity-fill" style="width:${mat}%;background:${amMaturityColor(mat)}"></div></div>
@@ -4788,10 +4813,20 @@ function calcFitnessBreakdown(){
   // 3. Practice repetitions
   const totalReps = Object.values(practiceRepetitions).reduce((s,n) => s+n, 0);
   const repScore  = totalReps * 2;
-  const total = Math.max(0, Math.min(100, Math.round(expScore + repScore)));
+  const legacyTotal = Math.max(0, Math.min(100, Math.round(expScore + repScore)));
   const expLinkedPracs = new Set(Object.values(experimentResults).map(er => er.practiceId).filter(Boolean));
-  return { total, expRan, expAdopted, expScore, totalReps, repScore, expLinkedPracs: expLinkedPracs.size,
-    hexScore:0, capScore:0, capCount:0, uniqueCaps:0, linkedPracScore:0, pracCount:0, pracScore:0,
+  // 4. Practice Fitness — the primary driver. Org Fitness = avg of every board
+  //    practice's fitness score. Falls back to the legacy score before any
+  //    practice is in play, so early games and old boards still show progress.
+  const org = (typeof pmOrgFitness === 'function') ? pmOrgFitness() : { avg: 0, count: 0 };
+  const ids = (typeof pmEngagedIds === 'function') ? pmEngagedIds() : [];
+  let pracMaturitySum = 0, pracAdopted = 0, pracFailed = 0;
+  ids.forEach(id => { const st = pmStats(id); pracMaturitySum += st.maturity; pracAdopted += st.adopted; pracFailed += st.failed; });
+  const avgMaturity = ids.length ? Math.round(pracMaturitySum / ids.length) : 0;
+  const total = org.count ? org.avg : legacyTotal;
+  return { total, legacyTotal, expRan, expAdopted, expScore, totalReps, repScore, expLinkedPracs: expLinkedPracs.size,
+    practicesAvg: org.avg, practiceCount: org.count, avgMaturity, pracAdopted, pracFailed,
+    hexScore:0, capScore:0, capCount:0, uniqueCaps:0, linkedPracScore:0, pracCount:org.count, pracScore:org.avg,
     ag:0, agBonus:0, drLinks:0, drBonus:0, cycleBonus:0, uniquePracs: expLinkedPracs.size };
 }
 function updateStats(){
@@ -5241,7 +5276,7 @@ function renderReportPage() {
   }).sort((a,b) => (a.cap||'').localeCompare(b.cap||'') || (a.name||'').localeCompare(b.name||''));
   const pmScoredRows = pmRows.filter(r => r.maturity > 0);
   const pmAvg = pmScoredRows.length ? Math.round(pmScoredRows.reduce((s,r)=>s+r.maturity,0)/pmScoredRows.length) : 0;
-  const pmTotFit = pmRows.reduce((s,r)=>s+r.fitness,0);
+  const pmOrgFit = pmRows.length ? Math.round(pmRows.reduce((s,r)=>s+r.fitness,0)/pmRows.length) : 0; // org fitness = avg
   const pmMatColor = n => n>=70?'#2e9e4f':n>=40?'#f5821f':'#d94a4a';
   const practiceDashHtml = pmRows.length === 0
     ? `<div class="rp-empty">No practices are being tracked yet. Use the Practices tab to score maturity as adoption progresses.</div>`
@@ -5260,11 +5295,11 @@ function renderReportPage() {
             <td class="num" style="color:#0072ce">${r.fitness}</td>
           </tr>`).join('')}
           <tr class="total">
-            <td>TOTALS</td><td></td><td></td>
+            <td>AVERAGE / TOTAL</td><td></td><td></td>
             <td class="num">${pmAvg}</td>
             <td class="num">${pmRows.reduce((s,r)=>s+r.ran,0)}</td>
             <td class="num">${pmRows.reduce((s,r)=>s+r.reps,0)}</td>
-            <td class="num">${pmTotFit}</td>
+            <td class="num">${pmOrgFit}</td>
           </tr>
         </tbody>
       </table>`;
@@ -5352,22 +5387,27 @@ function renderReportPage() {
         <div class="rp-fit-grid">
           <div>
             <div class="rp-col-title">Score Components — Cycle ${cycleNumber}</div>
-            ${[
+            ${(bd.practiceCount>0 ? [
+              {label:'Avg Practice Maturity',  detail:`Good-habit adoption across ${bd.practiceCount} practices`, score:bd.avgMaturity,                 max:100},
+              {label:'Repetition Depth',       detail:`${bd.totalReps} reps · target ${bd.practiceCount*5} for full habit`, score:Math.min(bd.practiceCount*5,bd.totalReps), max:bd.practiceCount*5||1},
+              {label:'Experiments Adopted',    detail:`${bd.pracAdopted} validated (+${bd.pracAdopted*6})`, score:bd.pracAdopted, max:Math.max(1,bd.practiceCount)},
+              {label:'Failed Experiments',     detail:`${bd.pracFailed} failed (−${bd.pracFailed})`, score:bd.pracFailed, max:Math.max(1,bd.practiceCount), penalty:true},
+            ] : [
               {label:'S2F Experiments Run',   detail:`${bd.expRan} experiments × 5 pts`,  score:bd.expRan*5,      max:40},
               {label:'Experiments Adopted',   detail:`${bd.expAdopted} adopted × 10 pts`, score:bd.expAdopted*10, max:50},
               {label:'Practice Repetitions',  detail:`${bd.totalReps} reps × 2 pts`,      score:bd.repScore,      max:30},
-            ].map(r=>`
+            ]).map(r=>`
               <div class="rp-comp-row">
                 <div class="rp-comp-info">
                   <div class="rp-comp-label">${r.label}</div>
                   <div class="rp-comp-detail">${r.detail}</div>
                 </div>
-                <div class="rp-comp-track"><div class="rp-comp-fill" style="width:${Math.min(100,r.max?Math.round(r.score/r.max*100):0)}%"></div></div>
-                <div class="rp-comp-score">${r.score}/${r.max}</div>
+                <div class="rp-comp-track"><div class="rp-comp-fill" style="width:${Math.min(100,r.max?Math.round(r.score/r.max*100):0)}%;${r.penalty?'background:#d94a4a':''}"></div></div>
+                <div class="rp-comp-score"${r.penalty?' style="color:#d94a4a"':''}>${r.penalty?'−':''}${r.score}</div>
               </div>`).join('')}
             <div class="rp-comp-total">
-              <span class="rp-comp-total-label">Total this cycle</span>
-              <span class="rp-comp-total-score">${f} / 100 pts possible</span>
+              <span class="rp-comp-total-label">${bd.practiceCount>0?`Org Fitness · avg of ${bd.practiceCount} practices`:'Total this cycle'}</span>
+              <span class="rp-comp-total-score">${f} / 100</span>
             </div>
           </div>
           <div>
@@ -5488,7 +5528,7 @@ function renderReportPage() {
           <div class="rp-stat" style="flex:1;min-width:120px"><div class="rp-stat-chip" style="background:#0a2a66">${pmRows.length}</div><div class="rp-stat-name">Practices<br>Tracked</div></div>
           <div class="rp-stat" style="flex:1;min-width:120px"><div class="rp-stat-chip" style="background:${pmMatColor(pmAvg)}">${pmAvg}</div><div class="rp-stat-name">Avg.<br>Maturity</div></div>
           <div class="rp-stat" style="flex:1;min-width:120px"><div class="rp-stat-chip" style="background:#123c86">${pmRows.reduce((s,r)=>s+r.ran,0)}</div><div class="rp-stat-name">Experiments<br>Run</div></div>
-          <div class="rp-stat" style="flex:1;min-width:120px"><div class="rp-stat-chip" style="background:#0072ce">${pmTotFit}</div><div class="rp-stat-name">Fitness<br>Contribution</div></div>
+          <div class="rp-stat" style="flex:1;min-width:120px"><div class="rp-stat-chip" style="background:${pmMatColor(pmOrgFit)}">${pmOrgFit}</div><div class="rp-stat-name">Org Fitness<br>(avg /100)</div></div>
         </div>
         ${practiceDashHtml}
       </div>
@@ -5666,22 +5706,30 @@ function generateCyclePDF() {
   doc.addPage();
   hdr('Organizational Fitness Score', 'Composite adaptive capacity score — components and tier trajectory · Cycle ' + cycleNumber);
   doc.setFont('helvetica','bold'); doc.setFontSize(11); C(NAVY); doc.text('Score Components — Cycle ' + cycleNumber, 10, CY+8);
-  const comps = [
-    { l:'S2F Experiments Run',  d:bd.expRan + ' experiments × 5 pts',  s:bd.expRan*5,      max:40 },
-    { l:'Experiments Adopted',  d:bd.expAdopted + ' adopted × 10 pts', s:bd.expAdopted*10, max:50 },
-    { l:'Practice Repetitions', d:bd.totalReps + ' reps × 2 pts',      s:bd.repScore,      max:30 },
+  const usePrac = bd.practiceCount > 0;
+  const comps = usePrac ? [
+    { l:'Avg Practice Maturity', d:'Good-habit adoption · ' + bd.practiceCount + ' practices', s:bd.avgMaturity, max:100, neg:false },
+    { l:'Repetition Depth',      d:bd.totalReps + ' reps · target ' + (bd.practiceCount*5),   s:Math.min(bd.practiceCount*5,bd.totalReps), max:(bd.practiceCount*5)||1, neg:false },
+    { l:'Experiments Adopted',   d:bd.pracAdopted + ' validated (+' + (bd.pracAdopted*6) + ')', s:bd.pracAdopted, max:Math.max(1,bd.practiceCount), neg:false },
+    { l:'Failed Experiments',    d:bd.pracFailed + ' failed (−' + bd.pracFailed + ')',        s:bd.pracFailed, max:Math.max(1,bd.practiceCount), neg:true },
+  ] : [
+    { l:'S2F Experiments Run',  d:bd.expRan + ' experiments × 5 pts',  s:bd.expRan*5,      max:40, neg:false },
+    { l:'Experiments Adopted',  d:bd.expAdopted + ' adopted × 10 pts', s:bd.expAdopted*10, max:50, neg:false },
+    { l:'Practice Repetitions', d:bd.totalReps + ' reps × 2 pts',      s:bd.repScore,      max:30, neg:false },
   ];
+  const compH = usePrac ? 22 : 30;
   comps.forEach((r,i) => {
-    const y = CY+14+i*30;
-    card(10, y, 138, 25);
-    doc.setFont('helvetica','bold'); doc.setFontSize(10); C(NAVY); doc.text(r.l, 16, y+10);
-    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); C(MUT); doc.text(r.d, 16, y+18);
-    track(90, y+9.5, 32, 6, r.max?Math.round(r.s/r.max*100):0, NAVY);
-    doc.setFont('helvetica','bold'); doc.setFontSize(10); C(NAVY); doc.text(r.s + '/' + r.max, 142, y+15, { align:'right' });
+    const y = CY+14+i*compH;
+    card(10, y, 138, compH-5);
+    doc.setFont('helvetica','bold'); doc.setFontSize(9.5); C(NAVY); doc.text(r.l, 16, y+9);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7); C(MUT); doc.text(r.d, 16, y+15.5);
+    track(90, y+8, 32, 5.5, r.max?Math.round(r.s/r.max*100):0, r.neg?'#d94a4a':NAVY);
+    doc.setFont('helvetica','bold'); doc.setFontSize(10); C(r.neg?'#d94a4a':NAVY); doc.text((r.neg?'−':'')+r.s, 142, y+12, { align:'right' });
   });
-  F(NAVY); doc.roundedRect(10, CY+106, 138, 15, 2.5, 2.5, 'F');
-  doc.setFont('helvetica','bold'); doc.setFontSize(8); C(LBLUE); doc.text('TOTAL THIS CYCLE', 16, CY+115.5);
-  doc.setFont('helvetica','bold'); doc.setFontSize(11); C(ORANGE); doc.text(f + ' / 100 pts possible', 142, CY+115.8, { align:'right' });
+  const totBoxY = usePrac ? CY+14+4*22+2 : CY+106;
+  F(NAVY); doc.roundedRect(10, totBoxY, 138, 15, 2.5, 2.5, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); C(LBLUE); doc.text(usePrac ? ('ORG FITNESS · AVG OF ' + bd.practiceCount) : 'TOTAL THIS CYCLE', 16, totBoxY+9.5);
+  doc.setFont('helvetica','bold'); doc.setFontSize(11); C(ORANGE); doc.text(f + ' / 100', 142, totBoxY+9.8, { align:'right' });
   // Right: tier card
   doc.setFont('helvetica','bold'); doc.setFontSize(11); C(NAVY); doc.text('Fitness Tier Progress', 156, CY+8);
   card(156, CY+14, W-166, 128);
@@ -5900,14 +5948,15 @@ function generateCyclePDF() {
       });
       const scored = pmr.filter(r=>r.mat>0);
       const avg = scored.length?Math.round(scored.reduce((s,r)=>s+r.mat,0)/scored.length):0;
+      const orgFit = pmr.length?Math.round(pmr.reduce((s,r)=>s+r.fit,0)/pmr.length):0; // org fitness = avg
       const totY = tY2+11+Math.min(pmr.length,maxR)*rH2;
       F(NAVY); doc.roundedRect(10, totY, x2-10, 11, 2, 2, 'F');
-      doc.setFont('helvetica','bold'); doc.setFontSize(8); C('#ffffff'); doc.text('TOTALS', cx[0]+4, totY+7.3);
+      doc.setFont('helvetica','bold'); doc.setFontSize(8); C('#ffffff'); doc.text('AVERAGE', cx[0]+4, totY+7.3);
       doc.setFontSize(9);
       doc.text(String(avg), cx[2]+cw[2]/2, totY+7.3, {align:'center'});
       doc.text(String(pmr.reduce((s,r)=>s+r.ran,0)), cx[3]+cw[3]/2, totY+7.3, {align:'center'});
       doc.text(String(pmr.reduce((s,r)=>s+r.reps,0)), cx[4]+cw[4]/2, totY+7.3, {align:'center'});
-      C(ORANGE); doc.text(String(pmr.reduce((s,r)=>s+r.fit,0)), cx[5]+cw[5]/2, totY+7.3, {align:'center'});
+      C(ORANGE); doc.text(String(orgFit), cx[5]+cw[5]/2, totY+7.3, {align:'center'});
       if (pmr.length>maxR) { doc.setFont('helvetica','italic'); doc.setFontSize(7); C(SUB); doc.text('Showing '+maxR+' of '+pmr.length+' practices', 10, totY+18); }
     }
   }
