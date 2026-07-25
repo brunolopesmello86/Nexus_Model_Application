@@ -267,8 +267,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .pm-exp-pts { font-size:11px; font-weight:800; min-width:44px; text-align:right; flex-shrink:0; }
 .pm-addbar { display:flex; gap:10px; align-items:center; }
 .pm-addbar select { flex:1; }
+/* Practices two-column layout: list left, radar right */
+.pm-layout { display:grid; grid-template-columns:minmax(0,1fr) 440px; gap:20px; align-items:start; }
+.pm-col-left { min-width:0; }
+.pm-col-right { position:sticky; top:12px; }
+@media (max-width:1080px) { .pm-layout { grid-template-columns:1fr; } .pm-col-right { position:static; } }
 /* Practice radar */
-.pm-radar-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 18px; margin-bottom:20px; }
+.pm-radar-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 18px; margin-bottom:0; }
 .pm-radar-hdr { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
 .pm-radar-title { font-size:12px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--accent); }
 .pm-radar-hdr .spacer { flex:1; }
@@ -2684,7 +2689,8 @@ function pmEngagedIds() {
     (typeof getCapabilityLinks === 'function' ? getCapabilityLinks(mk) : []).forEach(link => (link.practiceIds || []).forEach(pid => ids.add(pid)));
   });
   Object.keys(practiceMaturity).forEach(id => ids.add(id));
-  return [...ids].filter(id => pmFindPractice(id));
+  // Exclude practices the facilitator explicitly removed from the tracker
+  return [...ids].filter(id => pmFindPractice(id) && !(practiceMaturity[id] && practiceMaturity[id].dismissed));
 }
 
 function renderPracticesPage() {
@@ -2730,22 +2736,26 @@ function renderPracticesPage() {
       <div class="am-summary-card"><div class="am-summary-label">Org Fitness (avg)</div><div class="am-summary-value" style="color:${amMaturityColor(orgAvg)}">${orgAvg}</div></div>
     </div>
 
-    ${pmRadarPanel(rows)}
-
-    <div class="am-add-panel">
-      <div class="pm-addbar">
-        <select class="am-select" id="pmAddSelect">
-          <option value="">${addOpts ? '— Add a practice to track —' : 'All library practices already listed'}</option>
-          ${addOpts}
-        </select>
-        <button class="am-btn primary" onclick="pmAddPractice()">Add Practice</button>
+    <div class="pm-layout">
+      <div class="pm-col-left">
+        <div class="am-add-panel">
+          <div class="pm-addbar">
+            <select class="am-select" id="pmAddSelect">
+              <option value="">${addOpts ? '— Add a practice to track —' : 'All library practices already listed'}</option>
+              ${addOpts}
+            </select>
+            <button class="am-btn primary" onclick="pmAddPractice()">Add Practice</button>
+          </div>
+        </div>
+        <div id="pmList">
+          ${rows.length === 0
+            ? `<div class="am-empty">No practices in play yet. Link a capability or run an S2F experiment against a practice on the board, or add one above to start tracking its maturity.</div>`
+            : rows.map(r => pmRenderCard(r)).join('')}
+        </div>
       </div>
-    </div>
-
-    <div id="pmList">
-      ${rows.length === 0
-        ? `<div class="am-empty">No practices in play yet. Link a capability or run an S2F experiment against a practice on the board, or add one above to start tracking its maturity.</div>`
-        : rows.map(r => pmRenderCard(r)).join('')}
+      <div class="pm-col-right">
+        ${pmRadarPanel(rows)}
+      </div>
     </div>
     </div>
   `;
@@ -2826,13 +2836,13 @@ function pmRenderExperiments(pid) {
 
 function pmToggle(pid) { _pmExpandedId = _pmExpandedId === pid ? null : pid; renderPracticesPage(); }
 
-function pmEnsure(pid) { if (!practiceMaturity[pid]) practiceMaturity[pid] = { habits: [] }; return practiceMaturity[pid]; }
+function pmEnsure(pid) { if (!practiceMaturity[pid]) practiceMaturity[pid] = { habits: [] }; if (practiceMaturity[pid].dismissed) delete practiceMaturity[pid].dismissed; return practiceMaturity[pid]; }
 
 function pmAddPractice() {
   const sel = document.getElementById('pmAddSelect');
   const pid = sel && sel.value;
   if (!pid) { showToast('Pick a practice from the list', 'warning'); return; }
-  pmEnsure(pid);
+  pmEnsure(pid); // also clears the dismissed flag so re-adding restores it
   _pmExpandedId = pid;
   const f = pmFindPractice(pid);
   addLog(`Tracking practice: "${f?.prac.name || pid}"`, 'success');
@@ -2841,11 +2851,13 @@ function pmAddPractice() {
 }
 function pmUntrack(pid) {
   const f = pmFindPractice(pid);
-  const hasData = pmHabits(pid).length > 0;
-  if (hasData && !confirm(`Remove "${f?.prac.name || 'this practice'}" from the tracker? Its maturity habits will be deleted.`)) return;
-  delete practiceMaturity[pid];
+  if (!confirm(`Remove "${f?.prac.name || 'this practice'}" from the tracker? It will no longer count toward Organizational Fitness. You can add it back anytime.`)) return;
+  // Mark dismissed so it stays hidden even though it's linked to experiments/reps.
+  // Habits are kept (hidden) so re-adding restores the maturity work.
+  practiceMaturity[pid] = Object.assign({ habits: [] }, practiceMaturity[pid] || {}, { dismissed: true });
   if (_pmExpandedId === pid) _pmExpandedId = null;
   renderPracticesPage();
+  updateStats();
   scheduleAutoSave();
 }
 function pmAddHabit(pid) {
