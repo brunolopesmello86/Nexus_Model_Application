@@ -1128,6 +1128,80 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .loop-log-changed { font-size:11px; color:var(--text); margin-bottom:4px; }
 .loop-log-next { font-size:10px; color:#38b2a0; }
 .loop-empty-msg { font-size:11px; color:var(--text-muted); padding:10px; background:var(--surface2); border-radius:6px; }
+/* ══ CODEX CARD DECKS ══ */
+.toolbox-sub { font-size:9px; font-weight:400; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase; margin-left:4px; }
+.deck-slot { position:relative; display:flex; align-items:center; gap:12px; padding:14px 12px 26px; margin-bottom:12px; background:var(--surface); border:1.6px dashed var(--deck-c); border-radius:10px; cursor:pointer; transition:all .2s; overflow:hidden; }
+.deck-slot::before { content:''; position:absolute; inset:4px; border:1px solid var(--deck-c); opacity:.25; border-radius:7px; pointer-events:none; }
+.deck-slot:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.35); background:var(--surface2); }
+.deck-stack { position:relative; width:64px; height:58px; flex-shrink:0; }
+.deck-card { position:absolute; inset:0; border-radius:6px; background:var(--surface2); border:1px solid var(--border); }
+.deck-card.c3 { transform:translate(6px,-6px) rotate(4deg); opacity:.45; }
+.deck-card.c2 { transform:translate(3px,-3px) rotate(2deg); opacity:.7; }
+.deck-card.c1 { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; border-color:var(--deck-c); }
+.deck-hex { width:30px; height:26px; clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); background:var(--deck-c); color:#050D18; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; }
+.deck-count { font-size:10px; font-weight:800; color:var(--deck-c); }
+.deck-slot-info { flex:1; min-width:0; }
+.deck-slot-label { font-size:12.5px; font-weight:800; letter-spacing:1.8px; color:var(--text); }
+.deck-slot-sub { font-size:9.5px; color:var(--text-muted); letter-spacing:.6px; margin-top:2px; }
+.deck-slot-meta { font-size:9px; color:var(--deck-c); font-weight:700; margin-top:5px; }
+.deck-draw { position:absolute; bottom:6px; left:0; right:0; text-align:center; font-family:ui-monospace,monospace; font-size:8px; letter-spacing:1.6px; color:var(--text-muted); opacity:.7; }
+.deck-open-hdr { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.deck-back { width:26px; height:26px; border-radius:7px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:15px; cursor:pointer; line-height:1; }
+.deck-back:hover { border-color:var(--accent); color:var(--accent); }
+.doh-title { font-size:10.5px; font-weight:800; letter-spacing:1.6px; color:var(--text-muted); }
+.deck-grid { display:flex; flex-direction:column; gap:5px; }
+.deck-empty { font-size:11px; color:var(--text-muted); padding:12px; text-align:center; }
+.deck-chip { position:relative; display:flex; align-items:center; gap:8px; padding:6px 8px; background:var(--surface2); border:1px solid var(--border); border-radius:7px; cursor:pointer; transition:all .15s; }
+.deck-chip:hover { transform:translateX(3px); border-color:var(--accent); }
+.deck-chip.on-board::after { content:'✓'; position:absolute; top:3px; right:6px; font-size:9px; color:var(--cyan); font-weight:700; }
+.chip-hex { width:22px; height:19px; flex-shrink:0; clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; color:#050D18; }
+.chip-hex.pattern { background:#19A7A1; } .chip-hex.antipattern { background:#E2801E; }
+.chip-hex.transition { background:#3C6EB4; color:#fff; } .chip-hex.capability { background:#C9D6E6; }
+.chip-name { flex:1; font-size:11px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.chip-detail-dot { width:5px; height:5px; border-radius:50%; background:var(--cyan); flex-shrink:0; margin-right:8px; }
+/* ══ CODEX CARD MODAL (deck-style card) ══ */
+.codex-modal { position:fixed; inset:0; background:rgba(2,8,16,.78); backdrop-filter:blur(3px); z-index:400; display:flex; align-items:center; justify-content:center; padding:20px; animation:gsFadeIn .18s ease-out; }
+.codex-box { position:relative; width:760px; max-width:96vw; max-height:92vh; overflow-y:auto; background:var(--surface); border:1px solid var(--border); border-top:6px solid var(--card-c); border-radius:14px; padding:20px 22px 14px; box-shadow:0 24px 70px rgba(0,0,0,.55); }
+.codex-box.wide { width:980px; }
+.codex-close { position:absolute; top:10px; right:12px; width:28px; height:28px; border-radius:8px; border:1px solid var(--border); background:var(--surface2); color:var(--text-muted); cursor:pointer; font-size:13px; z-index:2; }
+.codex-close:hover { color:var(--text); border-color:var(--accent); }
+.codex-body { display:grid; grid-template-columns:250px 1fr; gap:18px; }
+@media (max-width:760px){ .codex-body { grid-template-columns:1fr; } }
+.codex-face { position:relative; background:#fff; border-radius:10px; padding:18px 14px 12px; display:flex; flex-direction:column; align-items:center; text-align:center; min-height:330px; box-shadow:0 4px 16px rgba(0,0,0,.3); }
+.codex-face .cf-top { position:absolute; top:0; left:0; right:0; height:7px; background:var(--card-c); border-radius:10px 10px 0 0; }
+.codex-face.compact { min-height:250px; padding-bottom:10px; }
+.cf-badge { width:74px; height:74px; border-radius:50%; background:var(--card-c); color:#fff; display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:800; margin:18px 0 14px; box-shadow:inset 0 0 0 4px rgba(255,255,255,.35); }
+.cf-name { font-size:16px; font-weight:800; color:#14264d; line-height:1.25; flex:1; display:flex; align-items:center; }
+.cf-class-line { width:80%; border-bottom:2px solid var(--card-c); text-align:center; margin:10px 0 6px; position:relative; }
+.cf-class-line span { position:relative; top:7px; background:#fff; padding:0 8px; font-size:8px; letter-spacing:1.6px; color:#8698b5; font-weight:700; }
+.cf-class { font-size:10px; font-weight:800; letter-spacing:1px; color:#fff; background:color-mix(in srgb, var(--card-c) 75%, #555); border-radius:4px; padding:5px 10px; width:100%; margin-top:8px; text-transform:uppercase; }
+.cf-type { font-size:11px; font-weight:800; letter-spacing:2.4px; color:#fff; background:var(--card-c); border-radius:4px; padding:7px 10px; width:100%; margin-top:6px; }
+.codex-detail { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:16px 18px; }
+.cd-title { font-size:18px; font-weight:800; color:var(--text); margin-bottom:10px; }
+.cd-sec { font-size:9px; font-weight:800; letter-spacing:1.8px; color:var(--card-c); margin:14px 0 6px; }
+.cd-essence { font-size:13px; color:var(--text); line-height:1.55; }
+.cd-li { font-size:12px; color:var(--text); opacity:.92; padding:3px 0 3px 4px; line-height:1.45; }
+.cd-note { border:1.6px solid var(--card-c); border-top-width:5px; border-radius:6px; padding:10px 12px; margin-top:16px; background:var(--surface); }
+.cd-note-hd { font-size:9px; font-weight:800; letter-spacing:1.8px; color:var(--card-c); margin-bottom:4px; }
+.cd-note-tx { font-size:12px; font-style:italic; color:var(--text); line-height:1.5; }
+.codex-actions { display:flex; gap:10px; align-items:center; margin-top:16px; padding-top:12px; border-top:1px solid var(--border); flex-wrap:wrap; }
+.codex-btn { padding:9px 16px; border-radius:8px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:12.5px; font-weight:700; cursor:pointer; transition:all .15s; }
+.codex-btn:hover { border-color:var(--accent); }
+.codex-btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+.codex-btn.primary:hover { opacity:.9; }
+.codex-btn.transition { border-color:#E2801E; color:#E2801E; }
+.codex-btn.transition:hover { background:rgba(226,128,30,.12); }
+.codex-foot { margin-left:auto; font-size:9px; letter-spacing:1px; color:var(--text-muted); }
+/* Transition (anti → pattern) three-panel view */
+.codex-trans-hd { text-align:center; font-size:10px; font-weight:800; letter-spacing:2.4px; color:var(--text-muted); margin-bottom:14px; }
+.codex-trans { display:grid; grid-template-columns:1fr 220px 1fr; gap:14px; align-items:stretch; }
+@media (max-width:860px){ .codex-trans { grid-template-columns:1fr; } }
+.ct-col { cursor:pointer; transition:transform .15s; } .ct-col:hover { transform:translateY(-3px); }
+.ct-mid { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:16px 14px; text-align:center; }
+.ct-guide { font-size:12px; font-style:italic; color:var(--text); line-height:1.55; }
+.ct-rule { width:80%; height:5px; background:#E2801E; border-radius:2px; }
+.ct-arrow { font-size:30px; color:#E2801E; font-weight:800; line-height:1; }
+.ct-lbl { font-size:9.5px; font-weight:800; letter-spacing:2px; color:#E2801E; line-height:1.7; }
 </style>
 </head>
 <body>
@@ -1424,15 +1498,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
   <div class="main-layout">
     <!-- LEFT: Toolbox -->
     <div class="toolbox">
-      <div class="toolbox-title"><span style="font-size:18px">⬡</span> Nexus Toolbox</div>
-      <input type="text" class="search-input" placeholder="Search patterns..." oninput="filterLibrary(this.value)">
-      <div class="filter-tabs">
-        <div class="filter-tab active" onclick="setFilter('all',this)">All</div>
-        <div class="filter-tab" onclick="setFilter('pattern',this)">Patterns</div>
-        <div class="filter-tab" onclick="setFilter('antipattern',this)">Anti</div>
-        <div class="filter-tab" onclick="setFilter('transition',this)">Trans</div>
-        <div class="filter-tab" onclick="setFilter('capability',this)">Caps</div>
-      </div>
+      <div class="toolbox-title"><span style="font-size:18px">⬡</span> THE CODEX <span class="toolbox-sub">card decks</span></div>
+      <input type="text" class="search-input" placeholder="Search all cards..." oninput="filterLibrary(this.value)">
       <div class="hex-list" id="libraryList"></div>
     </div>
 
@@ -1788,6 +1855,132 @@ let selectedDomainColor = null;
 // Fitness panel metrics
 let experimentResults = {}; // {key: {stage, practiceId, hypothesis, result}}
 // Key format: connId::pracId (nexus+practice), connId (nexus no-practice), hexId (legacy)
+// ══════════════════════════════════════════
+// CODEX CARD DETAILS — NTT-DATA-Nexus-Codex-Patterns-Deck v1.2.5
+// {n: card number in deck, e: essence, s: observable signals, i: system impact, note: nexus note/warning}
+// The CLASS chip shown on cards comes from the item's own class (item.domain).
+// Items without an entry fall back to their short signal/impact.
+// ══════════════════════════════════════════
+const CARD_DETAILS = {
+  // ── Patterns 1–25 ──
+  p33:{n:1, e:"Organizations behave like organisms, not machines. They sense threats, adapt defensively, and evolve socially.", s:["Informal networks influence outcomes","Resistance appears as self-protection","Change spreads socially, not hierarchically"], i:["Mechanical change models fail","Adaptive change sustains over time"], note:"Reframe resistance as feedback. Design for safety, not compliance."},
+  p25:{n:2, e:"All transformation succeeds or fails at the level of daily habits and behaviors.", s:["Language shifts before process shifts","Leaders model behaviors consistently","Old habits are intentionally replaced"], i:["Reduced resistance","Self-reinforcing change loops"], note:"Prioritize habit substitution over structural enforcement."},
+  p31:{n:3, e:"Different roles require different levels of adaptability. Universal change creates unnecessary friction.", s:["Critical roles shift first","Stable roles resist change without harm","Resistance clusters by function"], i:["Focused energy use","Preserved adaptive capacity"], note:"Target change where value demands it."},
+  p24:{n:4, e:"People adopt change when they understand why, not just what. Purpose precedes process.", s:["Purpose precedes action","Local narratives outperform global messaging"], i:["Faster adoption","Reduced pushback"], note:"Anchor every initiative in meaning before mechanics."},
+  p34:{n:5, e:"Transformation diffuses through peer influence and informal networks, not mandates.", s:["Early adopters influence peers","Informal leaders accelerate change"], i:["Organic scaling","Lower enforcement costs"], note:"Design for social proof, not org charts."},
+  p3:{n:6, e:"Shared language reduces friction and increases alignment across teams and levels.", s:["Fewer misunderstandings","Faster decision-making"], i:["Lower cognitive load","Stronger collaboration"], note:"Standardize language before standardizing processes."},
+  p4:{n:7, e:"Unchallenged assumptions silently constrain transformation and block better solutions.", s:["“This is how we've always done it”","Decisions based on legacy logic"], i:["Expanded solution space","Increased adaptability"], note:"Make assumptions explicit and testable."},
+  p32:{n:8, e:"Effective transformation responds to current reality, not inherited plans.", s:["Real-time sensing","Rapid feedback incorporation"], i:["Faster course correction","Reduced waste"], note:"Sense before acting. Re-sense continuously."},
+  p13:{n:9, e:"Continuous feedback enables learning, course correction, and adaptive change.", s:["Short learning cycles","Visible adjustments made regularly"], i:["Higher learning velocity","Safer experimentation"], note:"No feedback loop = no transformation."},
+  p37:{n:10, e:"Rigid contracts constrain learning; outcome-focus enables adaptation and real value.", s:["Success measured by impact","Flexibility in execution honored"], i:["Better value delivery","Reduced blame culture"], note:"Define outcomes, not instructions."},
+  p38:{n:11, e:"Small, elegant interventions consistently outperform large, complex transformations.", s:["Lightweight experiments preferred","Minimal bureaucracy"], i:["Lower risk","Faster learning cycles"], note:"Optimize for learning per dollar spent."},
+  p39:{n:12, e:"Standards enable scale when applied intentionally and at the right time.", s:["Reduced duplication","Faster onboarding"], i:["Operational efficiency","Predictable outcomes"], note:"Standardize late, not early."},
+  p42:{n:13, e:"Small teams learn faster, adapt better, and create clearer accountability.", s:["Clear ownership","Fast decisions"], i:["Higher accountability","Faster delivery"], note:"Design teams small enough to think."},
+  p43:{n:14, e:"Customer value is the only valid compass for transformation trade-offs.", s:["Decisions anchored in user impact","Trade-offs favor customer outcomes"], i:["Better prioritization","Stronger alignment"], note:"When in doubt, follow the customer."},
+  p44:{n:15, e:"Organizational inertia is natural; unmanaged it silently blocks all change.", s:["Passive delays","Slow decision cycles"], i:["Transformation stalls without intervention"], note:"Reduce friction before increasing pressure."},
+  p26:{n:16, e:"People change faster and more sustainably when they feel psychologically safe.", s:["Stable team structures maintained","Psychological safety observed"], i:["Higher change tolerance","Lower immune response"], note:"Protect stability while changing behavior."},
+  p27:{n:17, e:"Too much change too fast triggers organizational immune responses and reversion.", s:["Burnout signals","Reversion to old habits after peaks"], i:["Transformation collapse if not managed"], note:"Sequence change in small, meaningful waves."},
+  p64:{n:18, e:"Scaling without learning multiplies failure at organizational speed and cost.", s:["Premature rollout signals","Repeated mistakes at scale"], i:["Systemic inefficiency","Credibility loss"], note:"Prove it first. Then scale."},
+  p48:{n:19, e:"Experiments must be survivable and bounded to enable genuine learning.", s:["Limited blast radius designed in","Fast recovery demonstrated"], i:["Increased innovation","Safer organizational learning"], note:"Design experiments to fail safely."},
+  p5:{n:20, e:"No pattern is universally correct. Context is the lens, not the framework.", s:["Context-aware decisions","Method flexibility honored"], i:["Higher effectiveness","Reduced cargo-cult adoption"], note:"Fit patterns to context, not ideology."},
+  p2:{n:21, e:"Change unfolds through cycles, backtracking, and reframing — not project plans.", s:["Backtracking acknowledged","Reframing embraced as progress"], i:["Continuous improvement","Resilient to surprise"], note:"Expect loops, not lines."},
+  p57:{n:22, e:"Formal and informal power structures determine what actually changes — always.", s:["Hidden vetoes surface","Political resistance mapped"], i:["Blocked change unblocked","Decisions accelerate"], note:"Map power before acting."},
+  p28:{n:23, e:"Every solution alters the system and creates new tensions. Transformation never finishes.", s:["Ongoing adaptation required","Continuous sensing built in"], i:["Long-term resilience","Prevents ossification"], note:"Design for continuity, not completion."},
+  p21:{n:24, e:"Organizations contain multiple subcultures. One-size culture initiatives will fail.", s:["Local norms differ significantly","One-size initiatives fail in pockets"], i:["Cultural mismatch reduced","Adoption improves with local tailoring"], note:"Work with cultures, not against them."},
+  p62:{n:25, e:"The system must expect and absorb change as its natural operating mode.", s:["Modular structures designed","Adaptive governance in place"], i:["Sustained relevance","Lower disruption from change"], note:"Build evolution into the design."},
+  // ── Anti-Patterns 1–40 ──
+  a18:{n:1, e:"Change is introduced without a clear purpose that people can relate to or connect with.", s:["“Just do it” messaging","Low emotional engagement","Passive compliance"], i:["Superficial adoption","Silent resistance"], note:"Meaning must precede mechanics or change will decay."},
+  a15:{n:2, e:"Transformation is framed as a journey with a final destination after which change stops.", s:["“Target operating model achieved”","Transformation program officially closes"], i:["Learning stops","System rigidity increases"], note:"Living systems never stop evolving."},
+  a9:{n:3, e:"Feedback is collected systematically but never meaningfully acted upon.", s:["Surveys with no visible follow-up","Retrospectives with no resulting changes"], i:["Trust erosion","Learned helplessness"], note:"Unanswered feedback teaches people to stop speaking."},
+  a26:{n:4, e:"No coherent organizational story explains why change is happening.", s:["Rumors replace facts","Conflicting interpretations fill the gap"], i:["Fear-driven behavior","Resistance amplification"], note:"If you don't provide a narrative, the system will create one."},
+  a27:{n:5, e:"Transformation is managed like a delivery plan — milestones replace learning.", s:["Milestones over learning","Task completion equals success"], i:["Compliance without adoption"], note:"Execution delivers outputs, not change."},
+  a28:{n:6, e:"Success is measured by volume delivered, not value created.", s:["Velocity fixation","Feature counts celebrated"], i:["Value dilution","Burnout"], note:"Outputs are not outcomes."},
+  a23:{n:7, e:"Identical team models are forced everywhere regardless of context.", s:["One-size team templates","Context ignored in team design"], i:["Local inefficiency","Role confusion"], note:"Standardization too early kills adaptation."},
+  a21:{n:8, e:"Teams are constantly reconfigured, preventing learning and trust from forming.", s:["Frequent reshuffling","No shared history or team memory"], i:["Low trust","Poor learning loops"], note:"Stability is a prerequisite for change."},
+  a14:{n:9, e:"Improving parts of the system while degrading the whole.", s:["Team-level KPIs dominate","Cross-team friction increases"], i:["System degradation","Local wins, global loss"], note:"The system optimizes itself — whether you intend it or not."},
+  a10:{n:10, e:"Everything is declared top priority, making real trade-offs impossible.", s:["Competing urgencies with no resolution","No real trade-offs made"], i:["Decision paralysis","Loss of focus"], note:"If everything matters, nothing does."},
+  a2:{n:11, e:"Agile ceremonies performed without behavioral change or real collaboration.", s:["Standups without collaboration","Retrospectives with no resulting actions"], i:["Cynicism","Change fatigue"], note:"Rituals without intent are theater."},
+  a4:{n:12, e:"Decision forums exist and meet but hold no real authority to decide.", s:["Endless reviews","Decisions perpetually deferred"], i:["Slow execution","Disengagement"], note:"Fake governance destroys trust faster than no governance."},
+  a38:{n:13, e:"Technology architecture limits change instead of supporting it.", s:["“The system won't allow it”","Manual workarounds proliferate"], i:["Bottlenecks","Shadow processes"], note:"Architecture should follow intent, not block it."},
+  a40:{n:14, e:"Tools are implemented before behaviors are defined or understood.", s:["New platforms, same habits","Tool rollout precedes behavior design"], i:["Low ROI","Frustration and workarounds"], note:"Tools amplify behavior — good or bad."},
+  a39:{n:15, e:"The belief that deploying new technology will transform people's behaviors.", s:["Change plans = system rollouts","Success measured by go-live"], i:["Disappointment","Reversion to old habits"], note:"Technology enables change; it never is the change."},
+  a24:{n:16, e:"Operating models change faster than infrastructure can support.", s:["Scaling blocked by systems","Fragile integrations multiply"], i:["System instability"], note:"Structure must evolve with behavior."},
+  a13:{n:17, e:"Moving fast without allowing the organization time to absorb and adapt.", s:["Burnout signals across teams","Rework from rushed decisions"], i:["Immune response activation","Transformation regression"], note:"Too much change too fast is still too much."},
+  a19:{n:18, e:"Work managed as a collection of projects rather than as value streams.", s:["Fragmented ownership","No flow visibility across portfolio"], i:["Delayed value delivery"], note:"Projects finish; value flows."},
+  a43:{n:19, e:"Ignoring learning, risk reduction, and optionality as forms of organizational value.", s:["ROI-only investment decisions","Learning and resilience discounted"], i:["Innovation collapse","Strategic myopia"], note:"Not all value is immediately measurable."},
+  a30:{n:20, e:"Learning is performed and tracked — certificates collected — but not embodied.", s:["Training attendance celebrated","No observable habit change"], i:["False sense of progress"], note:"Learning is behavioral, not informational."},
+  a33:{n:21, e:"Learning reduced to formal courses and certification programs.", s:["Heavy training curricula","Light on applied practice"], i:["Knowledge decay","Skills not transferred to work"], note:"Training ≠ learning."},
+  a35:{n:22, e:"Past success blocks curiosity and openness to new information.", s:["“This worked before”","Dismissing new signals"], i:["Blind spots","Missed early warnings"], note:"Success is often the biggest risk."},
+  a6:{n:23, e:"Expanding solutions that have not been proven or truly understood.", s:["Rollout-first mindset","Pilots skipped or ignored"], i:["Systemic failure at scale","Credibility loss"], note:"Scale only what you understand."},
+  a37:{n:24, e:"Failure is treated as unacceptable, preventing honest experimentation.", s:["Risk avoidance","Problems hidden from view"], i:["Innovation freeze","Learning stops"], note:"No failure means no learning."},
+  a34:{n:25, e:"Learning flows only top-down — leadership teaches, teams receive.", s:["Experts talk, teams only listen","Feedback from frontline ignored"], i:["Reality disconnect","Bad decisions persist"], note:"Learning must flow both ways."},
+  a32:{n:26, e:"Learning is treated as a discovery phase that ends when execution begins.", s:["Plans become fixed after discovery","No learning loop in delivery"], i:["Rigidity","Inability to adapt"], note:"Learning is continuous or useless."},
+  a11:{n:27, e:"Critical knowledge lives with a small number of people — never shared.", s:["Bottlenecks around key individuals","Dependency on specific experts"], i:["Organizational fragility","Knowledge bottlenecks"], note:"Capability must spread, not centralize."},
+  a41:{n:28, e:"Strategy treated as a yearly ritual — static plans in a dynamic context.", s:["Static annual plans","Context shifts ignored between cycles"], i:["Slow adaptation","Misalignment with reality"], note:"Strategy is sensing, not scheduling."},
+  a42:{n:29, e:"People treated as interchangeable, optimizable units rather than complex humans.", s:["Utilization focus","Humans equated with capacity"], i:["Burnout","Loss of engagement"], note:"Humans are not interchangeable parts."},
+  a7:{n:30, e:"Everyone must change at the same pace, regardless of role or context.", s:["Blanket change policies","Zero opt-out zones"], i:["Unnecessary resistance","Energy wasted on wrong targets"], note:"Different contexts need different change."},
+  a16:{n:31, e:"Failure is punished rather than examined, making risk-taking impossible.", s:["Fear culture","Post-incident blame replaces learning"], i:["Risk avoidance","No real accountability"], note:"Blame kills learning."},
+  a17:{n:32, e:"Teams are given responsibility without authority to act on it.", s:["Teams accountable but not empowered","Decisions still escalated upward"], i:["Frustration","Disengagement"], note:"Authority must match responsibility."},
+  a1:{n:33, e:"Massive, simultaneous organizational change triggered without sequencing.", s:["Multiple changes launched at once","Overload signals ignored"], i:["Immune response activation","Transformation collapse"], note:"Change must come in waves."},
+  a3:{n:34, e:"A few exceptional individuals carry the system, creating fragility.", s:["Burnout in key leaders","Bottlenecks around star performers"], i:["Organizational fragility","Dependency risk"], note:"Systems should not depend on heroes."},
+  a5:{n:35, e:"Borrowing patterns or models from others without adapting to local context.", s:["Buzzword adoption","Best practice benchmarking as justification"], i:["Mismatch with reality","Wasted transformation effort"], note:"Context beats best practice."},
+  a12:{n:36, e:"Pretending that organizational politics and informal power don't shape outcomes.", s:["Hidden vetoes","Informal leaders bypassed"], i:["Stalled change","Covert resistance"], note:"Power always shapes outcomes."},
+  a25:{n:37, e:"Psychological safety eroded under delivery pressure — fear replaces trust.", s:["Fear-based delivery culture","Risk-hiding behavior"], i:["Short-term gains, long-term systemic loss"], note:"Fear accelerates collapse, not performance."},
+  a8:{n:38, e:"Linear, mechanical thinking applied to inherently complex adaptive systems.", s:["Control obsession","Mechanistic change blueprints"], i:["Unintended consequences","Brittle change"], note:"Complex systems cannot be commanded."},
+  a20:{n:39, e:"Stability and familiar structures removed too quickly, leaving nothing to hold onto.", s:["Confusion about what's permanent","Anxiety about fundamental change"], i:["Regression to prior behaviors"], note:"Stability enables adaptation."},
+  a44:{n:40, e:"Short-term workarounds become permanent fixtures of the operating model.", s:["“We'll fix it later” repeated","Workarounds institutionalized"], i:["Accumulated fragility","Technical and process debt"], note:"Temporary decisions need expiration dates."},
+};
+
+// ── Anti-Pattern → Pattern transition guidance (Codex Transition Patterns section) ──
+// {to: target pattern id, g: transition guidance}
+const TRANSITION_GUIDE = {
+  a8:  {to:'p33', g:"Shift from control blueprints to adaptive sensing. Map informal networks. Let the system show you what it needs."},
+  a13: {to:'p27', g:"Map all active changes. Sequence them in waves. Prioritize absorption over velocity."},
+  a7:  {to:'p31', g:"Segment roles by change demand. Focus energy on the roles where change creates value."},
+  a22: {to:'p59', g:"Name resistance openly. Ask what the system is protecting. Design with it, not against it."},
+  a20: {to:'p26', g:"Identify what must remain constant. Communicate what will not change before announcing what will."},
+  a15: {to:'p28', g:"Replace “End of Transformation” with “Next Evolution Cycle.” Build continuous sensing into governance."},
+  a6:  {to:'p64', g:"Run bounded pilots. Define what constitutes proof. Only scale after the signal is clear and repeatable."},
+  a37: {to:'p48', g:"Define blast radius before starting. Celebrate what the failure taught. Track experiments on the Nexus Board."},
+  a9:  {to:'p13', g:"Close every feedback loop visibly. Show what changed because someone spoke up. Make the loop explicit."},
+  a26: {to:'p24', g:"Define the “why” before the “what.” Use team stories over corporate messaging. Repeat it relentlessly."},
+  a5:  {to:'p5',  g:"Ask: what context does this pattern assume? Map your context first. Then choose the pattern that fits."},
+  a12: {to:'p57', g:"Map decision-making influence. Engage power holders early. Name the politics rather than pretending they don't exist."},
+  a28: {to:'p37', g:"Rewrite success metrics as outcomes, not deliverables. Ask: what changed in the system because of this work?"},
+  a23: {to:'p42', g:"Design teams by purpose, not template. Allow contextual team shapes. Standardize only what scale demands."},
+  a21: {to:'p26', g:"Commit to team continuity over rolling 90-day cycles. Measure team tenure as an input to learning velocity."},
+  a41: {to:'p32', g:"Move from annual planning to continuous sensing rhythms. Build monthly strategic review cadences."},
+  a42: {to:'p24', g:"Replace utilization metrics with engagement and learning metrics. Treat every person as a capability to grow."},
+  a30: {to:'p48', g:"Shift learning budget from training to practice. Every learning objective becomes an experiment on the Nexus Board."},
+  a18: {to:'p24', g:"Anchor every change in a purpose people can feel. Lead with why before what, and let meaning pull adoption."},
+  a27: {to:'p25', g:"Stop running transformation as a delivery plan. Shift the daily habits and behaviours that make new ways of working stick."},
+  a14: {to:'p32', g:"Zoom out before optimizing. Read the whole system and improve the parts that lift overall fitness, not just local metrics."},
+  a10: {to:'p37', g:"Cut the everything-is-P1 list. Anchor priorities in a few real outcomes and let value, not volume, decide."},
+  a2:  {to:'p25', g:"Drop ceremonies-for-show. Replace ritual with the behaviours that actually change how the team works."},
+  a4:  {to:'p13', g:"Turn review theatre into real feedback. Make governance a loop that senses, decides and adjusts."},
+  a38: {to:'p62', g:"Treat architecture as an enabler. Design for change so structure accelerates transformation instead of blocking it."},
+  a40: {to:'p25', g:"Lead with behaviour, not tools. Adopt tooling only to reinforce the habits you are trying to build."},
+  a39: {to:'p25', g:"Remember technology enables change — it is not the change. Pair every tool with the human habits it must support."},
+  a24: {to:'p26', g:"Build the stable foundations first. Ready the architecture so the organization can absorb change without breaking."},
+  a19: {to:'p2',  g:"Stop managing a static project list. Sense continuously and reallocate as evidence emerges."},
+  a43: {to:'p37', g:"Broaden the definition of value. Measure outcomes — learning, adaptability, customer impact — not only financials."},
+  a33: {to:'p64', g:"Move beyond courses and certificates. Embed learning in the work and prove it before you scale."},
+  a35: {to:'p4',  g:"Make assumptions explicit and testable. Replace certainty with curiosity and evidence."},
+  a34: {to:'p13', g:"Close the loop. Turn one-way reporting into feedback that changes what you do next."},
+  a32: {to:'p64', g:"Learning is not a phase you finish. Keep learning ahead of scaling, continuously."},
+  a11: {to:'p42', g:"Spread capability into small, coherent teams so knowledge is not trapped in a few experts."},
+  a16: {to:'p48', g:"Replace blame with safe-to-fail experiments. Make it safe to test, learn and adjust."},
+  a17: {to:'p57', g:"Move real authority, not just titles. Align power with the people accountable for the outcome."},
+  a1:  {to:'p27', g:"Trade the big bang for focused intensity. Sequence change so the organization can absorb it."},
+  a3:  {to:'p34', g:"Step back from rescue mode. Let change spread through peers and networks, not a single hero."},
+  a25: {to:'p48', g:"Never trade safety for speed. Design experiments that protect people while the system learns."},
+  a44: {to:'p62', g:"Stop enshrining the temporary fix. Design for evolution so solutions can change as context changes."},
+  // Nexus-derived mappings (not in the deck) for the remaining codex anti-patterns
+  a29: {to:'p48', g:"Bound the experiment before you run it. Give every probe a hypothesis, an owner and a blast radius so failure is survivable."},
+  a31: {to:'p5',  g:"Retire the template reflex. Read the context first and let it pick the pattern — not the other way around."},
+  a36: {to:'p42', g:"Break knowledge out of the vault. Move it into small, coherent teams that learn and own it together."},
+};
+
 function getConnExpKeys(connId) {
   const prefix = connId + '::';
   return Object.keys(experimentResults).filter(k => k === connId || k.startsWith(prefix));
@@ -4260,36 +4453,219 @@ function tryRenameGame(gameId, gameName, hasPassword) {
 // ══════════════════════════════════════════
 // LIBRARY
 // ══════════════════════════════════════════
-function renderLibrary() {
-  const list = document.getElementById('libraryList');
-  list.innerHTML = '';
-  const q = searchQuery.toLowerCase();
-  allItems.filter(item => {
-    if (item._anchorRef) return false; // anchor-backed items live in the Backlog only
-    if (currentFilter!=='all' && item.type!==currentFilter) return false;
-    if (activeDomain && item.domain!==activeDomain) return false;
-    if (q) return item.name.toLowerCase().includes(q)||item.signal.toLowerCase().includes(q)||item.domain.toLowerCase().includes(q);
-    return true;
-  }).forEach(item => {
-    const onBoard = isOnBoard(item.id);
-    const card = document.createElement('div');
-    card.className = `hex-card${onBoard?' on-board':''}${item.foundational?' foundational':''}`;
-    card.draggable = true;
-    card.innerHTML = `
-      <div class="hex-mini ${item.type}">${item.type==='pattern'?'P':item.type==='antipattern'?'A':item.type==='capability'?'C':'T'}</div>
-      <div class="hex-info">
-        <div class="hex-name">${item.name}</div>
-        <div class="hex-signal">${item.signal}</div>
-        <div class="hex-domain">${item.domain}</div>
-      </div>
-    `;
-    card.addEventListener('dragstart', e=>{draggedId=item.id;dragSource=null;e.dataTransfer.effectAllowed='move';showZoneGuidance(item.type);});
-    card.addEventListener('dragend', ()=>clearZoneGuidance());
-    list.appendChild(card);
+// ══════════════════════════════════════════
+// CODEX CARD DECKS — toolbox as decks of cards
+// ══════════════════════════════════════════
+let openDeck = null; // 'pattern' | 'antipattern' | 'transition' | 'capability' | null
+const DECK_META = [
+  {type:'antipattern', label:'ANTI-PATTERN', sub:'current reality',        color:'#E2801E', letter:'A'},
+  {type:'transition',  label:'TRANSITION',   sub:'safe bridge',            color:'#3C6EB4', letter:'T'},
+  {type:'pattern',     label:'PATTERN',      sub:'improved fitness',       color:'#19A7A1', letter:'P'},
+  {type:'capability',  label:'CAPABILITIES', sub:'stabilized habits',      color:'#C9D6E6', letter:'C'},
+];
+function deckItems(type){
+  return allItems.filter(it => !it._anchorRef && it.type===type && (!activeDomain || it.domain===activeDomain));
+}
+function openDeckView(type){ openDeck = type; renderLibrary(); }
+function closeDeckView(){ openDeck = null; renderLibrary(); }
+
+function deckChipHtml(item){
+  const onBoard = isOnBoard(item.id);
+  const has = !!CARD_DETAILS[item.id];
+  return `<div class="deck-chip ${item.type}${onBoard?' on-board':''}" draggable="true" data-item="${item.id}" title="${escHtml(item.name)} — click to open card">
+    <div class="chip-hex ${item.type}">${item.type==='pattern'?'✓':item.type==='antipattern'?'!':item.type==='capability'?'C':'→'}</div>
+    <div class="chip-name">${escHtml(item.name)}</div>
+    ${has?'<div class="chip-detail-dot" title="Full Codex card"></div>':''}
+  </div>`;
+}
+function wireDeckChips(container){
+  container.querySelectorAll('.deck-chip').forEach(chip=>{
+    const id = chip.getAttribute('data-item');
+    const item = allItems.find(i=>i.id===id);
+    if(!item) return;
+    chip.addEventListener('click', ()=>openCardModal(id));
+    chip.addEventListener('dragstart', e=>{draggedId=id;dragSource=null;e.dataTransfer.effectAllowed='move';showZoneGuidance(item.type);});
+    chip.addEventListener('dragend', ()=>clearZoneGuidance());
   });
 }
+
+function renderLibrary() {
+  const list = document.getElementById('libraryList');
+  if (!list) return;
+  const q = (searchQuery||'').toLowerCase();
+
+  // Search across all decks (flat results)
+  if (q) {
+    const hits = allItems.filter(it => !it._anchorRef && (!activeDomain || it.domain===activeDomain) &&
+      (it.name.toLowerCase().includes(q) || (it.signal||'').toLowerCase().includes(q) || (it.domain||'').toLowerCase().includes(q)));
+    list.innerHTML = `
+      <div class="deck-open-hdr"><span class="doh-title">SEARCH · ${hits.length} card${hits.length===1?'':'s'}</span></div>
+      <div class="deck-grid">${hits.map(deckChipHtml).join('') || '<div class="deck-empty">No cards match.</div>'}</div>`;
+    wireDeckChips(list);
+    return;
+  }
+
+  // Open deck → hex chip grid
+  if (openDeck) {
+    const meta = DECK_META.find(d=>d.type===openDeck);
+    const items = deckItems(openDeck);
+    list.innerHTML = `
+      <div class="deck-open-hdr">
+        <button class="deck-back" onclick="closeDeckView()">‹</button>
+        <span class="doh-title" style="color:${meta.color}">${meta.label}S · ${items.length}</span>
+      </div>
+      <div class="deck-grid">${items.map(deckChipHtml).join('') || '<div class="deck-empty">Deck is empty.</div>'}</div>`;
+    wireDeckChips(list);
+    return;
+  }
+
+  // Closed decks — the Codex rail
+  list.innerHTML = DECK_META.map(d=>{
+    const items = deckItems(d.type);
+    const onBoardN = items.filter(i=>isOnBoard(i.id)).length;
+    return `<div class="deck-slot ${d.type}" style="--deck-c:${d.color}" onclick="openDeckView('${d.type}')" title="Open the ${d.label} deck">
+      <div class="deck-stack"><div class="deck-card c3"></div><div class="deck-card c2"></div>
+        <div class="deck-card c1"><div class="deck-hex">${d.letter}</div><div class="deck-count">${items.length}</div></div>
+      </div>
+      <div class="deck-slot-info">
+        <div class="deck-slot-label">${d.label}</div>
+        <div class="deck-slot-sub">${d.sub}</div>
+        <div class="deck-slot-meta">${onBoardN} on board</div>
+      </div>
+      <div class="deck-draw">DRAW · PLACE · NAME</div>
+    </div>`;
+  }).join('');
+}
 function filterLibrary(v){searchQuery=v;renderLibrary();}
-function setFilter(f,el){currentFilter=f;document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderLibrary();}
+function setFilter(f,el){currentFilter=f;renderLibrary();}
+
+// ── Codex card modal ──
+let _cardModalId = null;
+function closeCardModal(){ const m=document.getElementById('cardModal'); if(m) m.remove(); _cardModalId=null; }
+function cardTypeMeta(type){
+  return type==='pattern' ? {label:'PATTERN', color:'#19A7A1', icon:'✓'}
+    : type==='antipattern' ? {label:'ANTI-PATTERN', color:'#E2801E', icon:'⚠'}
+    : type==='capability' ? {label:'CAPABILITY', color:'#C9D6E6', icon:'C'}
+    : {label:'TRANSITION PATTERN', color:'#3C6EB4', icon:'→'};
+}
+function cardFaceHtml(item, compact){
+  const meta = cardTypeMeta(item.type);
+  const d = CARD_DETAILS[item.id];
+  return `<div class="codex-face${compact?' compact':''}" style="--card-c:${meta.color}">
+    <div class="cf-top"></div>
+    <div class="cf-badge">${d && d.n ? String(d.n).padStart(2,'0') : meta.icon}</div>
+    <div class="cf-name">${escHtml(item.name)}</div>
+    <div class="cf-class-line"><span>CLASS</span></div>
+    <div class="cf-class">${escHtml(item.domain||'—')}</div>
+    <div class="cf-type">${meta.label}</div>
+  </div>`;
+}
+function cardDetailHtml(item){
+  const meta = cardTypeMeta(item.type);
+  const d = CARD_DETAILS[item.id];
+  const isAnti = item.type==='antipattern';
+  const essence = d ? d.e : (item.signal || '—');
+  const signals = d ? d.s : (item.signal ? [item.signal] : []);
+  const impacts = d ? d.i : (item.impact ? [item.impact] : []);
+  const note = d ? d.note : null;
+  return `<div class="codex-detail" style="--card-c:${meta.color}">
+    <div class="cd-title">${escHtml(item.name)}</div>
+    <div class="cd-sec">${isAnti?'CORE DESCRIPTION':'ESSENCE'}</div>
+    <div class="cd-essence">${escHtml(essence)}</div>
+    <div class="cd-sec">OBSERVABLE SIGNALS</div>
+    ${signals.map(s=>`<div class="cd-li">${isAnti?'⚡':'→'} ${escHtml(s)}</div>`).join('')}
+    <div class="cd-sec">SYSTEM IMPACT</div>
+    ${impacts.map(s=>`<div class="cd-li">${isAnti?'✕':'◆'} ${escHtml(s)}</div>`).join('')}
+    ${note?`<div class="cd-note"><div class="cd-note-hd">${isAnti?'NEXUS WARNING':'NEXUS NOTE'}</div><div class="cd-note-tx">${escHtml(note)}</div></div>`:''}
+  </div>`;
+}
+function openCardModal(itemId){
+  const item = allItems.find(i=>i.id===itemId);
+  if(!item) return;
+  closeCardModal();
+  _cardModalId = itemId;
+  const meta = cardTypeMeta(item.type);
+  const hasTransition = item.type==='antipattern' && typeof TRANSITION_GUIDE!=='undefined' && TRANSITION_GUIDE[itemId] && allItems.find(i=>i.id===TRANSITION_GUIDE[itemId].to);
+  const div = document.createElement('div');
+  div.id='cardModal'; div.className='codex-modal';
+  div.innerHTML = `<div class="codex-box" style="--card-c:${meta.color}">
+    <button class="codex-close" onclick="closeCardModal()">✕</button>
+    <div class="codex-body">
+      ${cardFaceHtml(item)}
+      ${cardDetailHtml(item)}
+    </div>
+    <div class="codex-actions">
+      <button class="codex-btn primary" onclick="addCardToBoard('${itemId}')">＋ Add to Board</button>
+      ${hasTransition?`<button class="codex-btn transition" onclick="openTransitionView('${itemId}')">→ Transition</button>`:''}
+      <span class="codex-foot">NTT DATA · Nexus · Transformation Codex</span>
+    </div>
+  </div>`;
+  div.addEventListener('click', e=>{ if(e.target===div) closeCardModal(); });
+  document.body.appendChild(div);
+}
+// ── Anti-pattern → Pattern transition view ──
+function openTransitionView(antiId){
+  const anti = allItems.find(i=>i.id===antiId);
+  const tg = TRANSITION_GUIDE[antiId];
+  const pat = tg && allItems.find(i=>i.id===tg.to);
+  if(!anti || !pat) return;
+  closeCardModal();
+  const div = document.createElement('div');
+  div.id='cardModal'; div.className='codex-modal';
+  div.innerHTML = `<div class="codex-box wide">
+    <button class="codex-close" onclick="closeCardModal()">✕</button>
+    <div class="codex-trans-hd">TRANSFORMATION CODEX · TRANSITION PATTERN</div>
+    <div class="codex-trans">
+      <div class="ct-col" onclick="openCardModal('${antiId}')" title="Open anti-pattern card">${cardFaceHtml(anti, true)}</div>
+      <div class="ct-mid">
+        <div class="ct-guide">${escHtml(tg.g)}</div>
+        <div class="ct-rule"></div>
+        <div class="ct-arrow">→</div>
+        <div class="ct-lbl">TRANSITION<br>PATTERN</div>
+      </div>
+      <div class="ct-col" onclick="openCardModal('${pat.id}')" title="Open pattern card">${cardFaceHtml(pat, true)}</div>
+    </div>
+    <div class="codex-actions">
+      <button class="codex-btn" onclick="openCardModal('${antiId}')">‹ Back to Card</button>
+      <button class="codex-btn" onclick="openCardModal('${pat.id}')">Open Pattern Card</button>
+      <button class="codex-btn primary" onclick="addCardToBoard('${pat.id}')">＋ Add Pattern to Board</button>
+    </div>
+  </div>`;
+  div.addEventListener('click', e=>{ if(e.target===div) closeCardModal(); });
+  document.body.appendChild(div);
+}
+// ── Click-to-place: put the card on the first free cell in its best zone ──
+function addCardToBoard(itemId){
+  const itemObj = resolveItem(itemId);
+  if(!itemObj) return;
+  const guide = GUIDANCE[itemObj.type];
+  const tiers = guide ? [guide.best, guide.ok, null] : [null];
+  let target = null;
+  outer:
+  for (const tier of tiers) {
+    for (let row = 0; row < GRID_ROWS; row++) {
+      for (const col of getColsForRow(row)) {
+        const key = `${row},${col}`;
+        if (gridState[key]) continue;
+        if (tier && !tier.includes(getZoneFromCoords(row,col))) continue;
+        target = key; break outer;
+      }
+    }
+  }
+  if (!target) { showToast('Board is full — add rows or columns first','warning'); return; }
+  const placeId = itemId + '_' + Date.now();
+  boardInstances[placeId] = itemId;
+  gridState[target] = placeId;
+  if (itemObj.type === 'capability' && itemObj._capRef) {
+    const alreadyMarked = boardMarkers.some(m => m.hexId === placeId && m.type === 'capability');
+    if (!alreadyMarked) boardMarkers.push({id:'mk_'+Date.now(), hexId:placeId, type:'capability', capabilityIds:[itemObj._capRef]});
+  }
+  addLog(`Placed "${itemObj.name}" from the Codex deck`,'action');
+  closeCardModal();
+  if (currentView !== 'board') switchBoardView('board');
+  renderBoard(); renderCurrentBacklog(); renderLibrary(); updateStats(); scheduleAutoSave();
+  showToast(`“${itemObj.name}” placed on the board`,'success');
+}
 
 // ══════════════════════════════════════════
 // HONEYCOMB BOARD
