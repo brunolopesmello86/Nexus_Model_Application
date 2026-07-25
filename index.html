@@ -267,6 +267,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .pm-exp-pts { font-size:11px; font-weight:800; min-width:44px; text-align:right; flex-shrink:0; }
 .pm-addbar { display:flex; gap:10px; align-items:center; }
 .pm-addbar select { flex:1; }
+/* Practice radar */
+.pm-radar-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 18px; margin-bottom:20px; }
+.pm-radar-hdr { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+.pm-radar-title { font-size:12px; font-weight:800; letter-spacing:.8px; text-transform:uppercase; color:var(--accent); }
+.pm-radar-hdr .spacer { flex:1; }
+.pm-radar-hdr select { padding:6px 10px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:12px; }
+.pm-radar-toggle { padding:5px 13px; border-radius:999px; border:1px solid var(--border); background:var(--surface2); color:var(--text-muted); font-size:11px; font-weight:700; cursor:pointer; }
+.pm-radar-toggle.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+.pm-radar-wrap { display:flex; justify-content:center; }
+.pm-radar-wrap svg { max-width:100%; height:auto; }
+.pm-radar-legend { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:12px; font-size:10.5px; color:var(--text-muted); }
+.pm-radar-legend .lg { display:inline-flex; align-items:center; gap:5px; }
+.pm-radar-legend .dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
 
 /* ══ HEADER ══ */
 .app-header { background:linear-gradient(135deg,#0e0e10,#161618); border-bottom:2px solid var(--accent); padding:10px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
@@ -2538,6 +2551,127 @@ function pmOrgFitness() {
   const sum = ids.reduce((s, id) => s + pmStats(id).fitness, 0);
   return { avg: Math.round(sum / ids.length), count: ids.length };
 }
+
+// ── Radar of practices ──────────────────────────────────────────────────
+let _pmRadarClass = '';       // '' = all classes
+let _pmRadarLabels = true;    // show value labels at each vertex
+let _pmRadarArea = true;      // fill the polygon
+const PM_BANDS = [
+  { v: 20,  n: 'Fragile',     c: '#d94a4a' },
+  { v: 40,  n: 'Emerging',    c: '#f5821f' },
+  { v: 60,  n: 'Stable',      c: '#f2c14e' },
+  { v: 80,  n: 'Resilient',   c: '#2d9d5e' },
+  { v: 100, n: 'Antifragile', c: '#0072ce' },
+];
+function pmBand(v) {
+  if (v >= 80) return PM_BANDS[4];
+  if (v >= 60) return PM_BANDS[3];
+  if (v >= 40) return PM_BANDS[2];
+  if (v >= 20) return PM_BANDS[1];
+  return PM_BANDS[0];
+}
+// rrows: [{ name, fitness }]
+function pmRadarSVG(rrows) {
+  const W = 720, H = 620, cx = 360, cy = 300, R = 210;
+  const P = [];
+  P.push(`<svg id="pmRadarSvg" xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`);
+  P.push(`<rect x="0" y="0" width="${W}" height="${H}" rx="14" fill="#ffffff"/>`);
+  // concentric band rings (outer→inner so inner deepens)
+  const ringFill = ['#cfdff4', '#d9e6f6', '#e3edf9', '#edf3fb', '#f5f8fd']; // 20..100
+  for (let k = PM_BANDS.length - 1; k >= 0; k--) {
+    const r = R * PM_BANDS[k].v / 100;
+    P.push(`<circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="${ringFill[k]}" stroke="#cdd8ea" stroke-width="1"/>`);
+  }
+  // band scale labels up the vertical axis
+  PM_BANDS.forEach(b => {
+    const y = cy - R * b.v / 100;
+    P.push(`<text x="${cx + 5}" y="${(y + 4).toFixed(1)}" font-family="Helvetica,Arial" font-size="11" font-weight="700" fill="#5a6b84">${b.v}</text>`);
+    P.push(`<text x="${cx + 5}" y="${(y + 15).toFixed(1)}" font-family="Helvetica,Arial" font-size="10" font-weight="700" fill="${b.c}">${b.n}</text>`);
+  });
+  const N = rrows.length;
+  const esc = s => String(s).replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[c]);
+  const pts = rrows.map((row, i) => {
+    const ang = (-90 + i * 360 / N) * Math.PI / 180;
+    const rr = R * Math.max(0, Math.min(100, row.fitness)) / 100;
+    return { x: cx + rr * Math.cos(ang), y: cy + rr * Math.sin(ang), ang, row };
+  });
+  // spokes + outer labels
+  rrows.forEach((row, i) => {
+    const ang = (-90 + i * 360 / N) * Math.PI / 180;
+    const ex = cx + R * Math.cos(ang), ey = cy + R * Math.sin(ang);
+    P.push(`<line x1="${cx}" y1="${cy}" x2="${ex.toFixed(1)}" y2="${ey.toFixed(1)}" stroke="#d3dcea" stroke-width="1"/>`);
+    const lx = cx + (R + 14) * Math.cos(ang), ly = cy + (R + 14) * Math.sin(ang);
+    const dx = Math.cos(ang);
+    const anchor = dx > 0.25 ? 'start' : dx < -0.25 ? 'end' : 'middle';
+    const nm = row.name.length > 20 ? row.name.slice(0, 18) + '…' : row.name;
+    P.push(`<text x="${lx.toFixed(1)}" y="${(ly + 4).toFixed(1)}" font-family="Helvetica,Arial" font-size="11.5" font-weight="700" fill="#0a2a66" text-anchor="${anchor}">${i + 1}. ${esc(nm)}</text>`);
+  });
+  // polygon / line
+  if (N >= 3) {
+    const d = 'M' + pts.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' L') + ' Z';
+    P.push(`<path d="${d}" fill="${_pmRadarArea ? 'rgba(0,114,206,.13)' : 'none'}" stroke="#0072ce" stroke-width="2.5"/>`);
+  } else if (N === 2) {
+    P.push(`<line x1="${pts[0].x.toFixed(1)}" y1="${pts[0].y.toFixed(1)}" x2="${pts[1].x.toFixed(1)}" y2="${pts[1].y.toFixed(1)}" stroke="#0072ce" stroke-width="2.5"/>`);
+  }
+  // dots + value labels
+  pts.forEach(p => {
+    const band = pmBand(p.row.fitness);
+    P.push(`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="5.5" fill="${band.c}" stroke="#ffffff" stroke-width="1.8"/>`);
+    if (_pmRadarLabels) {
+      const up = p.ang > 0 ? 15 : -9; // push label away from center
+      P.push(`<text x="${p.x.toFixed(1)}" y="${(p.y + up).toFixed(1)}" font-family="Helvetica,Arial" font-size="10.5" font-weight="800" fill="#0a2a66" text-anchor="middle">${p.row.fitness}</text>`);
+    }
+  });
+  P.push('</svg>');
+  return P.join('');
+}
+function pmRadarPanel(rows) {
+  // rows: [{id,prac,cap}] from renderPracticesPage
+  const filtered = (_pmRadarClass ? rows.filter(r => (r.cap.domain || '') === _pmRadarClass) : rows);
+  const rrows = filtered.map(r => ({ name: r.prac.name, fitness: pmStats(r.id).fitness }));
+  const classOpts = ['<option value="">All classes</option>']
+    .concat(CLASSES.map(c => `<option value="${amEscAttr(c)}" ${_pmRadarClass === c ? 'selected' : ''}>${amEsc(c)}</option>`)).join('');
+  const body = rrows.length
+    ? `<div class="pm-radar-wrap">${pmRadarSVG(rrows)}</div>`
+    : `<div class="am-empty">No practices in this class yet.</div>`;
+  return `
+    <div class="pm-radar-card">
+      <div class="pm-radar-hdr">
+        <span class="pm-radar-title">◎ Radar of Practices</span>
+        <span class="spacer"></span>
+        <button class="pm-radar-toggle ${_pmRadarLabels ? 'on' : ''}" onclick="pmToggleRadar('labels')">Labels</button>
+        <button class="pm-radar-toggle ${_pmRadarArea ? 'on' : ''}" onclick="pmToggleRadar('area')">Area</button>
+        <button class="pm-radar-toggle" onclick="pmRadarPNG()">⬇ PNG</button>
+        <select onchange="_pmRadarClass=this.value;renderPracticesPage()">${classOpts}</select>
+      </div>
+      ${body}
+      <div class="pm-radar-legend">
+        <span style="font-weight:700;color:var(--text)">Bands:</span>
+        ${PM_BANDS.map(b => `<span class="lg"><span class="dot" style="background:${b.c}"></span>${b.n}</span>`).join('')}
+      </div>
+    </div>`;
+}
+function pmToggleRadar(which) {
+  if (which === 'labels') _pmRadarLabels = !_pmRadarLabels;
+  else if (which === 'area') _pmRadarArea = !_pmRadarArea;
+  renderPracticesPage();
+}
+function pmRadarPNG() {
+  const svg = document.getElementById('pmRadarSvg');
+  if (!svg) { showToast('Add practices to export the radar', 'warning'); return; }
+  const xml = new XMLSerializer().serializeToString(svg);
+  const src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(xml)));
+  const img = new Image();
+  img.onload = () => {
+    const scale = 2, c = document.createElement('canvas');
+    c.width = 720 * scale; c.height = 620 * scale;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, c.width, c.height);
+    ctx.scale(scale, scale); ctx.drawImage(img, 0, 0, 720, 620);
+    c.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'nexus-practices-radar.png'; a.click(); });
+  };
+  img.src = src;
+}
 // Practice ids "in play" for this game
 function pmEngagedIds() {
   const ids = new Set();
@@ -2595,6 +2729,8 @@ function renderPracticesPage() {
       <div class="am-summary-card"><div class="am-summary-label">Total repetitions</div><div class="am-summary-value teal">${totReps}</div></div>
       <div class="am-summary-card"><div class="am-summary-label">Org Fitness (avg)</div><div class="am-summary-value" style="color:${amMaturityColor(orgAvg)}">${orgAvg}</div></div>
     </div>
+
+    ${pmRadarPanel(rows)}
 
     <div class="am-add-panel">
       <div class="pm-addbar">
