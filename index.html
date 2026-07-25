@@ -1224,6 +1224,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 [data-theme="light"] .fp-dest { background:linear-gradient(180deg,#0a2a66,#0d3a8f); }
 [data-theme="light"] .fdc { background:rgba(255,255,255,.08); }
 [data-theme="light"] .fp-dest .fb-name, [data-theme="light"] .fp-dest-score { color:#fff; }
+/* ══ EXPERIMENT READINESS GATE ══ */
+.exp-ready-chip { display:inline-flex; align-items:center; margin:4px 0 2px; padding:3px 9px; border-radius:999px; font-size:8.5px; font-weight:800; letter-spacing:1.2px; cursor:pointer; border:1px solid #E2801E; color:#E2801E; background:rgba(226,128,30,.1); }
+.exp-ready-chip.ok { border-color:var(--accent); color:var(--cyan); background:rgba(25,167,161,.12); }
+.exp-ready-chip:hover { filter:brightness(1.25); }
+.rdy-list { display:flex; flex-direction:column; gap:8px; margin:14px 0 4px; }
+.rdy-row { display:flex; gap:10px; align-items:flex-start; padding:9px 11px; border-radius:8px; border:1px solid var(--border); background:var(--surface2); }
+.rdy-row.ok { border-color:rgba(25,167,161,.5); }
+.rdy-row.miss { border-color:rgba(226,128,30,.5); }
+.rdy-ic { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0; }
+.rdy-row.ok .rdy-ic { background:rgba(25,167,161,.2); color:var(--cyan); }
+.rdy-row.miss .rdy-ic { background:rgba(226,128,30,.2); color:#E2801E; }
+.rdy-lbl { font-size:12.5px; font-weight:700; color:var(--text); }
+.rdy-hint { font-size:10.5px; color:var(--text-muted); margin-top:2px; line-height:1.45; }
 </style>
 </head>
 <body>
@@ -3213,6 +3226,7 @@ function renderExperimentsPage() {
           ondragstart="_draggedExpKey='${safeKey}';event.dataTransfer.setData('text/plain','${safeKey}')"
           ondragend="_draggedExpKey=null">
           <div class="kanban-card-name">${icon} ${escHtml(title)}</div>
+          ${expReadinessChip(safeKey)}
           ${linkedPrac
             ? `<div class="kanban-card-prac">◈ ${escHtml(linkedPrac.capName||'')} → ${escHtml(linkedPrac.name)}</div>`
             : `<div class="kanban-card-prac" style="color:var(--text-muted);font-style:italic;">No practice linked</div>`}
@@ -3239,8 +3253,81 @@ function renderExperimentsPage() {
   page.innerHTML = html;
 }
 
+// ══════════════════════════════════════════
+// EXPERIMENT READINESS GATE
+// New experiments (gated:true) may only leave Pending when all 4 hold:
+//  1. the practice's capability is placed on the board
+//  2. a practice is selected on the nexus link
+//  3. the experiment sits on a live Transition Nexus line
+//  4. the practice has ≥3 good habits scored in the Practice Tracker
+// Experiments created before this gate (no `gated` flag) are grandfathered.
+// ══════════════════════════════════════════
+function expReadiness(key) {
+  const er = experimentResults[key] || {};
+  const connId = key.includes('::') ? key.split('::')[0] : key;
+  const pracId = er.practiceId || (key.includes('::') ? key.split('::')[1] : null);
+  const practiceSelected = !!pracId;
+  const conn = connections.find(c => c.id === connId);
+  const nexusLink = conn ? conn.type === 'nexus'
+    : connections.some(c => c.type === 'nexus' && (c.from === key || c.to === key));
+  let capOnBoard = false;
+  if (pracId) {
+    const cap = capabilitiesLibrary.find(c => (c.practices||[]).some(p => p.id === pracId));
+    if (cap) {
+      const placed = Object.values(gridState);
+      capOnBoard = placed.some(gid => {
+        const itm = resolveItem(gid);
+        if (itm && itm.type === 'capability' && itm._capRef === cap.id) return true;
+        const mk = boardMarkers.find(m => m.type === 'capability' && m.hexId === gid);
+        if (!mk) return false;
+        return getCapabilityIds(mk).includes(cap.id) || getCapabilityLinks(mk).some(l => l.capabilityId === cap.id);
+      });
+    }
+  }
+  const habits3 = pracId ? (pmHabits(pracId).length >= 3) : false;
+  const ready = capOnBoard && practiceSelected && nexusLink && habits3;
+  return { capOnBoard, practiceSelected, nexusLink, habits3, ready, gated: !!er.gated };
+}
+function expReadinessChip(key) {
+  const r = expReadiness(key);
+  if (!r.gated) return '';
+  const n = [r.capOnBoard, r.practiceSelected, r.nexusLink, r.habits3].filter(Boolean).length;
+  return `<div class="exp-ready-chip ${r.ready?'ok':''}" onclick="event.stopPropagation();showReadinessModal('${escHtml(key)}')" title="Experiment readiness — click for details">${r.ready?'✓ READY':'◈ DRAFT · '+n+'/4'}</div>`;
+}
+function showReadinessModal(key) {
+  const r = expReadiness(key);
+  const pracId = (experimentResults[key]||{}).practiceId || (key.includes('::') ? key.split('::')[1] : null);
+  const habitsN = pracId ? pmHabits(pracId).length : 0;
+  const row = (ok, label, hint) => `<div class="rdy-row ${ok?'ok':'miss'}"><span class="rdy-ic">${ok?'✓':'✗'}</span><div><div class="rdy-lbl">${label}</div><div class="rdy-hint">${hint}</div></div></div>`;
+  const existing = document.getElementById('cardModal'); if (existing) existing.remove();
+  const div = document.createElement('div');
+  div.id = 'cardModal'; div.className = 'codex-modal';
+  div.innerHTML = `<div class="codex-box" style="--card-c:${r.ready?'#19A7A1':'#E2801E'};width:520px">
+    <button class="codex-close" onclick="closeCardModal()">✕</button>
+    <div class="cd-title" style="font-size:16px">🧪 Experiment Readiness ${r.ready?'— ready to run':'— not ready yet'}</div>
+    <div class="rdy-list">
+      ${row(r.capOnBoard, 'Capability on the board', 'The capability this practice belongs to must be placed on the board (green hex or C-marker).')}
+      ${row(r.practiceSelected, 'Practice selected', 'Link a practice to this experiment on the Nexus line.')}
+      ${row(r.nexusLink, 'Transition Nexus link', 'The experiment must sit on a live Transition Nexus line between hexes.')}
+      ${row(r.habits3, 'Practice evaluated — ≥3 good habits', `Score at least 3 good habits for this practice in the Practices tab (currently ${habitsN}).`)}
+    </div>
+    <div class="codex-actions">
+      ${!r.habits3 && pracId ? `<button class="codex-btn" onclick="closeCardModal();switchBoardView('practices')">Open Practices tab →</button>` : ''}
+      <button class="codex-btn primary" onclick="closeCardModal()">Got it</button>
+      <span class="codex-foot">All 4 required before the experiment can leave Pending</span>
+    </div>
+  </div>`;
+  div.addEventListener('click', e => { if (e.target === div) closeCardModal(); });
+  document.body.appendChild(div);
+}
+
 function moveExpStage(id, stage) {
-  if (!experimentResults[id]) experimentResults[id] = {};
+  if (!experimentResults[id]) experimentResults[id] = { gated: true };
+  // Readiness gate — new experiments must pass all 4 checks to leave Pending
+  if (stage !== 'pending' && experimentResults[id].gated) {
+    const r = expReadiness(id);
+    if (!r.ready) { showReadinessModal(id); return; }
+  }
   // Hypothesis required before moving to Running
   if (stage === 'running' && !experimentResults[id].hypothesis?.trim()) {
     showToast('✍️ First write your Hypothesis! "If we do X, then Y will happen because Z..." — a good experiment starts with a clear prediction! 🚀', 'info');
@@ -3259,7 +3346,7 @@ function moveExpStage(id, stage) {
 }
 
 function setExpField(id, field, value) {
-  if (!experimentResults[id]) experimentResults[id] = {};
+  if (!experimentResults[id]) experimentResults[id] = { gated:true };
   experimentResults[id][field] = value;
   if (field === 'practiceId') { renderExperimentsPage(); renderFitnessPanel(); }
   scheduleAutoSave();
@@ -3797,7 +3884,7 @@ function saveS2FExperiment() {
     if (checked.length === 0) { showToast('Select at least one practice to add to Kanban', 'info'); return; }
     checked.forEach(pracId => {
       const expKey = key + '::' + pracId;
-      if (!experimentResults[expKey]) experimentResults[expKey] = { stage: 'pending', practiceId: pracId };
+      if (!experimentResults[expKey]) experimentResults[expKey] = { stage: 'pending', practiceId: pracId, gated: true };
     });
     const fromItem = resolveItem(conn.from);
     const toItem   = resolveItem(conn.to);
@@ -4141,7 +4228,7 @@ function setExperimentStatus(hexId, status) {
   updateStats(); scheduleAutoSave();
 }
 function setExperimentPractice(hexId, practiceId) {
-  if (!experimentResults[hexId]) experimentResults[hexId]={};
+  if (!experimentResults[hexId]) experimentResults[hexId]={ gated:true };
   experimentResults[hexId].practiceId = practiceId;
   scheduleAutoSave();
 }
@@ -5077,9 +5164,18 @@ function handleConnectClick(hexId) {
   if (connections.some(c=>c.from===connectFrom && c.to===hexId && c.type===connectMode)) {
     connectFrom=null; updateConnectStatus(); renderAllZones(); return;
   }
-  connections.push({id:'conn_'+Date.now(), from:connectFrom, to:hexId, type:connectMode});
   const fromItem=resolveItem(connectFrom);
   const toItem=resolveItem(hexId);
+  // Nexus endpoint validation — a Transition Nexus should run:
+  // anti-pattern → pattern, capability → pattern, or anti-pattern → capability
+  if (connectMode === 'nexus' && fromItem && toItem) {
+    const pair = fromItem.type + '→' + toItem.type;
+    const validPairs = ['antipattern→pattern','capability→pattern','antipattern→capability'];
+    if (!validPairs.includes(pair)) {
+      showToast(`⚠️ Unusual nexus: ${fromItem.type} → ${toItem.type}. Recommended: Anti-Pattern → Pattern, Capability → Pattern, or Anti-Pattern → Capability.`,'warning');
+    }
+  }
+  connections.push({id:'conn_'+Date.now(), from:connectFrom, to:hexId, type:connectMode});
   addLog(`Connected "${fromItem?.name}" → "${toItem?.name}" (Transition Nexus)`,'success');
   connectFrom=null;
   updateConnectStatus();
