@@ -1237,9 +1237,129 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .rdy-row.miss .rdy-ic { background:rgba(226,128,30,.2); color:#E2801E; }
 .rdy-lbl { font-size:12.5px; font-weight:700; color:var(--text); }
 .rdy-hint { font-size:10.5px; color:var(--text-muted); margin-top:2px; line-height:1.45; }
+/* ══ POSTER LAYER — Bioluminescent Open Field (visual only) ══ */
+#bioField { position:fixed; inset:0; z-index:-1; pointer-events:none; }
+#bioField svg { width:100%; height:100%; display:block; }
+#posterVignette { position:fixed; inset:0; z-index:240; pointer-events:none; background:radial-gradient(ellipse at center, transparent 54%, rgba(0,0,0,.4) 100%); }
+#posterFrame { position:fixed; inset:0; z-index:241; pointer-events:none; }
+#posterFrame::before { content:''; position:absolute; inset:8px; border:3px solid rgba(30,66,102,.85); border-radius:16px; }
+#posterFrame::after { content:''; position:absolute; inset:15px; border:1.4px solid rgba(12,33,55,.75); border-radius:12px; }
+#posterGrain { position:fixed; inset:0; z-index:242; pointer-events:none; opacity:.07; mix-blend-mode:screen; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/><feColorMatrix type='saturate' values='0'/></filter><rect width='240' height='240' filter='url(%23n)' opacity='0.6'/></svg>"); }
+/* hero header */
+.hero-eyebrow { font-size:9px; font-weight:800; letter-spacing:3.4px; color:var(--accent); margin-bottom:1px; }
+.logo h1 { font-size:19px; font-weight:800; letter-spacing:2.8px; line-height:1.05; }
+.logo .sub { font-size:10px; font-weight:800; letter-spacing:2.6px; color:var(--cyan); text-transform:uppercase; }
+.app-header { border-bottom:2px solid #1E4266; }
+/* board field — framed open field */
+.board-map { background:transparent; }
+#hexBoardArea { position:relative; }
+#hexBoardArea::after { content:'THE TRANSITIONAL SPACE'; position:absolute; top:40px; left:50%; transform:translateX(-50%); padding:7px 26px 6px; border:1.6px solid rgba(60,110,180,.6); border-radius:999px; background:rgba(5,13,24,.7); color:var(--text); font-size:10.5px; font-weight:800; letter-spacing:4.2px; z-index:6; pointer-events:none; white-space:nowrap; }
+#hexScrollArea { background:linear-gradient(180deg, rgba(7,26,46,.94), rgba(7,26,46,.68)); border:3px solid #1E4266; border-radius:14px; margin:6px 10px 10px 6px; box-shadow:inset 0 0 70px rgba(0,0,0,.4); }
+/* stroked hex cells — outline look with faint blue fill */
+.hex-cell-bg, .hex-cell[data-parity="1"] .hex-cell-bg, .hex-cell[data-parity="2"] .hex-cell-bg { background:#1B3A55; }
+.hex-cell-bg::before { content:''; position:absolute; inset:2px; clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); background:rgba(60,110,180,.06); }
+.hex-cell[data-parity="1"] .hex-cell-bg::before { background:rgba(60,110,180,.10); }
+.hex-cell[data-parity="2"] .hex-cell-bg::before { background:rgba(60,110,180,.145); }
+.hex-cell.drag-over .hex-cell-bg::before { background:rgba(25,167,161,.3) !important; }
+.hex-cell.guide-best .hex-cell-bg::before { background:rgba(45,200,94,.16) !important; }
+.hex-cell.guide-yes .hex-cell-bg::before { background:rgba(45,157,94,.09) !important; }
+.hex-cell.guide-no .hex-cell-bg::before { background:rgba(217,74,74,.07) !important; }
+.hex-cell.empty .hex-cell-bg::after { position:relative; z-index:2; }
+.cell-tag { position:absolute; left:50%; top:50%; transform:translate(-50%, 9px); font-family:ui-monospace,monospace; font-size:8px; font-weight:700; letter-spacing:.8px; color:rgba(124,147,171,.45); pointer-events:none; z-index:2; }
+/* dotted flow contours across the field */
+.field-contours { position:absolute; top:0; left:0; pointer-events:none; z-index:0; }
+.field-contours path { fill:none; stroke:#2A5C86; stroke-width:2.6; opacity:.3; stroke-dasharray:2 13; stroke-linecap:round; }
+/* lane + zone typography (poster axis labels) */
+.lane-label-abs { background:rgba(7,24,42,.9); border-right:1px solid #1E4266; }
+.lane-label-abs .ll-text { letter-spacing:3px; color:#48607A; font-size:9.5px; }
+.zone-col-header .zone-tag { letter-spacing:1.6px; }
+.cr-zone-hdr { letter-spacing:1.4px; }
+/* side panels — poster frames with corner brackets */
+.toolbox { position:relative; background:#07182A; border-right:2px solid #1E4266; }
+.toolbox::before, .toolbox::after, .fitness-panel::before, .fitness-panel::after { content:''; position:absolute; width:22px; height:22px; pointer-events:none; z-index:3; }
+.toolbox::before { top:6px; left:6px; border-top:2.4px solid #1E4266; border-left:2.4px solid #1E4266; }
+.toolbox::after { bottom:6px; right:6px; border-bottom:2.4px solid #1E4266; border-right:2.4px solid #1E4266; }
+.fitness-panel { position:relative; background:linear-gradient(180deg,#04101D,#07182A); border-left:2px solid var(--accent); }
+.fitness-panel::before { top:6px; left:6px; border-top:2.4px solid var(--accent); border-left:2.4px solid var(--accent); opacity:.65; }
+.fitness-panel::after { bottom:6px; right:6px; border-bottom:2.4px solid var(--accent); border-right:2.4px solid var(--accent); opacity:.65; }
+/* light (executive) theme — poster layer fully off */
+[data-theme="light"] #bioField, [data-theme="light"] #posterVignette, [data-theme="light"] #posterFrame,
+[data-theme="light"] #posterGrain, [data-theme="light"] .field-contours, [data-theme="light"] .cell-tag,
+[data-theme="light"] #hexBoardArea::after { display:none; }
+[data-theme="light"] #hexScrollArea { background:transparent; border:none; margin:0; box-shadow:none; border-radius:0; }
+[data-theme="light"] .board-map { background:var(--bg); }
+[data-theme="light"] .hex-cell-bg::before { display:none; }
+[data-theme="light"] .toolbox { background:var(--surface); border-right:1px solid var(--border); }
+[data-theme="light"] .fitness-panel { background:var(--surface); border-left:1px solid var(--border); }
+[data-theme="light"] .toolbox::before, [data-theme="light"] .toolbox::after,
+[data-theme="light"] .fitness-panel::before, [data-theme="light"] .fitness-panel::after { display:none; }
+[data-theme="light"] .hero-eyebrow { color:#7FE3DD; }
+[data-theme="light"] .lane-label-abs { background:var(--surface); border-right:1px solid var(--border); }
 </style>
 </head>
 <body>
+
+<!-- ══ POSTER LAYER · Bioluminescent Open Field (visual only — no mechanics) ══ -->
+<div id="bioField" aria-hidden="true"><svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="bfBlur" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="34"/></filter>
+    <filter id="bfBlur2" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="5"/></filter>
+    <path id="bfHex" d="M -30 -52 L 30 -52 L 60 0 L 30 52 L -30 52 L -60 0 Z"/>
+  </defs>
+  <rect width="1600" height="1000" fill="#050D18"/>
+  <rect width="1600" height="1000" fill="#08182B" opacity="0.5"/>
+  <g filter="url(#bfBlur)">
+    <ellipse cx="180" cy="140" rx="260" ry="180" fill="#0A1A22" opacity="0.55"/>
+    <ellipse cx="740" cy="60" rx="300" ry="170" fill="#0A1A22" opacity="0.6"/>
+    <ellipse cx="1350" cy="130" rx="320" ry="200" fill="#071A2E" opacity="0.55"/>
+    <ellipse cx="120" cy="520" rx="240" ry="220" fill="#062724" opacity="0.5"/>
+    <ellipse cx="620" cy="470" rx="280" ry="200" fill="#071A2E" opacity="0.45"/>
+    <ellipse cx="1080" cy="540" rx="300" ry="230" fill="#062724" opacity="0.42"/>
+    <ellipse cx="1500" cy="480" rx="260" ry="240" fill="#0A1A22" opacity="0.5"/>
+    <ellipse cx="260" cy="900" rx="300" ry="200" fill="#0A1A22" opacity="0.5"/>
+    <ellipse cx="820" cy="940" rx="320" ry="190" fill="#062724" opacity="0.48"/>
+    <ellipse cx="1400" cy="890" rx="300" ry="210" fill="#071A2E" opacity="0.55"/>
+    <ellipse cx="960" cy="300" rx="200" ry="150" fill="#0A1A22" opacity="0.4"/>
+    <ellipse cx="420" cy="720" rx="220" ry="160" fill="#071A2E" opacity="0.45"/>
+  </g>
+  <g filter="url(#bfBlur2)" opacity="0.5">
+    <use href="#bfHex" transform="translate(240 260) scale(1.1)" fill="#19A7A1" opacity="0.07"/>
+    <use href="#bfHex" transform="translate(250 268) scale(0.86)" fill="none" stroke="#19A7A1" stroke-width="2" opacity="0.3"/>
+    <use href="#bfHex" transform="translate(560 180) scale(0.7)" fill="#E2801E" opacity="0.08"/>
+    <use href="#bfHex" transform="translate(566 174) scale(0.55)" fill="none" stroke="#E2801E" stroke-width="2.2" opacity="0.33"/>
+    <use href="#bfHex" transform="translate(1210 240) scale(0.95)" fill="none" stroke="#3C6EB4" stroke-width="2.4" opacity="0.3"/>
+    <use href="#bfHex" transform="translate(1430 380) scale(0.6)" fill="#19A7A1" opacity="0.09"/>
+    <use href="#bfHex" transform="translate(1436 386) scale(0.45)" fill="none" stroke="#19A7A1" stroke-width="2" opacity="0.28"/>
+    <use href="#bfHex" transform="translate(160 640) scale(0.8)" fill="none" stroke="#E2801E" stroke-width="1.8" opacity="0.3"/>
+    <use href="#bfHex" transform="translate(520 840) scale(1.0)" fill="#19A7A1" opacity="0.06"/>
+    <use href="#bfHex" transform="translate(528 848) scale(0.78)" fill="none" stroke="#19A7A1" stroke-width="2.2" opacity="0.26"/>
+    <use href="#bfHex" transform="translate(1040 800) scale(0.66)" fill="none" stroke="#E2801E" stroke-width="2" opacity="0.3"/>
+    <use href="#bfHex" transform="translate(1330 720) scale(0.9)" fill="#3C6EB4" opacity="0.06"/>
+    <use href="#bfHex" transform="translate(1338 726) scale(0.7)" fill="none" stroke="#3C6EB4" stroke-width="2" opacity="0.24"/>
+    <use href="#bfHex" transform="translate(880 120) scale(0.5)" fill="none" stroke="#19A7A1" stroke-width="2" opacity="0.26"/>
+    <circle cx="252" cy="262" r="7" fill="#19A7A1" opacity="0.3"/>
+    <circle cx="1436" cy="386" r="6" fill="#7FE3DD" opacity="0.32"/>
+    <circle cx="1040" cy="800" r="6" fill="#E2801E" opacity="0.3"/>
+    <circle cx="566" cy="176" r="6" fill="#E2801E" opacity="0.28"/>
+    <circle cx="1332" cy="722" r="7" fill="#3C6EB4" opacity="0.3"/>
+  </g>
+  <g fill="none" stroke="#2A5C86" stroke-width="2.4" opacity="0.32" stroke-dasharray="2 13" stroke-linecap="round">
+    <path d="M 0 330 L 260 360 L 520 348 L 780 316 L 1040 302 L 1300 318 L 1600 350"/>
+    <path d="M 0 620 L 280 650 L 560 628 L 840 600 L 1120 612 L 1400 646 L 1600 640"/>
+    <path d="M 0 860 L 300 848 L 600 872 L 900 886 L 1200 862 L 1600 844"/>
+  </g>
+  <g opacity="0.55">
+    <circle cx="780" cy="316" r="4" fill="none" stroke="#2A5C86" stroke-width="1.6"/>
+    <circle cx="1300" cy="318" r="3" fill="#7FE3DD" opacity="0.7"/>
+    <circle cx="560" cy="628" r="4" fill="none" stroke="#2A5C86" stroke-width="1.6"/>
+    <circle cx="1400" cy="646" r="3" fill="#7FE3DD" opacity="0.7"/>
+    <circle cx="900" cy="886" r="4" fill="none" stroke="#2A5C86" stroke-width="1.6"/>
+    <circle cx="300" cy="848" r="3" fill="#7FE3DD" opacity="0.7"/>
+  </g>
+</svg></div>
+<div id="posterVignette" aria-hidden="true"></div>
+<div id="posterFrame" aria-hidden="true"></div>
+<div id="posterGrain" aria-hidden="true"></div>
 
 <!-- ══ INTRO ══ -->
 <div class="intro-screen" id="introScreen">
@@ -1513,7 +1633,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
                 stroke="url(#mobiusGradH)" stroke-width="4.5" stroke-linecap="round"/>
         </svg>
       </div>
-      <div><h1>Nexus Board</h1><div class="sub">Transformation Codex — NTT DATA</div></div>
+      <div><div class="hero-eyebrow">NTT DATA · TRANSFORMATION CODEX</div><h1>THE NEXUS</h1><div class="sub">Transformation Board</div></div>
     </div>
     <div class="header-center">
       <span class="game-name-tag" id="gameNameTag">—</span>
@@ -4855,6 +4975,17 @@ function renderBoard() {
   divider.style.top = Math.round(strategicH) + 'px';
   container.appendChild(divider);
 
+  // Poster contour lines — faint dotted flow curves across the open field
+  const contours = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  contours.setAttribute('class','field-contours');
+  contours.setAttribute('width', totalW); contours.setAttribute('height', totalH);
+  contours.innerHTML = [0.3, 0.62, 0.86].map((f,i)=>{
+    const y = Math.round(totalH * f); const steps = 8; let d = 'M 0 ' + y;
+    for (let st = 1; st <= steps; st++) { const x = Math.round(totalW * st / steps); const dy = Math.round(Math.sin(st + i * 2) * 18); d += ' L ' + x + ' ' + (y + dy); }
+    return '<path d="' + d + '" />';
+  }).join('');
+  container.appendChild(contours);
+
   // Lane labels
   [{cls:'strategic',rows:[0, laneRows-1],text:'Strategic',sub:'Intent · Meaning'},{cls:'operational',rows:[laneRows, GRID_ROWS-1],text:'Operational',sub:'Structure · Process'}].forEach(l=>{
     const p1y = hexPixelPosition(l.rows[0],0).y;
@@ -4879,6 +5010,7 @@ function renderBoard() {
       cell.style.width = HEX_W + 'px'; cell.style.height = HEX_H + 'px';
       cell.dataset.row = row; cell.dataset.col = col;
       cell.setAttribute('data-parity', (row * 2 + col) % 3);
+      if (!hexId) { const tag = document.createElement('span'); tag.className = 'cell-tag'; tag.textContent = String.fromCharCode(65 + (col % 26)) + (row + 1); cell.appendChild(tag); }
       // Drag-drop
       cell.addEventListener('dragover', e=>{e.preventDefault();e.dataTransfer.dropEffect=(draggedMarkerType||draggedAgentType)?'copy':'move';cell.classList.add('drag-over');});
       cell.addEventListener('dragleave', ()=>cell.classList.remove('drag-over'));
