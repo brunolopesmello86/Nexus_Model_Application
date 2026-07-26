@@ -408,11 +408,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .board-hex:hover .remove-hex { opacity:1; }
 
 /* Agent badges */
-.agent-badge { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; cursor:pointer; transition:opacity .15s; }
+.agent-badge { width:23px; height:20px; clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); border-radius:0; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:opacity .15s; color:#050D18; }
 .agent-badge:hover { opacity:.7; }
-.agent-badge.human { background:rgba(255,255,255,.2); }
-.agent-badge.systemic { background:rgba(123,94,167,.5); }
-.agent-badge.ai { background:rgba(25,167,161,.4); }
+.agent-badge svg { width:15px; height:15px; }
+.agent-badge.human, .agent-badge.systemic, .agent-badge.ai { background:#F2C879; }
 
 /* Axis labels — subtle vertical cues */
 .axis-label-left, .axis-label-right { position:absolute; top:50%; writing-mode:vertical-rl; font-size:8px; font-weight:500; letter-spacing:1.5px; text-transform:uppercase; z-index:5; pointer-events:none; opacity:.25; }
@@ -1353,7 +1352,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 :root:not([data-theme="light"]) .rp-cycle-node::before { background:var(--border); }
 /* ══ top band — THE AGENTS / TRANSITION ARROWS (poster) ══ */
 .agent-circle { clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); border-radius:0; border:none; }
-.agent-circle.human { background:#F2C879; } .agent-circle.systemic { background:#9B8CD9; } .agent-circle.ai { background:#FF6FB5; }
+.agent-circle.human, .agent-circle.systemic, .agent-circle.ai { background:#F2C879; }
+.agent-circle svg { width:60%; height:60%; color:#050D18; }
 .marker-circle { clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); border-radius:0; }
 :root:not([data-theme="light"]) .connect-toolbar { background:#07182A; border-bottom:1px solid #1E4266; padding:8px 14px; }
 :root:not([data-theme="light"]) .connect-toolbar .ct-label { font-weight:800; letter-spacing:1.8px; color:var(--text-muted); }
@@ -1392,16 +1392,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 /* remove the quick-tools strip and the Transformation Path zone header (dark) */
 :root:not([data-theme="light"]) .connect-toolbar { display:none; }
 :root:not([data-theme="light"]) #hexBoardArea .zone-headers { display:none; }
-/* taller portrait "playing-card" agent + arrow cards */
-.app-header.ptb { height:250px; }
-.main-layout { height:calc(100vh - 250px); }
-.ptb-card { flex-direction:column; align-items:center; text-align:center; gap:6px; padding:13px 10px 11px; justify-content:flex-start; }
-.ptb-card .ptb-hex { width:56px; height:49px; align-self:center; font-size:8.5px; }
+/* compact vertical "playing-card" agent + arrow cards (icon/hex on top, text below) */
+.app-header.ptb { height:216px; }
+.main-layout { height:calc(100vh - 216px); }
+.ptb-cards { gap:8px; }
+.ptb-card { flex-direction:column !important; align-items:center; text-align:center; gap:4px; padding:10px 8px 8px; justify-content:flex-start; }
+.ptb-hex { width:44px; height:38px; align-self:center; }
+.ptb-hex svg { width:26px; height:26px; }
 .ptb-cbody { text-align:center; display:flex; flex-direction:column; align-items:center; flex:1; width:100%; }
-.ptb-cname { font-size:12px; margin-top:2px; }
-.ptb-cdesc { font-size:8.5px; margin:5px 0 8px; }
-.ptb-supply { margin-top:auto; }
-.ptb-ic { margin-bottom:3px; }
+.ptb-cname { font-size:11px; margin-top:2px; letter-spacing:.6px; }
+.ptb-cdesc { font-size:8px; line-height:1.35; margin:4px 0 6px; }
+.ptb-supply { margin-top:auto; font-size:6.5px; }
+.ptb-ic { margin-bottom:2px; }
+.ptb-ic svg { height:20px; }
 .ptb-card.legend.nexus.on { box-shadow:inset 0 0 0 1px var(--ac), 0 0 16px rgba(25,167,161,.3); background:rgba(25,167,161,.1); }
 @media (max-width:1180px){ .ptb-grid { grid-template-columns:1fr; overflow:auto; } }
 /* side panels — poster frames with corner brackets */
@@ -1768,15 +1771,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
         <div class="ptb-sec"><b>THE AGENTS</b><span>pieces that carry change — placed on any hexagon</span></div>
         <div class="ptb-cards">
           <div class="ptb-card agent" style="--ac:#F2C879" draggable="true" onclick="selectAgent('human')" ondragstart="startAgentDrag('human',event)" ondragend="draggedAgentType=null" title="Drag to a hex or click to select">
-            <div class="ptb-hex" style="background:#F2C879">Human<br>Agent</div>
+            <div class="ptb-hex" style="background:#F2C879"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12" r="4.3" fill="currentColor"/><path d="M9.2 24 a6.8 6.8 0 0 1 13.6 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M9.2 24 v2.4 M22.8 24 v2.4" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></div>
             <div class="ptb-cbody"><div class="ptb-cname">HUMAN AGENT</div><div class="ptb-cdesc">People, teams and roles. Each one carries habits, beliefs — and an immune response to change.</div><div class="ptb-supply">SUPPLY <span>⬡ ⬡ ⬡ ⬡ ⬡</span></div></div>
           </div>
-          <div class="ptb-card agent" style="--ac:#9B8CD9" draggable="true" onclick="selectAgent('systemic')" ondragstart="startAgentDrag('systemic',event)" ondragend="draggedAgentType=null" title="Drag to a hex or click to select">
-            <div class="ptb-hex" style="background:#9B8CD9">Systemic<br>Agent</div>
+          <div class="ptb-card agent" style="--ac:#F2C879" draggable="true" onclick="selectAgent('systemic')" ondragstart="startAgentDrag('systemic',event)" ondragend="draggedAgentType=null" title="Drag to a hex or click to select">
+            <div class="ptb-hex" style="background:#F2C879"><svg viewBox="0 0 32 32" fill="none"><path d="M16 8 L10.5 18 L21.5 18 Z" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="8" r="3" fill="currentColor"/><circle cx="10.5" cy="18" r="3" fill="currentColor"/><circle cx="21.5" cy="18" r="3" fill="currentColor"/><circle cx="16" cy="14.8" r="2" fill="currentColor"/></svg></div>
             <div class="ptb-cbody"><div class="ptb-cname">SYSTEMIC AGENT</div><div class="ptb-cdesc">Processes, tools, incentives and structures. They shape how every other agent behaves.</div><div class="ptb-supply">SUPPLY <span>⬡ ⬡ ⬡ ⬡ ⬡</span></div></div>
           </div>
-          <div class="ptb-card agent" style="--ac:#FF6FB5" draggable="true" onclick="selectAgent('ai')" ondragstart="startAgentDrag('ai',event)" ondragend="draggedAgentType=null" title="Drag to a hex or click to select">
-            <div class="ptb-hex" style="background:#FF6FB5">AI<br>Agent</div>
+          <div class="ptb-card agent" style="--ac:#F2C879" draggable="true" onclick="selectAgent('ai')" ondragstart="startAgentDrag('ai',event)" ondragend="draggedAgentType=null" title="Drag to a hex or click to select">
+            <div class="ptb-hex" style="background:#F2C879"><svg viewBox="0 0 32 32" fill="none"><path d="M16 11 L20 16 L16 21 L12 16 Z" fill="currentColor"/><g stroke="currentColor" stroke-width="1.6"><line x1="20" y1="16" x2="26" y2="16"/><line x1="12" y1="16" x2="6" y2="16"/><line x1="17.6" y1="12.6" x2="22" y2="8.2"/><line x1="14.4" y1="12.6" x2="10" y2="8.2"/><line x1="17.6" y1="19.4" x2="22" y2="23.8"/><line x1="14.4" y1="19.4" x2="10" y2="23.8"/></g><g fill="currentColor"><circle cx="26" cy="16" r="1.8"/><circle cx="6" cy="16" r="1.8"/><circle cx="22" cy="8.2" r="1.8"/><circle cx="10" cy="8.2" r="1.8"/><circle cx="22" cy="23.8" r="1.8"/><circle cx="10" cy="23.8" r="1.8"/></g></svg></div>
             <div class="ptb-cbody"><div class="ptb-cname">AI AGENT</div><div class="ptb-cdesc">Autonomous capability placed into the system. It amplifies whatever habit it lands on.</div><div class="ptb-supply">SUPPLY <span>⬡ ⬡ ⬡ ⬡ ⬡</span></div></div>
           </div>
         </div>
@@ -5277,7 +5280,7 @@ function renderBoard() {
         el.className = `board-hex ${item.type}${item.foundational?' foundational':''}${dim}${cm}${cs}${domCls}`;
         el.draggable = !connectMode;
         el.setAttribute('data-hex-id', hexId);
-        const agents = (agentAssignments[hexId]||[]).map(a=>`<div class="agent-badge ${a.type}" title="${a.type} agent" onclick="event.stopPropagation();assignAgent('${hexId}','${a.type}')">${a.type==='human'?'🧑':a.type==='systemic'?'🏛':'🤖'}</div>`).join('');
+        const agents = (agentAssignments[hexId]||[]).map(a=>`<div class="agent-badge ${a.type}" title="${a.type} agent" onclick="event.stopPropagation();assignAgent('${hexId}','${a.type}')">${agentIconSVG(a.type)}</div>`).join('');
         const markers = boardMarkers.filter(m=>m.hexId===hexId).map(m=>`<div class="marker-badge ${m.type}" title="${m.type==='s2f'?'S2F':'Capability'}" onclick="event.stopPropagation();toggleMarker('${hexId}','${m.type}')">${m.type==='s2f'?'S2F':'C'}</div>`).join('');
         const drvs = (driverAssignments[hexId]||[]).map(d=>`<div class="driver-badge" title="${d}" onclick="event.stopPropagation();assignDriver('${hexId}','${d}')"><span class="db-bolt">⚡</span>${d}</div>`).join('');
         const icons = agents + markers;
@@ -5798,6 +5801,13 @@ function renderCycleSteps(){
 // Poster bottom-band phase loop (SENSE → FOCUS → EXPERIMENT → STABILIZE → DIFFUSE)
 const PPS_TITLES=['SIGNAL LOG','FOCUS FRAME','EXPERIMENT WALL','STABILIZE SHELF','DIFFUSE STORIES'];
 const PPS_KEYS=['SENSE','FOCUS','EXPERIMENT','STABILIZE','DIFFUSE'];
+// Agent hex icons (poster) — all agents are yellow hexes, distinguished by icon
+const AGENT_SVG = {
+  human:'<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12" r="4.3" fill="currentColor"/><path d="M9.2 24 a6.8 6.8 0 0 1 13.6 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M9.2 24 v2.4 M22.8 24 v2.4" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>',
+  systemic:'<svg viewBox="0 0 32 32" fill="none"><path d="M16 8 L10.5 18 L21.5 18 Z" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="8" r="3" fill="currentColor"/><circle cx="10.5" cy="18" r="3" fill="currentColor"/><circle cx="21.5" cy="18" r="3" fill="currentColor"/><circle cx="16" cy="14.8" r="2" fill="currentColor"/></svg>',
+  ai:'<svg viewBox="0 0 32 32" fill="none"><path d="M16 11 L20 16 L16 21 L12 16 Z" fill="currentColor"/><g stroke="currentColor" stroke-width="1.6"><line x1="20" y1="16" x2="26" y2="16"/><line x1="12" y1="16" x2="6" y2="16"/><line x1="17.6" y1="12.6" x2="22" y2="8.2"/><line x1="14.4" y1="12.6" x2="10" y2="8.2"/><line x1="17.6" y1="19.4" x2="22" y2="23.8"/><line x1="14.4" y1="19.4" x2="10" y2="23.8"/></g><g fill="currentColor"><circle cx="26" cy="16" r="1.8"/><circle cx="6" cy="16" r="1.8"/><circle cx="22" cy="8.2" r="1.8"/><circle cx="10" cy="8.2" r="1.8"/><circle cx="22" cy="23.8" r="1.8"/><circle cx="10" cy="23.8" r="1.8"/></g></svg>',
+};
+function agentIconSVG(t){ return AGENT_SVG[t] || ''; }
 function renderPosterPhaseStrip(){
   const ps=document.getElementById('posterPhaseStrip'); if(!ps) return;
   ps.innerHTML='<div class="pps-cards">'+PHASES.map((p,i)=>{
