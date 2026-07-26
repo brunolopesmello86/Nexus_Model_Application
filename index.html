@@ -5063,17 +5063,17 @@ function renderBoard() {
   const flatHex = (cx, cy, r) => { const p = []; for (let k = 0; k < 6; k++) { const a = Math.PI / 180 * (60 * k); p.push(`${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`); } return p.join(' '); };
   const P = ['<defs><filter id="fdBlur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="34"/></filter></defs>'];
   // organic glow blobs
-  const blobCols = ['#19A7A1','#E2801E','#3C6EB4','#071A2E','#062724','#0A1A22','#19A7A1','#062724'];
-  const nBlobs = Math.max(12, Math.round(totalW * totalH / 110000));
-  P.push('<g filter="url(#fdBlur)" opacity="0.55">');
+  const blobCols = ['#19A7A1','#19A7A1','#19A7A1','#E2801E','#E2801E','#3C6EB4','#3C6EB4','#0f6b64','#062724','#0A1A22'];
+  const nBlobs = Math.max(16, Math.round(totalW * totalH / 82000));
+  P.push('<g filter="url(#fdBlur)" opacity="0.62">');
   for (let i = 0; i < nBlobs; i++) {
-    const cx = rnd() * totalW, cy = rnd() * totalH, rx = 45 + rnd() * 95, ry = 45 + rnd() * 95;
-    P.push(`<ellipse cx="${cx.toFixed(0)}" cy="${cy.toFixed(0)}" rx="${rx.toFixed(0)}" ry="${ry.toFixed(0)}" fill="${blobCols[Math.floor(rnd() * blobCols.length)]}" opacity="${(0.07 + rnd() * 0.20).toFixed(2)}"/>`);
+    const cx = rnd() * totalW, cy = rnd() * totalH, rx = 42 + rnd() * 120, ry = 42 + rnd() * 120;
+    P.push(`<ellipse cx="${cx.toFixed(0)}" cy="${cy.toFixed(0)}" rx="${rx.toFixed(0)}" ry="${ry.toFixed(0)}" fill="${blobCols[Math.floor(rnd() * blobCols.length)]}" opacity="${(0.09 + rnd() * 0.25).toFixed(2)}"/>`);
   }
   P.push('</g>');
   // dotted mycelium flow lines
   P.push('<g fill="none" stroke="#2A5C86" stroke-width="2.4" opacity="0.30" stroke-dasharray="2 13" stroke-linecap="round">');
-  const nFlows = Math.max(6, Math.round(totalW / 280));
+  const nFlows = Math.max(8, Math.round(totalW / 230));
   for (let i = 0; i < nFlows; i++) {
     let x = rnd() * totalW * 0.35, y = rnd() * totalH; let d = `M ${x.toFixed(0)} ${y.toFixed(0)}`;
     const segs = 5 + Math.floor(rnd() * 5);
@@ -5091,13 +5091,13 @@ function renderBoard() {
   // deco hexes / concentric circles centered on a scattering of cells
   P.push('<g opacity="0.9">');
   for (let row = 0; row < GRID_ROWS; row++) for (const col of getColsForRow(row)) {
-    const roll = rnd(); if (roll > 0.17) continue;
+    const roll = rnd(); if (roll > 0.24) continue;
     const pos = hexPixelPosition(row, col); const cx = pos.x + HEX_W / 2, cy = pos.y + HEX_H / 2;
     const dc = ['#3C6EB4','#19A7A1','#E2801E'][Math.floor(rnd() * 3)];
-    if (roll < 0.055) {
+    if (roll < 0.09) {
       P.push(`<circle cx="${cx.toFixed(0)}" cy="${cy.toFixed(0)}" r="${(HEX_W * 0.34).toFixed(0)}" fill="none" stroke="${dc}" stroke-width="1.2" opacity="0.28"/>`);
       P.push(`<circle cx="${cx.toFixed(0)}" cy="${cy.toFixed(0)}" r="${(HEX_W * 0.5).toFixed(0)}" fill="none" stroke="${dc}" stroke-width="1.2" opacity="0.22"/>`);
-    } else if (roll < 0.115) {
+    } else if (roll < 0.16) {
       P.push(`<polygon points="${flatHex(cx, cy, HEX_W * 0.3)}" fill="none" stroke="${dc}" stroke-width="1.8" stroke-dasharray="9 8" opacity="0.42"/>`);
     } else {
       P.push(`<polygon points="${flatHex(cx, cy, HEX_W * 0.16)}" fill="none" stroke="#2A5C86" stroke-width="1.6" opacity="0.55"/>`);
