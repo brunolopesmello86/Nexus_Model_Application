@@ -1316,6 +1316,41 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .pps-card.done::before { background:#3C6EB4; }
 .pps-foot { text-align:center; font-size:8.5px; font-weight:700; letter-spacing:1.4px; color:var(--text-muted); margin-top:6px; opacity:.85; }
 [data-theme="light"] .poster-phase-strip { display:none; }
+/* ══ on-screen Org Fit Report → poster dark (PDF/download export is jsPDF, unaffected) ══ */
+:root:not([data-theme="light"]) .report-page { background:var(--bg); }
+:root:not([data-theme="light"]) .rp-slide { background:var(--surface); border-color:var(--border); box-shadow:none; }
+:root:not([data-theme="light"]) .rp-phase-card,
+:root:not([data-theme="light"]) .rp-stat,
+:root:not([data-theme="light"]) .rp-comp-row,
+:root:not([data-theme="light"]) .rp-tier-card,
+:root:not([data-theme="light"]) .rp-phase,
+:root:not([data-theme="light"]) .rp-exp-card,
+:root:not([data-theme="light"]) .rp-milestone-card { background:var(--surface2); border-color:var(--border); box-shadow:none; }
+:root:not([data-theme="light"]) .rp-phase-card-name,
+:root:not([data-theme="light"]) .rp-stat-name,
+:root:not([data-theme="light"]) .rp-comp-label,
+:root:not([data-theme="light"]) .rp-comp-score,
+:root:not([data-theme="light"]) .rp-col-title,
+:root:not([data-theme="light"]) .rp-tier-score,
+:root:not([data-theme="light"]) .rp-cycle-num,
+:root:not([data-theme="light"]) .rp-tier-stats strong { color:var(--text); }
+:root:not([data-theme="light"]) .rp-domain-table td { background:var(--surface2); border-color:var(--border); color:var(--text); }
+:root:not([data-theme="light"]) .rp-comp-track,
+:root:not([data-theme="light"]) .rp-tier-track,
+:root:not([data-theme="light"]) .rp-prog-track { background:#0C2137; }
+:root:not([data-theme="light"]) .rp-exp-hyp { color:var(--text); border-top-color:var(--border); }
+:root:not([data-theme="light"]) .rp-slide-sub,
+:root:not([data-theme="light"]) .rp-comp-detail,
+:root:not([data-theme="light"]) .rp-stat-detail,
+:root:not([data-theme="light"]) .rp-phase-card-desc,
+:root:not([data-theme="light"]) .rp-phase-desc,
+:root:not([data-theme="light"]) .rp-exp-domain,
+:root:not([data-theme="light"]) .rp-exp-note,
+:root:not([data-theme="light"]) .rp-cycle-phase-label,
+:root:not([data-theme="light"]) .rp-tier-stats,
+:root:not([data-theme="light"]) .rp-tier-band { color:var(--text-muted); }
+:root:not([data-theme="light"]) .rp-cycle-dot { border-color:var(--surface); }
+:root:not([data-theme="light"]) .rp-cycle-node::before { background:var(--border); }
 /* side panels — poster frames with corner brackets */
 .toolbox { position:relative; background:#07182A; border-right:2px solid #1E4266; }
 .toolbox::before, .toolbox::after, .fitness-panel::before, .fitness-panel::after { content:''; position:absolute; width:22px; height:22px; pointer-events:none; z-index:3; }
