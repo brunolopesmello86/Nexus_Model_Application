@@ -1130,20 +1130,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .loop-empty-msg { font-size:11px; color:var(--text-muted); padding:10px; background:var(--surface2); border-radius:6px; }
 /* ══ CODEX CARD DECKS ══ */
 .toolbox-sub { font-size:9px; font-weight:400; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase; margin-left:4px; }
-.deck-slot { position:relative; display:flex; align-items:center; gap:12px; padding:14px 12px 26px; margin-bottom:12px; background:var(--surface); border:1.6px dashed var(--deck-c); border-radius:10px; cursor:pointer; transition:all .2s; overflow:hidden; }
-.deck-slot::before { content:''; position:absolute; inset:4px; border:1px solid var(--deck-c); opacity:.25; border-radius:7px; pointer-events:none; }
-.deck-slot:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.35); background:var(--surface2); }
-.deck-stack { position:relative; width:64px; height:58px; flex-shrink:0; }
-.deck-card { position:absolute; inset:0; border-radius:6px; background:var(--surface2); border:1px solid var(--border); }
-.deck-card.c3 { transform:translate(6px,-6px) rotate(4deg); opacity:.45; }
-.deck-card.c2 { transform:translate(3px,-3px) rotate(2deg); opacity:.7; }
-.deck-card.c1 { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; border-color:var(--deck-c); }
-.deck-hex { width:30px; height:26px; clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); background:var(--deck-c); color:#050D18; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; }
-.deck-count { font-size:10px; font-weight:800; color:var(--deck-c); }
-.deck-slot-info { flex:1; min-width:0; }
-.deck-slot-label { font-size:12.5px; font-weight:800; letter-spacing:1.8px; color:var(--text); }
-.deck-slot-sub { font-size:9.5px; color:var(--text-muted); letter-spacing:.6px; margin-top:2px; }
-.deck-slot-meta { font-size:9px; color:var(--deck-c); font-weight:700; margin-top:5px; }
+/* poster CODEX deck slots — tall vertical cards, dashed colored border, centered hex + labels */
+.deck-slot { position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; gap:5px; padding:16px 12px 22px; margin-bottom:12px; background:#050D18; border:2px dashed var(--deck-c); border-radius:10px; cursor:pointer; transition:all .2s; }
+.deck-slot::before { content:''; position:absolute; inset:5px; border:1px solid var(--deck-c); opacity:.30; border-radius:7px; pointer-events:none; }
+.deck-slot:hover { transform:translateY(-2px); box-shadow:0 8px 22px rgba(0,0,0,.4); }
+.deck-hexicon { width:56px; height:49px; clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); background:var(--deck-c); color:#050D18; font-weight:800; font-size:22px; display:flex; align-items:center; justify-content:center; margin:4px 0 2px; }
+.deck-count-badge { position:absolute; top:9px; right:12px; font-family:ui-monospace,monospace; font-size:11px; font-weight:800; color:var(--deck-c); }
+.deck-slot-label { font-size:14px; font-weight:800; letter-spacing:2.2px; color:var(--text); }
+.deck-slot-sub { font-size:9.5px; color:var(--text-muted); letter-spacing:.6px; }
+.deck-slot-meta { font-size:9px; color:var(--deck-c); font-weight:700; margin-top:2px; }
 .deck-draw { position:absolute; bottom:6px; left:0; right:0; text-align:center; font-family:ui-monospace,monospace; font-size:8px; letter-spacing:1.6px; color:var(--text-muted); opacity:.7; }
 .deck-open-hdr { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
 .deck-back { width:26px; height:26px; border-radius:7px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:15px; cursor:pointer; line-height:1; }
@@ -1255,27 +1250,28 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 #hexBoardArea { position:relative; }
 #hexBoardArea::after { content:'THE TRANSITIONAL SPACE'; position:absolute; top:40px; left:50%; transform:translateX(-50%); padding:7px 26px 6px; border:1.6px solid rgba(60,110,180,.6); border-radius:999px; background:rgba(5,13,24,.7); color:var(--text); font-size:10.5px; font-weight:800; letter-spacing:4.2px; z-index:6; pointer-events:none; white-space:nowrap; }
 #hexScrollArea { background:linear-gradient(180deg, rgba(7,26,46,.94), rgba(7,26,46,.68)); border:3px solid #1E4266; border-radius:14px; margin:6px 10px 10px 6px; box-shadow:inset 0 0 70px rgba(0,0,0,.4); }
-/* stroked hex cells — outline look with faint blue fill */
+/* poster-exact honeycomb cells — opaque #1B3A55 lattice rim + inner #3C6EB4 hairline + translucent fill so the glow field shows through */
 .hex-cell-bg, .hex-cell[data-parity="1"] .hex-cell-bg, .hex-cell[data-parity="2"] .hex-cell-bg { background:#1B3A55; }
-.hex-cell-bg::before { content:''; position:absolute; inset:2px; clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); background:rgba(60,110,180,.06); }
-.hex-cell[data-parity="1"] .hex-cell-bg::before { background:rgba(60,110,180,.10); }
-.hex-cell[data-parity="2"] .hex-cell-bg::before { background:rgba(60,110,180,.145); }
-.hex-cell.drag-over .hex-cell-bg::before { background:rgba(25,167,161,.3) !important; }
-.hex-cell.guide-best .hex-cell-bg::before { background:rgba(45,200,94,.16) !important; }
+.hex-cell-bg::before { content:''; position:absolute; inset:1.4px; clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); background:rgba(60,110,180,.04); box-shadow:inset 0 0 0 1.2px rgba(60,110,180,.30); }
+.hex-cell[data-parity="1"] .hex-cell-bg::before { background:rgba(60,110,180,.065); }
+.hex-cell[data-parity="2"] .hex-cell-bg::before { background:rgba(60,110,180,.09); }
+.hex-cell.drag-over .hex-cell-bg::before { background:rgba(25,167,161,.30) !important; box-shadow:inset 0 0 0 1.6px rgba(25,167,161,.7) !important; }
+.hex-cell.guide-best .hex-cell-bg::before { background:rgba(45,200,94,.16) !important; box-shadow:inset 0 0 0 1.4px rgba(45,200,94,.5) !important; }
 .hex-cell.guide-yes .hex-cell-bg::before { background:rgba(45,157,94,.09) !important; }
 .hex-cell.guide-no .hex-cell-bg::before { background:rgba(217,74,74,.07) !important; }
 :root:not([data-theme="light"]) .hex-cell.empty .hex-cell-bg::after { content:''; }
-.cell-tag { position:absolute; left:24%; top:14%; font-family:ui-monospace,monospace; font-size:8.5px; font-weight:700; letter-spacing:.8px; color:rgba(124,147,171,.5); pointer-events:none; z-index:1; }
+.cell-tag { position:absolute; left:22%; top:12%; font-family:ui-monospace,monospace; font-size:8.5px; font-weight:700; letter-spacing:.8px; color:rgba(124,147,171,.55); pointer-events:none; z-index:1; }
 /* poster field decoration layer — sits above zone tint, below hex cells */
 .field-decor { position:absolute; top:0; left:0; pointer-events:none; z-index:0; }
-/* brighter honeycomb lattice to match the poster field */
-.hex-cell-bg, .hex-cell[data-parity="1"] .hex-cell-bg, .hex-cell[data-parity="2"] .hex-cell-bg { background:#254c70; }
-.hex-cell-bg::before { inset:1.6px; }
 /* lane + zone typography (poster axis labels) */
 .lane-label-abs { background:rgba(7,24,42,.9); border-right:1px solid #1E4266; }
 .lane-label-abs .ll-text { letter-spacing:3px; color:#48607A; font-size:9.5px; }
 .zone-col-header .zone-tag { letter-spacing:1.6px; }
-.cr-zone-hdr { letter-spacing:1.4px; }
+.cr-zone-hdr { letter-spacing:1.4px; cursor:pointer; }
+/* open field — backlog collapses to a slim drawer (dark only; poster: one open field) */
+:root:not([data-theme="light"]) #hexBoardArea:not(.bl-open) .cr-backlog { width:0; min-width:0; padding:0; border:none; overflow:hidden; }
+:root:not([data-theme="light"]) #hexBoardArea:not(.bl-open) .cr-zone-hdr { width:32px; min-width:32px; overflow:hidden; white-space:nowrap; color:var(--accent); }
+:root:not([data-theme="light"]) #hexBoardArea.bl-open .cr-zone-hdr::after { content:' ✕'; opacity:.6; }
 /* side panels — poster frames with corner brackets */
 .toolbox { position:relative; background:#07182A; border-right:2px solid #1E4266; }
 .toolbox::before, .toolbox::after, .fitness-panel::before, .fitness-panel::after { content:''; position:absolute; width:22px; height:22px; pointer-events:none; z-index:3; }
@@ -1709,7 +1705,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
           <div id="hexBoardArea" style="flex:7;display:flex;flex-direction:column;overflow:hidden;">
             <!-- Header row: backlog label + path zone header -->
             <div style="display:flex;flex-shrink:0;">
-              <div class="cr-zone-hdr">◀ Current Reality</div>
+              <div class="cr-zone-hdr" onclick="toggleBacklog()" title="Show / hide the Current Reality backlog">◀ Current Reality</div>
               <div class="zone-headers" style="flex:1;">
                 <div class="zh-spacer"></div>
                 <div class="zone-col-header hdr-path" style="flex:1"><span class="zone-tag">⟷ Transformation Path</span></div>
@@ -4790,20 +4786,18 @@ function renderLibrary() {
     const items = deckItems(d.type);
     const onBoardN = items.filter(i=>isOnBoard(i.id)).length;
     return `<div class="deck-slot ${d.type}" style="--deck-c:${d.color}" onclick="openDeckView('${d.type}')" title="Open the ${d.label} deck">
-      <div class="deck-stack"><div class="deck-card c3"></div><div class="deck-card c2"></div>
-        <div class="deck-card c1"><div class="deck-hex">${d.letter}</div><div class="deck-count">${items.length}</div></div>
-      </div>
-      <div class="deck-slot-info">
-        <div class="deck-slot-label">${d.label}</div>
-        <div class="deck-slot-sub">${d.sub}</div>
-        <div class="deck-slot-meta">${onBoardN} on board</div>
-      </div>
+      <div class="deck-count-badge">${items.length}</div>
+      <div class="deck-hexicon">${d.letter}</div>
+      <div class="deck-slot-label">${d.label}</div>
+      <div class="deck-slot-sub">${d.sub}</div>
+      <div class="deck-slot-meta">${onBoardN} on board</div>
       <div class="deck-draw">DRAW · PLACE · NAME</div>
     </div>`;
   }).join('');
 }
 function filterLibrary(v){searchQuery=v;renderLibrary();}
 function setFilter(f,el){currentFilter=f;renderLibrary();}
+function toggleBacklog(){ const e=document.getElementById('hexBoardArea'); if(e) e.classList.toggle('bl-open'); }
 
 // ── Codex card modal ──
 let _cardModalId = null;
