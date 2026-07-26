@@ -1272,6 +1272,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 :root:not([data-theme="light"]) #hexBoardArea:not(.bl-open) .cr-backlog { width:0; min-width:0; padding:0; border:none; overflow:hidden; }
 :root:not([data-theme="light"]) #hexBoardArea:not(.bl-open) .cr-zone-hdr { width:32px; min-width:32px; overflow:hidden; white-space:nowrap; color:var(--accent); }
 :root:not([data-theme="light"]) #hexBoardArea.bl-open .cr-zone-hdr::after { content:' ✕'; opacity:.6; }
+/* left rail = poster CODEX: centered header, AXIS B gradient strip, clean cards */
+.toolbox-title { justify-content:center; text-align:center; letter-spacing:4px; color:var(--text-muted); }
+.codex-divider { height:1px; background:#1E4266; opacity:.7; margin:8px 4px 12px; }
+.deck-count-badge { display:none; }
+:root:not([data-theme="light"]) .toolbox { padding-left:30px; }
+.codex-axisb { position:absolute; left:0; top:0; bottom:0; width:26px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; border-right:1px solid #1E4266; background:#07182A; pointer-events:none; z-index:2; }
+.codex-axisb b { writing-mode:vertical-lr; transform:rotate(180deg); font-size:9px; font-weight:800; letter-spacing:3px; color:#7C93AB; white-space:nowrap; }
+.codex-axisb i { writing-mode:vertical-lr; transform:rotate(180deg); font-size:6.5px; font-style:normal; letter-spacing:.5px; color:#48607A; white-space:nowrap; }
+[data-theme="light"] .codex-axisb { display:none; }
+/* remove the right dashboard (now a duplicate of the fitness panel) in the poster theme */
+:root:not([data-theme="light"]) .main-layout { grid-template-columns:260px 1fr; }
+:root:not([data-theme="light"]) .dashboard { display:none; }
 /* side panels — poster frames with corner brackets */
 .toolbox { position:relative; background:#07182A; border-right:2px solid #1E4266; }
 .toolbox::before, .toolbox::after, .fitness-panel::before, .fitness-panel::after { content:''; position:absolute; width:22px; height:22px; pointer-events:none; z-index:3; }
@@ -1651,8 +1663,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
   <div class="main-layout">
     <!-- LEFT: Toolbox -->
     <div class="toolbox">
-      <div class="toolbox-title"><span style="font-size:18px">⬡</span> THE CODEX <span class="toolbox-sub">card decks</span></div>
-      <input type="text" class="search-input" placeholder="Search all cards..." oninput="filterLibrary(this.value)">
+      <div class="codex-axisb"><b>AXIS B — STRATEGIC INTENT GRADIENT</b><i>why leadership cares → where change happens</i></div>
+      <div class="toolbox-title">THE CODEX</div>
+      <div class="codex-divider"></div>
+      <input type="text" class="search-input" placeholder="Search all cards…" oninput="filterLibrary(this.value)">
       <div class="hex-list" id="libraryList"></div>
     </div>
 
