@@ -1441,6 +1441,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .cl-prac-hex-name { font-size:8.5px; font-weight:600; color:var(--text); line-height:1.15; max-height:32px; overflow:hidden; }
 .cl-circle-add { width:94px; height:82px; }
 .cl-prac-detail { border:1.6px solid var(--dc); border-top-width:5px; border-radius:10px; background:var(--surface2); padding:12px 14px; margin-top:12px; }
+/* type icons inside the deck hexes + chips */
+.deck-hexicon svg { width:58%; height:58%; color:#fff; }
+.deck-slot.capability .deck-hexicon svg { color:#050D18; }
+.chip-hex svg { width:72%; height:72%; color:#fff; }
+.chip-hex.capability svg { color:#050D18; }
 /* side panels — poster frames with corner brackets */
 .toolbox { position:relative; background:#07182A; border-right:2px solid #1E4266; }
 .toolbox::before, .toolbox::after, .fitness-panel::before, .fitness-panel::after { content:''; position:absolute; width:22px; height:22px; pointer-events:none; z-index:3; }
@@ -4928,7 +4933,7 @@ function deckChipHtml(item){
   const onBoard = isOnBoard(item.id);
   const has = !!CARD_DETAILS[item.id];
   return `<div class="deck-chip ${item.type}${onBoard?' on-board':''}" draggable="true" data-item="${item.id}" title="${escHtml(item.name)} — click to open card">
-    <div class="chip-hex ${item.type}">${item.type==='pattern'?'✓':item.type==='antipattern'?'!':item.type==='capability'?'C':'→'}</div>
+    <div class="chip-hex ${item.type}">${TYPE_ICON_SVG[item.type]||''}</div>
     <div class="chip-name">${escHtml(item.name)}</div>
     ${has?'<div class="chip-detail-dot" title="Full Codex card"></div>':''}
   </div>`;
@@ -4980,7 +4985,7 @@ function renderLibrary() {
     const onBoardN = items.filter(i=>isOnBoard(i.id)).length;
     return `<div class="deck-slot ${d.type}" style="--deck-c:${d.color}" onclick="openDeckView('${d.type}')" title="Open the ${d.label} deck">
       <div class="deck-count-badge">${items.length}</div>
-      <div class="deck-hexicon">${d.letter}</div>
+      <div class="deck-hexicon">${TYPE_ICON_SVG[d.type]||d.letter}</div>
       <div class="deck-slot-label">${d.label}</div>
       <div class="deck-slot-sub">${d.sub}</div>
       <div class="deck-slot-meta">${onBoardN} on board</div>
@@ -5839,6 +5844,13 @@ const AGENT_SVG = {
   ai:'<svg viewBox="0 0 32 32" fill="none"><path d="M16 11 L20 16 L16 21 L12 16 Z" fill="currentColor"/><g stroke="currentColor" stroke-width="1.6"><line x1="20" y1="16" x2="26" y2="16"/><line x1="12" y1="16" x2="6" y2="16"/><line x1="17.6" y1="12.6" x2="22" y2="8.2"/><line x1="14.4" y1="12.6" x2="10" y2="8.2"/><line x1="17.6" y1="19.4" x2="22" y2="23.8"/><line x1="14.4" y1="19.4" x2="10" y2="23.8"/></g><g fill="currentColor"><circle cx="26" cy="16" r="1.8"/><circle cx="6" cy="16" r="1.8"/><circle cx="22" cy="8.2" r="1.8"/><circle cx="10" cy="8.2" r="1.8"/><circle cx="22" cy="23.8" r="1.8"/><circle cx="10" cy="23.8" r="1.8"/></g></svg>',
 };
 function agentIconSVG(t){ return AGENT_SVG[t] || ''; }
+const TYPE_ICON_SVG = {
+  antipattern:'<svg viewBox="0 0 32 32" fill="none"><g stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="10.5" y1="10.5" x2="21.5" y2="21.5"/><line x1="21.5" y1="10.5" x2="10.5" y2="21.5"/></g><g fill="currentColor"><circle cx="10.5" cy="10.5" r="2.1"/><circle cx="21.5" cy="21.5" r="2.1"/><circle cx="21.5" cy="10.5" r="2.1"/><circle cx="10.5" cy="21.5" r="2.1"/></g></svg>',
+  transition:'<svg viewBox="0 0 32 32" fill="none"><path d="M6 20 L11 20 A5 5 0 0 1 21 20 L26 20" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  pattern:'<svg viewBox="0 0 32 32" fill="none"><path d="M16 7 L25 23 L7 23 Z" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M16 15.5 L20 23 L12 23 Z" fill="currentColor"/></svg>',
+  capability:'<svg viewBox="0 0 32 32" fill="none"><path d="M16 6 L25 11 L25 21 L16 26 L7 21 L7 11 Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M16 12 L20.5 14.5 L20.5 19 L16 21.5 L11.5 19 L11.5 14.5 Z" fill="currentColor"/></svg>',
+};
+function typeIconSVG(t){ return TYPE_ICON_SVG[t] || ''; }
 function renderPosterPhaseStrip(){
   const ps=document.getElementById('posterPhaseStrip'); if(!ps) return;
   ps.innerHTML='<div class="pps-cards">'+PHASES.map((p,i)=>{
