@@ -1264,11 +1264,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .hex-cell.guide-best .hex-cell-bg::before { background:rgba(45,200,94,.16) !important; }
 .hex-cell.guide-yes .hex-cell-bg::before { background:rgba(45,157,94,.09) !important; }
 .hex-cell.guide-no .hex-cell-bg::before { background:rgba(217,74,74,.07) !important; }
-.hex-cell.empty .hex-cell-bg::after { position:relative; z-index:2; }
-.cell-tag { position:absolute; left:50%; top:50%; transform:translate(-50%, 9px); font-family:ui-monospace,monospace; font-size:8px; font-weight:700; letter-spacing:.8px; color:rgba(124,147,171,.45); pointer-events:none; z-index:2; }
-/* dotted flow contours across the field */
-.field-contours { position:absolute; top:0; left:0; pointer-events:none; z-index:0; }
-.field-contours path { fill:none; stroke:#2A5C86; stroke-width:2.6; opacity:.3; stroke-dasharray:2 13; stroke-linecap:round; }
+:root:not([data-theme="light"]) .hex-cell.empty .hex-cell-bg::after { content:''; }
+.cell-tag { position:absolute; left:24%; top:14%; font-family:ui-monospace,monospace; font-size:8.5px; font-weight:700; letter-spacing:.8px; color:rgba(124,147,171,.5); pointer-events:none; z-index:1; }
+/* poster field decoration layer — sits above zone tint, below hex cells */
+.field-decor { position:absolute; top:0; left:0; pointer-events:none; z-index:0; }
+/* brighter honeycomb lattice to match the poster field */
+.hex-cell-bg, .hex-cell[data-parity="1"] .hex-cell-bg, .hex-cell[data-parity="2"] .hex-cell-bg { background:#254c70; }
+.hex-cell-bg::before { inset:1.6px; }
 /* lane + zone typography (poster axis labels) */
 .lane-label-abs { background:rgba(7,24,42,.9); border-right:1px solid #1E4266; }
 .lane-label-abs .ll-text { letter-spacing:3px; color:#48607A; font-size:9.5px; }
@@ -4975,16 +4977,60 @@ function renderBoard() {
   divider.style.top = Math.round(strategicH) + 'px';
   container.appendChild(divider);
 
-  // Poster contour lines — faint dotted flow curves across the open field
-  const contours = document.createElementNS('http://www.w3.org/2000/svg','svg');
-  contours.setAttribute('class','field-contours');
-  contours.setAttribute('width', totalW); contours.setAttribute('height', totalH);
-  contours.innerHTML = [0.3, 0.62, 0.86].map((f,i)=>{
-    const y = Math.round(totalH * f); const steps = 8; let d = 'M 0 ' + y;
-    for (let st = 1; st <= steps; st++) { const x = Math.round(totalW * st / steps); const dy = Math.round(Math.sin(st + i * 2) * 18); d += ' L ' + x + ' ' + (y + dy); }
-    return '<path d="' + d + '" />';
-  }).join('');
-  container.appendChild(contours);
+  // ── Poster field decoration (visual only): glow blobs, mycelium flow lines, glow dots, deco hexes ──
+  const decor = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  decor.setAttribute('class','field-decor');
+  decor.setAttribute('width', totalW); decor.setAttribute('height', totalH);
+  decor.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
+  let _fdSeed = (0x9e3779b9 ^ (Math.round(totalW) * 131 + Math.round(totalH))) >>> 0;
+  const rnd = () => { _fdSeed = (_fdSeed * 1664525 + 1013904223) >>> 0; return _fdSeed / 4294967296; };
+  const flatHex = (cx, cy, r) => { const p = []; for (let k = 0; k < 6; k++) { const a = Math.PI / 180 * (60 * k); p.push(`${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`); } return p.join(' '); };
+  const P = ['<defs><filter id="fdBlur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="34"/></filter></defs>'];
+  // organic glow blobs
+  const blobCols = ['#19A7A1','#E2801E','#3C6EB4','#071A2E','#062724','#0A1A22','#19A7A1','#062724'];
+  const nBlobs = Math.max(12, Math.round(totalW * totalH / 110000));
+  P.push('<g filter="url(#fdBlur)" opacity="0.55">');
+  for (let i = 0; i < nBlobs; i++) {
+    const cx = rnd() * totalW, cy = rnd() * totalH, rx = 45 + rnd() * 95, ry = 45 + rnd() * 95;
+    P.push(`<ellipse cx="${cx.toFixed(0)}" cy="${cy.toFixed(0)}" rx="${rx.toFixed(0)}" ry="${ry.toFixed(0)}" fill="${blobCols[Math.floor(rnd() * blobCols.length)]}" opacity="${(0.07 + rnd() * 0.20).toFixed(2)}"/>`);
+  }
+  P.push('</g>');
+  // dotted mycelium flow lines
+  P.push('<g fill="none" stroke="#2A5C86" stroke-width="2.4" opacity="0.30" stroke-dasharray="2 13" stroke-linecap="round">');
+  const nFlows = Math.max(6, Math.round(totalW / 280));
+  for (let i = 0; i < nFlows; i++) {
+    let x = rnd() * totalW * 0.35, y = rnd() * totalH; let d = `M ${x.toFixed(0)} ${y.toFixed(0)}`;
+    const segs = 5 + Math.floor(rnd() * 5);
+    for (let s = 0; s < segs; s++) { x += totalW / segs * (0.55 + rnd() * 0.85); y += (rnd() - 0.5) * totalH * 0.42; y = Math.max(18, Math.min(totalH - 18, y)); d += ` L ${x.toFixed(0)} ${y.toFixed(0)}`; }
+    P.push(`<path d="${d}"/>`);
+  }
+  P.push('</g>');
+  // scattered glow dots
+  P.push('<g>');
+  for (let i = 0; i < Math.max(12, nBlobs * 1.4); i++) {
+    const cx = (rnd() * totalW).toFixed(0), cy = (rnd() * totalH).toFixed(0);
+    P.push(rnd() < 0.5 ? `<circle cx="${cx}" cy="${cy}" r="3.2" fill="#7FE3DD" opacity="0.7"/>` : `<circle cx="${cx}" cy="${cy}" r="4" fill="none" stroke="#2A5C86" stroke-width="1.5" opacity="0.5"/>`);
+  }
+  P.push('</g>');
+  // deco hexes / concentric circles centered on a scattering of cells
+  P.push('<g opacity="0.9">');
+  for (let row = 0; row < GRID_ROWS; row++) for (const col of getColsForRow(row)) {
+    const roll = rnd(); if (roll > 0.17) continue;
+    const pos = hexPixelPosition(row, col); const cx = pos.x + HEX_W / 2, cy = pos.y + HEX_H / 2;
+    const dc = ['#3C6EB4','#19A7A1','#E2801E'][Math.floor(rnd() * 3)];
+    if (roll < 0.055) {
+      P.push(`<circle cx="${cx.toFixed(0)}" cy="${cy.toFixed(0)}" r="${(HEX_W * 0.34).toFixed(0)}" fill="none" stroke="${dc}" stroke-width="1.2" opacity="0.28"/>`);
+      P.push(`<circle cx="${cx.toFixed(0)}" cy="${cy.toFixed(0)}" r="${(HEX_W * 0.5).toFixed(0)}" fill="none" stroke="${dc}" stroke-width="1.2" opacity="0.22"/>`);
+    } else if (roll < 0.115) {
+      P.push(`<polygon points="${flatHex(cx, cy, HEX_W * 0.3)}" fill="none" stroke="${dc}" stroke-width="1.8" stroke-dasharray="9 8" opacity="0.42"/>`);
+    } else {
+      P.push(`<polygon points="${flatHex(cx, cy, HEX_W * 0.16)}" fill="none" stroke="#2A5C86" stroke-width="1.6" opacity="0.55"/>`);
+      P.push(`<circle cx="${cx.toFixed(0)}" cy="${cy.toFixed(0)}" r="2.6" fill="#7FE3DD" opacity="0.8"/>`);
+    }
+  }
+  P.push('</g>');
+  decor.innerHTML = P.join('');
+  container.appendChild(decor);
 
   // Lane labels
   [{cls:'strategic',rows:[0, laneRows-1],text:'Strategic',sub:'Intent · Meaning'},{cls:'operational',rows:[laneRows, GRID_ROWS-1],text:'Operational',sub:'Structure · Process'}].forEach(l=>{
@@ -5010,7 +5056,7 @@ function renderBoard() {
       cell.style.width = HEX_W + 'px'; cell.style.height = HEX_H + 'px';
       cell.dataset.row = row; cell.dataset.col = col;
       cell.setAttribute('data-parity', (row * 2 + col) % 3);
-      if (!hexId) { const tag = document.createElement('span'); tag.className = 'cell-tag'; tag.textContent = String.fromCharCode(65 + (col % 26)) + (row + 1); cell.appendChild(tag); }
+      { const tag = document.createElement('span'); tag.className = 'cell-tag'; tag.textContent = String.fromCharCode(65 + (col % 26)) + (row + 1); cell.appendChild(tag); }
       // Drag-drop
       cell.addEventListener('dragover', e=>{e.preventDefault();e.dataTransfer.dropEffect=(draggedMarkerType||draggedAgentType)?'copy':'move';cell.classList.add('drag-over');});
       cell.addEventListener('dragleave', ()=>cell.classList.remove('drag-over'));
