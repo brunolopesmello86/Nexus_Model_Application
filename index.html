@@ -1422,6 +1422,25 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 :root:not([data-theme="light"]) .domain-toolbar .dt-label { font-weight:800; letter-spacing:1.8px; color:var(--text-muted); }
 :root:not([data-theme="light"]) .domain-add-btn { border:1px dashed var(--accent); color:var(--accent); font-weight:700; }
 :root:not([data-theme="light"]) .domain-add-btn:hover { background:rgba(25,167,161,.12); }
+/* ══ Capabilities Library — poker cards → practice hexes → practice card ══ */
+.cl-hexgrid { display:grid; grid-template-columns:repeat(auto-fill,134px); gap:12px; }
+.cl-card { position:relative; width:134px; aspect-ratio:5 / 7; border:2px solid var(--dc); border-radius:10px; background:#050D18; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:3px; padding:12px 10px 20px; cursor:pointer; transition:transform .15s, box-shadow .15s; }
+.cl-card::before { content:''; position:absolute; inset:4px; border:1px solid var(--dc); opacity:.30; border-radius:7px; pointer-events:none; }
+.cl-card:hover { transform:translateY(-3px); box-shadow:0 8px 20px rgba(0,0,0,.4); }
+.cl-card.sel { box-shadow:inset 0 0 0 1px var(--dc), 0 8px 22px rgba(0,0,0,.5); }
+.cl-card-hex { width:44px; height:38px; clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); background:var(--dc); color:#050D18; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:18px; margin-bottom:3px; }
+.cl-card-name { font-size:11.5px; font-weight:800; color:var(--text); line-height:1.2; }
+.cl-card-count { font-size:24px; font-weight:800; color:var(--dc); line-height:1.1; }
+.cl-card-lbl { font-size:8px; letter-spacing:1.4px; text-transform:uppercase; color:var(--text-muted); }
+.cl-card-foot { position:absolute; bottom:7px; left:0; right:0; font-family:ui-monospace,monospace; font-size:7px; letter-spacing:1.4px; color:var(--text-muted); opacity:.6; }
+.cl-circle-grid { display:grid; grid-template-columns:repeat(auto-fill,94px); gap:10px; }
+.cl-prac-hex { position:relative; width:94px; height:82px; cursor:pointer; }
+.cl-prac-hex-inner { position:absolute; inset:0; clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); background:#0C2137; box-shadow:inset 0 0 0 2px var(--dc); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:2px; padding:0 14px; transition:background .15s; }
+.cl-prac-hex:hover .cl-prac-hex-inner, .cl-prac-hex.sel .cl-prac-hex-inner { background:color-mix(in srgb, var(--dc) 24%, #0C2137); }
+.cl-prac-hex-lvl { font-size:9px; font-weight:800; color:var(--dc); letter-spacing:.5px; }
+.cl-prac-hex-name { font-size:8.5px; font-weight:600; color:var(--text); line-height:1.15; max-height:32px; overflow:hidden; }
+.cl-circle-add { width:94px; height:82px; }
+.cl-prac-detail { border:1.6px solid var(--dc); border-top-width:5px; border-radius:10px; background:var(--surface2); padding:12px 14px; margin-top:12px; }
 /* side panels — poster frames with corner brackets */
 .toolbox { position:relative; background:#07182A; border-right:2px solid #1E4266; }
 .toolbox::before, .toolbox::after, .fitness-panel::before, .fitness-panel::after { content:''; position:absolute; width:22px; height:22px; pointer-events:none; z-index:3; }
@@ -3706,16 +3725,14 @@ function renderCapabilitiesPage() {
 
 function capHexHtml(cap, color) {
   const sel = _capDrawerId === cap.id;
+  const initial = (cap.name || '?').trim().charAt(0).toUpperCase();
   return `
-    <div class="cl-hex ${sel ? 'sel' : ''}" style="--dc:${color}" onclick="openCapDrawer('${cap.id}')" title="${escHtml(cap.name)}">
-      <div class="cl-hex-shape"></div>
-      <div class="cl-hex-fill"></div>
-      <div class="cl-hex-tint"></div>
-      <div class="cl-hex-content">
-        <div class="cl-hex-name">${escHtml(cap.name)}</div>
-        <div class="cl-hex-count">${cap.practices.length}</div>
-        <div class="cl-hex-lbl">${cap.practices.length === 1 ? 'practice' : 'practices'}</div>
-      </div>
+    <div class="cl-card ${sel ? 'sel' : ''}" style="--dc:${color}" onclick="openCapDrawer('${cap.id}')" title="${escHtml(cap.name)} — click to open its practices">
+      <div class="cl-card-hex">${escHtml(initial)}</div>
+      <div class="cl-card-name">${escHtml(cap.name)}</div>
+      <div class="cl-card-count">${cap.practices.length}</div>
+      <div class="cl-card-lbl">${cap.practices.length === 1 ? 'practice' : 'practices'}</div>
+      <div class="cl-card-foot">CLICK · PRACTICES</div>
     </div>`;
 }
 
@@ -3755,9 +3772,8 @@ function capCircleHtml(p, capId, color) {
   const lvl = String(p.level || '').slice(0,2).toUpperCase() || '•';
   const sel = _capPracDetailId === p.id;
   return `
-    <div class="cl-circle ${sel ? 'sel' : ''}" style="--dc:${color}" onclick="showPracDetail('${p.id}','${capId}')" title="${escHtml(p.name)}">
-      <div class="cl-circle-badge">${escHtml(lvl)}</div>
-      <div class="cl-circle-name">${escHtml(p.name)}</div>
+    <div class="cl-prac-hex ${sel ? 'sel' : ''}" style="--dc:${color}" onclick="showPracDetail('${p.id}','${capId}')" title="${escHtml(p.name)} — click for the practice card">
+      <div class="cl-prac-hex-inner"><div class="cl-prac-hex-lvl">${escHtml(lvl)}</div><div class="cl-prac-hex-name">${escHtml(p.name)}</div></div>
     </div>`;
 }
 
