@@ -1388,8 +1388,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .ptb-card.legend.nexus { cursor:pointer; }
 .ptb-ic { color:var(--ac); width:100%; }
 .ptb-ic svg { width:100%; height:22px; }
-.main-layout { height:calc(100vh - 200px); }
 :root:not([data-theme="light"]) #boardDomains { display:none; }
+/* remove the quick-tools strip and the Transformation Path zone header (dark) */
+:root:not([data-theme="light"]) .connect-toolbar { display:none; }
+:root:not([data-theme="light"]) #hexBoardArea .zone-headers { display:none; }
+/* taller portrait "playing-card" agent + arrow cards */
+.app-header.ptb { height:250px; }
+.main-layout { height:calc(100vh - 250px); }
+.ptb-card { flex-direction:column; align-items:center; text-align:center; gap:6px; padding:13px 10px 11px; justify-content:flex-start; }
+.ptb-card .ptb-hex { width:56px; height:49px; align-self:center; font-size:8.5px; }
+.ptb-cbody { text-align:center; display:flex; flex-direction:column; align-items:center; flex:1; width:100%; }
+.ptb-cname { font-size:12px; margin-top:2px; }
+.ptb-cdesc { font-size:8.5px; margin:5px 0 8px; }
+.ptb-supply { margin-top:auto; }
+.ptb-ic { margin-bottom:3px; }
+.ptb-card.legend.nexus.on { box-shadow:inset 0 0 0 1px var(--ac), 0 0 16px rgba(25,167,161,.3); background:rgba(25,167,161,.1); }
 @media (max-width:1180px){ .ptb-grid { grid-template-columns:1fr; overflow:auto; } }
 /* side panels — poster frames with corner brackets */
 .toolbox { position:relative; background:#07182A; border-right:2px solid #1E4266; }
@@ -1740,6 +1753,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
       <button class="btn btn-sm" onclick="switchGame()">Switch Game</button>
       <button class="btn btn-sm" onclick="resetBoard()">Reset</button>
       <button class="btn btn-sm" onclick="exportSession()">Export</button>
+      <button class="btn btn-sm" onclick="addBoardRow()" title="Add 2 rows">＋ Rows</button>
+      <button class="btn btn-sm" onclick="addBoardCol()" title="Add 2 columns">＋ Cols</button>
       <button class="btn btn-sm btn-primary" onclick="advanceCycle()">Next Phase →</button>
     </div>
     <div class="ptb-grid">
@@ -1774,7 +1789,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
             <div class="ptb-cname">TRANSITION PATH</div>
             <div class="ptb-cdesc">Dashed arrow. The intended journey: anti-pattern → transition → pattern.</div>
           </div>
-          <div class="ptb-card legend nexus" style="--ac:#19A7A1" onclick="toggleConnectMode('nexus')" title="Toggle Transition Nexus linking">
+          <div class="ptb-card legend nexus" style="--ac:#19A7A1" onclick="toggleConnectMode('nexus');this.classList.toggle('on')" title="Toggle Transition Nexus linking">
             <div class="ptb-ic"><svg viewBox="0 0 120 26" fill="none"><path d="M18 6 H60 V13" stroke="currentColor" stroke-width="3" fill="none"/><path d="M18 20 H60 V13" stroke="currentColor" stroke-width="3" fill="none"/><line x1="60" y1="13" x2="98" y2="13" stroke="currentColor" stroke-width="3"/><path d="M108 13 l-14 7 v-14 z" fill="currentColor"/></svg></div>
             <div class="ptb-cname">TRANSITION NEXUS</div>
             <div class="ptb-cdesc">Solid L-arrow. Where transitions converge or diverge — the leverage points.</div>
