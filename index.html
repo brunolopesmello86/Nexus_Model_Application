@@ -1361,6 +1361,36 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 :root:not([data-theme="light"]) .connect-btn.nexus-btn { border-color:var(--accent); color:var(--cyan); }
 :root:not([data-theme="light"]) .app-header { background:linear-gradient(120deg,#050D18,#07182A 60%,#0A2035); }
 .hero-eyebrow { color:var(--accent); }
+/* ══ full poster top band ══ */
+.app-header.ptb { display:flex; flex-direction:column; height:200px; padding:6px 14px 10px; gap:6px; align-items:stretch; justify-content:flex-start; }
+.ptb-actions { display:flex; align-items:center; gap:6px; justify-content:flex-end; flex-shrink:0; flex-wrap:wrap; }
+.ptb-grid { flex:1; display:grid; grid-template-columns:300px 1fr 1fr; gap:14px; min-height:0; }
+.ptb-nexus { border:1.4px solid #1E4266; border-radius:12px; background:rgba(5,13,24,.45); padding:12px 20px; display:flex; flex-direction:column; justify-content:center; }
+.ptb-nexus .hero-eyebrow { color:#19A7A1; margin-bottom:7px; }
+.ptb-title1 { font-size:29px; font-weight:800; letter-spacing:2px; color:#DCEBF7; line-height:1; }
+.ptb-title2 { font-size:22px; font-weight:800; letter-spacing:2px; color:#7FE3DD; line-height:1.1; margin-top:5px; }
+.ptb-tag { font-size:9px; color:#7C93AB; margin-top:11px; line-height:1.6; }
+.ptb-panel { border:1.4px solid #1E4266; border-radius:12px; background:rgba(5,13,24,.35); padding:11px 14px; display:flex; flex-direction:column; min-width:0; }
+.ptb-sec { display:flex; align-items:baseline; gap:10px; margin-bottom:9px; flex-shrink:0; }
+.ptb-sec b { font-size:11px; font-weight:800; letter-spacing:2.4px; color:#7C93AB; }
+.ptb-sec span { font-size:9px; color:#48607A; }
+.ptb-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; flex:1; min-height:0; }
+.ptb-card { position:relative; border:1.4px solid var(--ac); border-radius:9px; background:rgba(5,13,24,.4); padding:9px 11px; display:flex; gap:9px; min-width:0; overflow:hidden; }
+.ptb-card.agent { cursor:grab; transition:background .15s; }
+.ptb-card.agent:hover { background:rgba(10,32,53,.75); }
+.ptb-hex { width:46px; height:40px; flex-shrink:0; align-self:center; clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); display:flex; align-items:center; justify-content:center; text-align:center; font-size:8px; font-weight:800; color:#050D18; line-height:1.15; }
+.ptb-cbody { min-width:0; }
+.ptb-cname { font-size:11.5px; font-weight:800; letter-spacing:1px; color:#DCEBF7; }
+.ptb-cdesc { font-size:8.5px; color:#7C93AB; line-height:1.4; margin:3px 0 6px; }
+.ptb-supply { font-family:ui-monospace,monospace; font-size:7px; letter-spacing:1.6px; color:#48607A; }
+.ptb-supply span { color:var(--ac); font-size:10px; letter-spacing:1px; opacity:.6; margin-left:4px; }
+.ptb-card.legend { flex-direction:column; align-items:center; text-align:center; gap:4px; justify-content:center; }
+.ptb-card.legend.nexus { cursor:pointer; }
+.ptb-ic { color:var(--ac); width:100%; }
+.ptb-ic svg { width:100%; height:22px; }
+.main-layout { height:calc(100vh - 200px); }
+:root:not([data-theme="light"]) #boardDomains { display:none; }
+@media (max-width:1180px){ .ptb-grid { grid-template-columns:1fr; overflow:auto; } }
 /* side panels — poster frames with corner brackets */
 .toolbox { position:relative; background:#07182A; border-right:2px solid #1E4266; }
 .toolbox::before, .toolbox::after, .fitness-panel::before, .fitness-panel::after { content:''; position:absolute; width:22px; height:22px; pointer-events:none; z-index:3; }
@@ -1700,33 +1730,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 
 <!-- ══ MAIN APP ══ -->
 <div id="mainApp" style="display:none">
-  <header class="app-header">
-    <div class="logo">
-      <div class="logo-mobius">
-        <svg viewBox="0 0 64 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="mobiusGradH" x1="0" y1="0" x2="64" y2="34" gradientUnits="userSpaceOnUse">
-              <stop offset="0" stop-color="#19A7A1"/>
-              <stop offset="1" stop-color="#7FE3DD"/>
-            </linearGradient>
-          </defs>
-          <!-- full lemniscate ribbon -->
-          <path d="M32 17 C25 5 8 5 8 17 C8 29 25 29 32 17 C39 5 56 5 56 17 C56 29 39 29 32 17 Z"
-                stroke="url(#mobiusGradH)" stroke-width="4.5" stroke-linecap="round"/>
-          <!-- möbius twist: over-strand redrawn with a gap beneath it -->
-          <path d="M26 22 C28 20 30 18.5 32 17 C34 15.5 36 14 38 12.5"
-                style="stroke:var(--header-bg,#07182A)" stroke-width="9" stroke-linecap="butt" opacity=".9"/>
-          <path d="M24 23.5 C27 21.5 29.5 19.5 32 17 C35 14 38.5 11 42 9.5"
-                stroke="url(#mobiusGradH)" stroke-width="4.5" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div><div class="hero-eyebrow">NTT DATA · TRANSFORMATION CODEX</div><h1>THE NEXUS</h1><div class="sub">Transformation Board</div></div>
-    </div>
-    <div class="header-center">
+  <header class="app-header ptb">
+    <div class="ptb-actions">
       <span class="game-name-tag" id="gameNameTag">—</span>
       <span class="save-status" id="saveStatus"></span>
-    </div>
-    <div class="header-actions">
       <button class="btn btn-sm" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme" style="min-width:70px">☀ Light</button>
       <button class="btn btn-sm" onclick="showModal('howToPlayModal')">? Help</button>
       <button class="btn btn-sm" onclick="showModal('addPatternModal')">+ Pattern</button>
@@ -1734,6 +1741,51 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
       <button class="btn btn-sm" onclick="resetBoard()">Reset</button>
       <button class="btn btn-sm" onclick="exportSession()">Export</button>
       <button class="btn btn-sm btn-primary" onclick="advanceCycle()">Next Phase →</button>
+    </div>
+    <div class="ptb-grid">
+      <div class="ptb-nexus">
+        <div class="hero-eyebrow">NTT DATA · TRANSFORMATION CODEX</div>
+        <div class="ptb-title1">THE NEXUS</div>
+        <div class="ptb-title2">TRANSFORMATION BOARD</div>
+        <div class="ptb-tag">A living map of how an organization changes —<br>patterns over playbooks, habits over mandates.</div>
+      </div>
+      <div class="ptb-panel">
+        <div class="ptb-sec"><b>THE AGENTS</b><span>pieces that carry change — placed on any hexagon</span></div>
+        <div class="ptb-cards">
+          <div class="ptb-card agent" style="--ac:#F2C879" draggable="true" onclick="selectAgent('human')" ondragstart="startAgentDrag('human',event)" ondragend="draggedAgentType=null" title="Drag to a hex or click to select">
+            <div class="ptb-hex" style="background:#F2C879">Human<br>Agent</div>
+            <div class="ptb-cbody"><div class="ptb-cname">HUMAN AGENT</div><div class="ptb-cdesc">People, teams and roles. Each one carries habits, beliefs — and an immune response to change.</div><div class="ptb-supply">SUPPLY <span>⬡ ⬡ ⬡ ⬡ ⬡</span></div></div>
+          </div>
+          <div class="ptb-card agent" style="--ac:#9B8CD9" draggable="true" onclick="selectAgent('systemic')" ondragstart="startAgentDrag('systemic',event)" ondragend="draggedAgentType=null" title="Drag to a hex or click to select">
+            <div class="ptb-hex" style="background:#9B8CD9">Systemic<br>Agent</div>
+            <div class="ptb-cbody"><div class="ptb-cname">SYSTEMIC AGENT</div><div class="ptb-cdesc">Processes, tools, incentives and structures. They shape how every other agent behaves.</div><div class="ptb-supply">SUPPLY <span>⬡ ⬡ ⬡ ⬡ ⬡</span></div></div>
+          </div>
+          <div class="ptb-card agent" style="--ac:#FF6FB5" draggable="true" onclick="selectAgent('ai')" ondragstart="startAgentDrag('ai',event)" ondragend="draggedAgentType=null" title="Drag to a hex or click to select">
+            <div class="ptb-hex" style="background:#FF6FB5">AI<br>Agent</div>
+            <div class="ptb-cbody"><div class="ptb-cname">AI AGENT</div><div class="ptb-cdesc">Autonomous capability placed into the system. It amplifies whatever habit it lands on.</div><div class="ptb-supply">SUPPLY <span>⬡ ⬡ ⬡ ⬡ ⬡</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="ptb-panel">
+        <div class="ptb-sec"><b>TRANSITION ARROWS</b><span>laid between hexagons</span></div>
+        <div class="ptb-cards">
+          <div class="ptb-card legend" style="--ac:#3C6EB4">
+            <div class="ptb-ic"><svg viewBox="0 0 120 26" fill="none"><line x1="12" y1="13" x2="98" y2="13" stroke="currentColor" stroke-width="3" stroke-dasharray="9 7" stroke-linecap="round"/><path d="M108 13 l-14 7 v-14 z" fill="currentColor"/></svg></div>
+            <div class="ptb-cname">TRANSITION PATH</div>
+            <div class="ptb-cdesc">Dashed arrow. The intended journey: anti-pattern → transition → pattern.</div>
+          </div>
+          <div class="ptb-card legend nexus" style="--ac:#19A7A1" onclick="toggleConnectMode('nexus')" title="Toggle Transition Nexus linking">
+            <div class="ptb-ic"><svg viewBox="0 0 120 26" fill="none"><path d="M18 6 H60 V13" stroke="currentColor" stroke-width="3" fill="none"/><path d="M18 20 H60 V13" stroke="currentColor" stroke-width="3" fill="none"/><line x1="60" y1="13" x2="98" y2="13" stroke="currentColor" stroke-width="3"/><path d="M108 13 l-14 7 v-14 z" fill="currentColor"/></svg></div>
+            <div class="ptb-cname">TRANSITION NEXUS</div>
+            <div class="ptb-cdesc">Solid L-arrow. Where transitions converge or diverge — the leverage points.</div>
+          </div>
+          <div class="ptb-card legend" style="--ac:#E2801E">
+            <div class="ptb-ic"><svg viewBox="0 0 120 26" fill="none"><path d="M96 7 C60 -3 44 15 26 8" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M26 8 l12 -5 l-2 12 z" fill="currentColor"/><path d="M26 20 C62 30 78 12 96 19" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.65"/><path d="M96 19 l-12 5 l2 -12 z" fill="currentColor"/></svg></div>
+            <div class="ptb-cname">COUNTER-MAPPING</div>
+            <div class="ptb-cdesc">Power pulls and influence. Where the system pulls back against the move.</div>
+          </div>
+        </div>
+      </div>
     </div>
   </header>
 
