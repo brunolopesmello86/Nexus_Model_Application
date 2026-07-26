@@ -1407,6 +1407,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .ptb-ic svg { height:20px; }
 .ptb-card.legend.nexus.on { box-shadow:inset 0 0 0 1px var(--ac), 0 0 16px rgba(25,167,161,.3); background:rgba(25,167,161,.1); }
 @media (max-width:1180px){ .ptb-grid { grid-template-columns:1fr; overflow:auto; } }
+/* CODEX deck slots → poker-card proportions (thinner / taller, centered in the rail) */
+.deck-slot { width:150px; aspect-ratio:5 / 7; max-width:100%; margin:0 auto 10px; justify-content:center; padding:12px 10px 22px; }
+.deck-hexicon { width:48px; height:42px; font-size:19px; }
+.deck-slot-label { font-size:12px; letter-spacing:1.4px; }
+.deck-slot-sub { font-size:9px; }
+.deck-slot-meta { font-size:8.5px; }
+.deck-draw { font-size:7.5px; bottom:8px; }
 /* side panels — poster frames with corner brackets */
 .toolbox { position:relative; background:#07182A; border-right:2px solid #1E4266; }
 .toolbox::before, .toolbox::after, .fitness-panel::before, .fitness-panel::after { content:''; position:absolute; width:22px; height:22px; pointer-events:none; z-index:3; }
