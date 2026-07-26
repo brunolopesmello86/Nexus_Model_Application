@@ -1284,6 +1284,32 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 /* remove the right dashboard (now a duplicate of the fitness panel) in the poster theme */
 :root:not([data-theme="light"]) .main-layout { grid-template-columns:260px 1fr; }
 :root:not([data-theme="light"]) .dashboard { display:none; }
+/* ══ poster bottom band — Domains, Drivers, phase loop ══ */
+:root:not([data-theme="light"]) .board-domains { background:#07182A; border-bottom:1px solid #1E4266; gap:6px; padding:6px 12px; align-items:center; }
+:root:not([data-theme="light"]) .board-domains::before { content:'ORGANIZATIONAL DOMAINS'; font-size:9px; font-weight:800; letter-spacing:2px; color:var(--text-muted); margin-right:10px; white-space:nowrap; flex-shrink:0; }
+:root:not([data-theme="light"]) .domain-label { border:1.4px dashed #3C6EB4; border-radius:7px; background:#050D18; color:var(--text); padding:5px 12px; font-size:11px; letter-spacing:.5px; }
+:root:not([data-theme="light"]) .domain-label.active { background:rgba(60,110,180,.18); border-style:solid; }
+:root:not([data-theme="light"]) .board-drivers { background:#07182A; border-top:1px solid #1E4266; gap:6px; }
+:root:not([data-theme="light"]) .driver-label { font-size:9px; font-weight:800; letter-spacing:2px; color:var(--text-muted); }
+:root:not([data-theme="light"]) .driver-chip { border:1.4px dashed #E2801E; border-radius:7px; background:#050D18; color:var(--text); padding:5px 12px; font-size:11px; font-weight:700; letter-spacing:.8px; }
+:root:not([data-theme="light"]) .driver-chip.selected { background:rgba(226,128,30,.2); border-style:solid; }
+:root:not([data-theme="light"]) .driver-chip.used { border-color:var(--accent); color:var(--accent); }
+.poster-phase-strip { flex-shrink:0; background:#07182A; border-top:1px solid #1E4266; padding:8px 12px 6px; }
+.pps-cards { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+.pps-card { position:relative; background:#050D18; border:1px solid #1E4266; border-radius:8px; padding:7px 10px 7px 34px; min-height:44px; cursor:pointer; transition:all .15s; }
+.pps-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:#1E4266; border-radius:8px 0 0 8px; }
+.pps-num { position:absolute; left:9px; top:8px; font-family:ui-monospace,monospace; font-size:11px; font-weight:800; color:#48607A; }
+.pps-ic { position:absolute; left:9px; bottom:7px; font-size:12px; opacity:.65; }
+.pps-title { font-size:11.5px; font-weight:800; letter-spacing:1.2px; color:var(--text); }
+.pps-key { font-family:ui-monospace,monospace; font-size:8px; font-weight:700; letter-spacing:1.4px; color:#48607A; margin:1px 0 3px; }
+.pps-desc { font-size:9px; color:var(--text-muted); line-height:1.3; }
+.pps-card:hover { border-color:var(--accent); }
+.pps-card.on { border-color:var(--accent); background:linear-gradient(180deg, rgba(25,167,161,.12), #050D18); box-shadow:inset 0 0 0 1px var(--accent), 0 0 14px rgba(25,167,161,.15); }
+.pps-card.on::before { background:var(--accent); }
+.pps-card.on .pps-key { color:var(--accent); }
+.pps-card.done::before { background:#3C6EB4; }
+.pps-foot { text-align:center; font-size:8.5px; font-weight:700; letter-spacing:1.4px; color:var(--text-muted); margin-top:6px; opacity:.85; }
+[data-theme="light"] .poster-phase-strip { display:none; }
 /* side panels — poster frames with corner brackets */
 .toolbox { position:relative; background:#07182A; border-right:2px solid #1E4266; }
 .toolbox::before, .toolbox::after, .fitness-panel::before, .fitness-panel::after { content:''; position:absolute; width:22px; height:22px; pointer-events:none; z-index:3; }
@@ -1745,7 +1771,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
           </div>
         </div><!-- /boardContent -->
       </div>
-      <div class="board-drivers" id="boardDrivers"><span class="driver-label"><span class="bolt">⚡</span> Drivers:</span></div>
+      <div class="board-drivers" id="boardDrivers"><span class="driver-label"><span class="bolt">⚡</span> TRANSFORMATION DRIVERS</span></div>
+      <div class="poster-phase-strip" id="posterPhaseStrip"></div>
       <div class="axis-bottom">Axis A — Horizontal: <strong>Evolution of Capability</strong> &nbsp;│&nbsp; Axis B — Vertical: <strong>Strategic Intent Gradient</strong></div>
     </div>
 
@@ -5599,7 +5626,7 @@ function getUsedDrivers(){
 function renderDrivers(){
   const c=document.getElementById('boardDrivers');
   const used=getUsedDrivers();
-  c.innerHTML='<span class="driver-label"><span class="bolt">⚡</span> Drivers:</span>';
+  c.innerHTML='<span class="driver-label"><span class="bolt">⚡</span> TRANSFORMATION DRIVERS</span>';
   DEFAULT_DRIVERS.forEach(d=>{
     const ch=document.createElement('div');
     const sel=selectedDriver===d;
@@ -5617,6 +5644,7 @@ function renderDrivers(){
   });
   const st=document.getElementById('driverStatus');
   if(st) updateDriverStatus();
+  renderPosterPhaseStrip();
 }
 function updateDriverStatus(){
   let st=document.getElementById('driverStatus');
@@ -5647,6 +5675,22 @@ function renderCycleSteps(){
     let cls='cycle-step';if(i===cyclePhase)cls+=' active';if(completedPhases.has(i))cls+=' completed';
     return `<div class="${cls}" onclick="setCyclePhase(${i})"><div class="cycle-icon">${p.i}</div><div><div class="cycle-name">${p.n}</div><div class="cycle-desc">${p.d}</div></div></div>`;
   }).join('');
+  renderPosterPhaseStrip();
+}
+// Poster bottom-band phase loop (SENSE → FOCUS → EXPERIMENT → STABILIZE → DIFFUSE)
+const PPS_TITLES=['SIGNAL LOG','FOCUS FRAME','EXPERIMENT WALL','STABILIZE SHELF','DIFFUSE STORIES'];
+const PPS_KEYS=['SENSE','FOCUS','EXPERIMENT','STABILIZE','DIFFUSE'];
+function renderPosterPhaseStrip(){
+  const ps=document.getElementById('posterPhaseStrip'); if(!ps) return;
+  ps.innerHTML='<div class="pps-cards">'+PHASES.map((p,i)=>{
+    let cls='pps-card';if(i===cyclePhase)cls+=' on';if(completedPhases.has(i))cls+=' done';
+    return `<div class="${cls}" onclick="setCyclePhase(${i})" title="${escHtml(p.d)}">
+      <div class="pps-num">0${i+1}</div><div class="pps-ic">${p.i}</div>
+      <div class="pps-title">${PPS_TITLES[i]}</div>
+      <div class="pps-key">PHASE · ${PPS_KEYS[i]}</div>
+      <div class="pps-desc">${escHtml(p.d)}</div>
+    </div>`;
+  }).join('')+'</div><div class="pps-foot">SENSE → FOCUS → EXPERIMENT → STABILIZE → DIFFUSE → back to SENSE.&nbsp;&nbsp;·&nbsp;&nbsp;The board never closes.</div>';
 }
 function setCyclePhase(i){cyclePhase=i;renderCycleSteps();scheduleAutoSave();}
 function advanceCycle(){
