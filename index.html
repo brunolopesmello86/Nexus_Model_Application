@@ -1414,6 +1414,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .deck-slot-sub { font-size:9px; }
 .deck-slot-meta { font-size:8.5px; }
 .deck-draw { font-size:7.5px; bottom:8px; }
+/* ORGANIZATIONAL DOMAINS toolbar (add / manage org domains) */
+:root:not([data-theme="light"]) .domain-toolbar { background:#07182A; border-bottom:1px solid #1E4266; }
+:root:not([data-theme="light"]) .domain-toolbar .dt-label { font-weight:800; letter-spacing:1.8px; color:var(--text-muted); }
+:root:not([data-theme="light"]) .domain-add-btn { border:1px dashed var(--accent); color:var(--accent); font-weight:700; }
+:root:not([data-theme="light"]) .domain-add-btn:hover { background:rgba(25,167,161,.12); }
 /* side panels — poster frames with corner brackets */
 .toolbox { position:relative; background:#07182A; border-right:2px solid #1E4266; }
 .toolbox::before, .toolbox::after, .fitness-panel::before, .fitness-panel::after { content:''; position:absolute; width:22px; height:22px; pointer-events:none; z-index:3; }
@@ -1676,10 +1681,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 <!-- ══ ADD DOMAIN MODAL ══ -->
 <div class="modal-overlay" id="addDomainModal">
   <div class="modal">
-    <h2>Create Organizational Class</h2>
-    <div class="form-group"><label>Class Name</label><input id="newDomainName" placeholder="e.g., Technology, People & Culture"></div>
+    <h2>Add Organizational Domain</h2>
+    <div class="form-group"><label>Domain Name</label><input id="newDomainName" placeholder="e.g., Delivery, Enabling, Governance, Strategic"></div>
     <div class="form-group"><label>Color</label><div class="color-swatches" id="domainColorPicker"></div></div>
-    <div class="modal-actions"><button class="btn" onclick="closeModal('addDomainModal')">Cancel</button><button class="btn btn-primary" onclick="createDomain()">Create</button></div>
+    <div class="modal-actions"><button class="btn" onclick="closeModal('addDomainModal')">Cancel</button><button class="btn btn-primary" onclick="createDomain()">Add Domain</button></div>
   </div>
 </div>
 
@@ -5942,8 +5947,8 @@ function renderDomainList(){
   // Render domain chips in the top toolbar
   const toolbar = document.getElementById('domainToolbar');
   if (toolbar) {
-    toolbar.innerHTML = `<span class="dt-label">Classes:</span>
-      <button class="domain-add-btn" onclick="showModal('addDomainModal')">＋ Add Class</button>
+    toolbar.innerHTML = `<span class="dt-label">⬡ ORGANIZATIONAL DOMAINS</span>
+      <button class="domain-add-btn" onclick="showModal('addDomainModal')">＋ Add Domain</button>
       ${domainDefinitions.map(d=>`
         <div class="domain-chip${selectedDomainId===d.id?' selected':''}"
           style="background:${d.color}22;border-color:${d.color};color:${d.color};"
