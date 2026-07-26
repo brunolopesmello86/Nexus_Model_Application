@@ -25,10 +25,10 @@
   --gold2: #7FE3DD;
   --header-bg: #07182A;
   --gray: #8b949e;
-  --pattern-hex: #2c3e6b;
-  --anti-hex: #ff0066;
-  --trans-hex: #7b8794;
-  --cap-hex: #38b2a0;
+  --pattern-hex: #19A7A1;   /* Pattern — teal (deck) */
+  --anti-hex: #E2801E;      /* Anti-Pattern — orange (deck) */
+  --trans-hex: #3C6EB4;     /* Transition — blue (deck) */
+  --cap-hex: #C9D6E6;       /* Capability — white/light (deck) */
 }
 /* ── Light theme — executive navy/orange (matches the Org Fit Report) ── */
 [data-theme="light"] {
@@ -396,6 +396,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .board-hex.antipattern .board-hex-shape { background:var(--anti-hex); }
 .board-hex.transition .board-hex-shape { background:var(--trans-hex); }
 .board-hex.capability .board-hex-shape { background:var(--cap-hex); }
+/* Capability hexes are light — force dark text for legibility */
+.board-hex.capability .board-hex-shape, .board-hex.capability .board-hex-shape * { color:#0A1A2F !important; }
+.hex-mini.capability, .hex-mini.capability * { color:#0A1A2F !important; }
 
 /* All content centered symmetrically inside the hex safe zone */
 .bh-text { display:flex; flex-direction:column; justify-content:center; align-items:center; padding:0 18%; }
