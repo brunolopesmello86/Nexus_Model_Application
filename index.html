@@ -1325,8 +1325,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .codex-axisb i { display:none; }
 [data-theme="light"] .codex-axisb { display:none; }
 /* remove the right dashboard (now a duplicate of the fitness panel) in the poster theme */
-:root:not([data-theme="light"]) .main-layout { grid-template-columns:260px 1fr; }
-:root:not([data-theme="light"]) .dashboard { display:none; }
+.main-layout { grid-template-columns:260px 1fr; }
+.dashboard { display:none; }
 /* ══ poster bottom band — Domains, Drivers, phase loop ══ */
 :root:not([data-theme="light"]) .board-domains { background:#07182A; border-bottom:1px solid #1E4266; gap:6px; padding:6px 12px; align-items:center; }
 :root:not([data-theme="light"]) .board-domains::before { content:'ORGANIZATIONAL DOMAINS'; font-size:9px; font-weight:800; letter-spacing:2px; color:var(--text-muted); margin-right:10px; white-space:nowrap; flex-shrink:0; }
