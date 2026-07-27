@@ -32,19 +32,19 @@
 }
 /* ── Light theme — executive navy/orange (matches the Org Fit Report) ── */
 [data-theme="light"] {
-  --bg: #eef2f8;
-  --surface: #ffffff;
-  --surface2: #e9eef7;
-  --border: #d3dcea;
-  --text: #14264d;
-  --text-muted: #5a6b84;
-  --accent: #0072ce;
-  --cyan: #f5821f;   /* orange highlights in light mode */
-  --gold: #f5821f;
-  --gold2: #f5821f;
-  --header-bg: #0a2a66;
+  --bg: #E7DBBE;            /* aged parchment */
+  --surface: #F3EAD3;       /* paper card */
+  --surface2: #DED0AE;      /* tan panel */
+  --border: #C4B084;        /* ink-tan border */
+  --text: #3B2F1C;          /* sepia ink */
+  --text-muted: #7C6C4E;    /* faded ink */
+  --accent: #1F6E66;        /* nautical teal */
+  --cyan: #B4531F;          /* terracotta highlight */
+  --gold: #B4531F;
+  --gold2: #C56A2E;
+  --header-bg: #6E5A38;
 }
-[data-theme="light"] .app-header { background:linear-gradient(120deg,#071e4d,#0a2a66 60%,#0d3a8f); border-bottom:2px solid #f5821f; }
+[data-theme="light"] .app-header { background:linear-gradient(120deg,#E7DBBE,#EFE4CB 60%,#E3D6B6); border-bottom:2px solid #B4531F; }
 [data-theme="light"] .app-header .logo h1 { color:#ffffff; }
 [data-theme="light"] .app-header .logo .sub { color:#8fb4e8; }
 [data-theme="light"] .app-header .game-name-tag { background:rgba(255,255,255,.12); color:#ffffff; border-color:rgba(255,255,255,.25); }
@@ -52,10 +52,10 @@
 [data-theme="light"] .app-header .btn { background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.28); color:#ffffff; }
 [data-theme="light"] .app-header .btn:hover { border-color:#f5821f; }
 [data-theme="light"] .app-header .btn-primary { background:#f5821f; border-color:#f5821f; }
-[data-theme="light"] .hex-cell-bg { background:#d8dce4; }
-[data-theme="light"] .hex-cell[data-parity="1"] .hex-cell-bg { background:#d0d5de; }
-[data-theme="light"] .hex-cell[data-parity="2"] .hex-cell-bg { background:#c8cdd8; }
-[data-theme="light"] .hex-cell.empty .hex-cell-bg::after { color:rgba(0,0,0,.18); }
+[data-theme="light"] .hex-cell-bg { background:#E1D4B4; }
+[data-theme="light"] .hex-cell[data-parity="1"] .hex-cell-bg { background:#DBCDA9; }
+[data-theme="light"] .hex-cell[data-parity="2"] .hex-cell-bg { background:#D4C59E; }
+[data-theme="light"] .hex-cell.empty .hex-cell-bg::after { color:rgba(59,47,28,.22); }
 [data-theme="light"] .zone-headers { background:var(--surface); border-color:rgba(0,0,0,.08); }
 [data-theme="light"] .zone-headers .zh-spacer { border-color:rgba(0,0,0,.06); }
 [data-theme="light"] .zone-col-header { border-color:rgba(0,0,0,.04); }
@@ -75,8 +75,37 @@
 [data-theme="light"] .board-toast.hint { background:rgba(0,114,206,.95); }
 [data-theme="light"] .gs-org-badge { background:rgba(0,114,206,.08); border-color:rgba(0,114,206,.2); }
 [data-theme="light"] #introScreen { background:var(--bg); }
-[data-theme="light"] .conn-nexus { stroke:#0072ce; }
-[data-theme="light"] .conn-path { stroke:#7b8794; }
+[data-theme="light"] .conn-nexus { stroke:#1F6E66; }
+[data-theme="light"] .conn-path { stroke:#8A6A3F; }
+/* ══ Cartographer light — flip the hardcoded-dark poster panels to parchment (hex type colors kept) ══ */
+[data-theme="light"] .app-header.ptb { background:linear-gradient(120deg,#E7DBBE,#EFE4CB 60%,#E3D6B6); }
+[data-theme="light"] .ptb-nexus, [data-theme="light"] .ptb-panel { background:rgba(255,252,242,.55); border-color:#C4B084; }
+[data-theme="light"] .ptb-card { background:rgba(255,252,242,.65); }
+[data-theme="light"] .ptb-title1, [data-theme="light"] .ptb-cname { color:#3B2F1C; }
+[data-theme="light"] .ptb-title2 { color:#1F6E66; }
+[data-theme="light"] .ptb-tag, [data-theme="light"] .ptb-cdesc, [data-theme="light"] .ptb-sec b, [data-theme="light"] .ptb-sec span, [data-theme="light"] .ptb-supply { color:#7C6C4E; }
+[data-theme="light"] .ptb-nexus .hero-eyebrow { color:#1F6E66; }
+[data-theme="light"] .app-header .game-name-tag { background:rgba(59,47,28,.07); color:#3B2F1C; border-color:#C4B084; }
+[data-theme="light"] .app-header .save-status { color:#7C6C4E; }
+[data-theme="light"] .app-header .btn { background:rgba(59,47,28,.06); border-color:#C4B084; color:#3B2F1C; }
+[data-theme="light"] .app-header .btn:hover { border-color:#B4531F; }
+[data-theme="light"] .app-header .btn-primary { background:#B4531F; border-color:#B4531F; color:#fff; }
+[data-theme="light"] .toolbox { background:#EFE4CB; }
+[data-theme="light"] .deck-slot { background:#F3EAD3; }
+[data-theme="light"] .toolbox-title, [data-theme="light"] .doh-title, [data-theme="light"] .deck-slot-sub, [data-theme="light"] .deck-draw { color:#7C6C4E; }
+[data-theme="light"] .codex-axisb { background:#EFE4CB; border-right-color:#C4B084; }
+[data-theme="light"] .codex-axisb b { color:#7C6C4E; } [data-theme="light"] .codex-axisb i { color:#9A8A6A; }
+[data-theme="light"] .fitness-panel { background:linear-gradient(180deg,#EFE4CB,#F3EAD3); }
+[data-theme="light"] .fp-dest { background:linear-gradient(180deg,#EFE4CB,#F3EAD3); border-color:#1F6E66; }
+[data-theme="light"] .fdc { background:#F3EAD3; border-color:#C4B084; }
+[data-theme="light"] .poster-phase-strip { background:#EFE4CB; border-top-color:#C4B084; }
+[data-theme="light"] .pps-card { background:#F3EAD3; border-color:#C4B084; }
+[data-theme="light"] .pps-title, [data-theme="light"] .cl-card-name, [data-theme="light"] .cl-prac-hex-name { color:#3B2F1C; }
+[data-theme="light"] .cl-card { background:#F3EAD3; }
+[data-theme="light"] .cl-prac-hex-inner { background:#E7DBBE; }
+[data-theme="light"] .board-domains, [data-theme="light"] .board-drivers, [data-theme="light"] .domain-toolbar { background:#EFE4CB; }
+[data-theme="light"] .domain-label { background:#F3EAD3; }
+[data-theme="light"] .driver-chip { background:#F3EAD3; }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
