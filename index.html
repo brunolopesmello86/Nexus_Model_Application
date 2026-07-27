@@ -1255,6 +1255,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .fp-dest-foot { text-align:center; font-size:7.5px; font-weight:700; letter-spacing:1.4px; color:var(--text-muted); margin-top:10px; opacity:.8; }
 [data-theme="light"] .fp-dest { background:linear-gradient(180deg,#EAE1C7,#E1D5B6); border-color:#B79A6A; }
 [data-theme="light"] .report-page { background:#E7DBBE; }
+/* light-mode selected/active states — lighten the dark navy */
+[data-theme="light"] .ptb-card.agent:hover { background:rgba(31,110,102,.10); }
+[data-theme="light"] .ptb-card.agent.selected { box-shadow:inset 0 0 0 1px var(--ac), 0 0 12px rgba(31,110,102,.18); }
+[data-theme="light"] .pps-card.on { background:linear-gradient(180deg,rgba(31,110,102,.16),#EDE2C7); box-shadow:inset 0 0 0 1px #1F6E66, 0 0 12px rgba(31,110,102,.18); }
+[data-theme="light"] .pps-card.on .pps-title { color:#1a4d47; }
+[data-theme="light"] .pps-card:hover { background:rgba(31,110,102,.07); }
 [data-theme="light"] .fdc { background:#E7DBBE; border-color:#8A6A3F; }
 [data-theme="light"] .fp-dest .fb-name, [data-theme="light"] .fp-dest-score { color:#3B2F1C; }
 [data-theme="light"] .fp-dest-title { color:#1F6E66; }
