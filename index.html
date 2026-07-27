@@ -1319,10 +1319,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .toolbox-title { justify-content:center; text-align:center; letter-spacing:4px; color:var(--text-muted); }
 .codex-divider { height:1px; background:#1E4266; opacity:.7; margin:8px 4px 12px; }
 .deck-count-badge { display:none; }
-:root:not([data-theme="light"]) .toolbox { padding-left:30px; }
-.codex-axisb { position:absolute; left:0; top:0; bottom:0; width:26px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; border-right:1px solid #1E4266; background:#07182A; pointer-events:none; z-index:2; }
-.codex-axisb b { writing-mode:vertical-lr; transform:rotate(180deg); font-size:9px; font-weight:800; letter-spacing:3px; color:#7C93AB; white-space:nowrap; }
-.codex-axisb i { writing-mode:vertical-lr; transform:rotate(180deg); font-size:6.5px; font-style:normal; letter-spacing:.5px; color:#48607A; white-space:nowrap; }
+:root:not([data-theme="light"]) .toolbox { padding-left:40px; }
+.codex-axisb { position:absolute; left:0; top:0; bottom:0; width:34px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; border-right:1px solid #1E4266; background:#07182A; pointer-events:none; z-index:2; }
+.codex-axisb b { writing-mode:vertical-lr; transform:rotate(180deg); font-size:10.5px; font-weight:800; letter-spacing:2.4px; color:#9DB2C8; white-space:nowrap; }
+.codex-axisb i { display:none; }
 [data-theme="light"] .codex-axisb { display:none; }
 /* remove the right dashboard (now a duplicate of the fitness panel) in the poster theme */
 :root:not([data-theme="light"]) .main-layout { grid-template-columns:260px 1fr; }
@@ -1403,7 +1403,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .app-header.ptb { display:flex; flex-direction:column; height:200px; padding:6px 14px 10px; gap:6px; align-items:stretch; justify-content:flex-start; }
 .ptb-actions { display:flex; align-items:center; gap:6px; justify-content:flex-end; flex-shrink:0; flex-wrap:wrap; }
 .ptb-grid { flex:1; display:grid; grid-template-columns:300px 1fr 1fr; gap:14px; min-height:0; }
-.ptb-nexus { border:1.4px solid #1E4266; border-radius:12px; background:rgba(5,13,24,.45); padding:12px 20px; display:flex; flex-direction:column; justify-content:center; }
+.ptb-nexus { border:1.4px solid #1E4266; border-radius:12px; background:rgba(5,13,24,.45); padding:14px 20px; display:flex; flex-direction:column; justify-content:flex-start; }
 .ptb-nexus .hero-eyebrow { color:#19A7A1; margin-bottom:7px; }
 .ptb-title1 { font-size:29px; font-weight:800; letter-spacing:2px; color:#DCEBF7; line-height:1; }
 .ptb-title2 { font-size:22px; font-weight:800; letter-spacing:2px; color:#7FE3DD; line-height:1.1; margin-top:5px; }
@@ -1431,8 +1431,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 :root:not([data-theme="light"]) .connect-toolbar { display:none; }
 :root:not([data-theme="light"]) #hexBoardArea .zone-headers { display:none; }
 /* compact vertical "playing-card" agent + arrow cards (icon/hex on top, text below) */
-.app-header.ptb { height:216px; }
-.main-layout { height:calc(100vh - 216px); }
+.app-header.ptb { height:230px; }
+.main-layout { height:calc(100vh - 230px); }
 .ptb-cards { gap:8px; }
 .ptb-card { flex-direction:column !important; align-items:center; text-align:center; gap:4px; padding:10px 8px 8px; justify-content:flex-start; }
 .ptb-hex { width:44px; height:38px; align-self:center; }
