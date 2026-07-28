@@ -6019,8 +6019,12 @@ function renderDomainList(){
   // Render domain chips in the top toolbar
   const toolbar = document.getElementById('domainToolbar');
   if (toolbar) {
-    toolbar.innerHTML = `<span class="dt-label">⬡ ORGANIZATIONAL DOMAINS</span>
-      <button class="domain-add-btn" onclick="showModal('addDomainModal')">＋ Add Domain</button>
+    const _atMax = domainDefinitions.length >= 3;
+    const _addBtn = _atMax
+      ? '<span class="domain-add-btn" style="border-style:solid;opacity:.55;cursor:default" title="Max 3 organizational areas per board — start another board for more">3 / 3 · new board for more</span>'
+      : '<button class="domain-add-btn" onclick="showModal(\'addDomainModal\')">＋ Add Area</button>';
+    toolbar.innerHTML = `<span class="dt-label">⬡ ORGANIZATIONAL DOMAINS <span style="opacity:.75;font-weight:800">${domainDefinitions.length} / 3</span></span>
+      ${_addBtn}
       ${domainDefinitions.map(d=>`
         <div class="domain-chip${selectedDomainId===d.id?' selected':''}"
           style="background:${d.color}22;border-color:${d.color};color:${d.color};"
@@ -6061,7 +6065,9 @@ function toggleHexDomain(hexId){
   if(!wasInDomain) dom.hexIds.push(hexId);
   renderBoard();renderDomainList();scheduleAutoSave();
 }
+const MAX_DOMAINS = 3; // scope guard — max organizational areas per board
 function createDomain(){
+  if(domainDefinitions.length>=MAX_DOMAINS){ showToast(`Max ${MAX_DOMAINS} organizational areas per board — start another board (or one board per area) for more.`,'warning'); closeModal('addDomainModal'); return; }
   const name=document.getElementById('newDomainName').value.trim();
   if(!name){showToast('Enter a domain name','warning');return;}
   const color=selectedDomainColor||DOMAIN_COLORS[domainDefinitions.length%DOMAIN_COLORS.length];
@@ -6144,9 +6150,10 @@ function renderDomainBoundaries(){
     const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
     lbl.setAttribute('x',cx);lbl.setAttribute('y',cy);
     lbl.setAttribute('text-anchor','middle');lbl.setAttribute('dominant-baseline','middle');
-    lbl.setAttribute('font-size','16');lbl.setAttribute('font-weight','700');
-    lbl.setAttribute('fill',dom.color);lbl.setAttribute('opacity','0.15');
-    lbl.textContent=dom.name;
+    lbl.setAttribute('font-size','15');lbl.setAttribute('font-weight','800');
+    lbl.setAttribute('letter-spacing','1.5');
+    lbl.setAttribute('fill',dom.color);lbl.setAttribute('opacity','0.32');
+    lbl.textContent=(dom.name||'').toUpperCase();
     g.appendChild(lbl);
     svg.appendChild(g);
   });
