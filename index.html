@@ -1430,6 +1430,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .ptb-supply span { color:var(--ac); font-size:10px; letter-spacing:1px; opacity:.6; margin-left:4px; }
 .ptb-card.legend { flex-direction:column; align-items:center; text-align:center; gap:4px; justify-content:center; }
 .ptb-card.legend.nexus { cursor:pointer; }
+.ptb-card.legend.cmap { cursor:pointer; }
+.ptb-card.legend.cmap:hover { background:rgba(226,128,30,.10); }
+.ptb-card.legend.cmap.arming { box-shadow:inset 0 0 0 1px var(--ac), 0 0 16px rgba(226,128,30,.32); background:rgba(226,128,30,.12); }
+[data-theme="light"] .ptb-card.legend.cmap:hover { background:rgba(180,83,31,.10); }
 .ptb-ic { color:var(--ac); width:100%; }
 .ptb-ic svg { width:100%; height:22px; }
 #boardDomains { display:none; }
@@ -1877,10 +1881,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
             <div class="ptb-cname">TRANSITION NEXUS</div>
             <div class="ptb-cdesc">Solid L-arrow. Where transitions converge or diverge — the leverage points.</div>
           </div>
-          <div class="ptb-card legend" style="--ac:#E2801E">
+          <div class="ptb-card legend cmap" style="--ac:#E2801E" onclick="startCounterMapping()" title="Counter-Mapping — enclose hexes to scope an organizational area (max 3 per board)">
             <div class="ptb-ic"><svg viewBox="0 0 120 26" fill="none"><path d="M96 7 C60 -3 44 15 26 8" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M26 8 l12 -5 l-2 12 z" fill="currentColor"/><path d="M26 20 C62 30 78 12 96 19" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.65"/><path d="M96 19 l-12 5 l2 -12 z" fill="currentColor"/></svg></div>
             <div class="ptb-cname">COUNTER-MAPPING</div>
-            <div class="ptb-cdesc">Power pulls and influence. Where the system pulls back against the move.</div>
+            <div class="ptb-cdesc">Enclose hexes to scope an organizational area — draws a boundary line. Max 3 areas per board.</div>
           </div>
         </div>
       </div>
@@ -6046,11 +6050,15 @@ function renderDomainList(){
     </div>
   `).join('');
 }
+function syncCounterMappingCard(){
+  const card=document.querySelector('.ptb-card.legend.cmap');
+  if(card) card.classList.toggle('arming', !!selectedDomainId);
+}
 function selectDomainForAssignment(domId){
   if(selectedDomainId===domId){selectedDomainId=null;}
   else{selectedDomainId=domId;selectedAgent=null;selectedMarker=null;selectedDriver=null;
     document.querySelectorAll('.agent-pal,.marker-pal').forEach(e=>e.classList.remove('selected'));renderDrivers();}
-  renderDomainList();
+  renderDomainList();syncCounterMappingCard();
   showToast(selectedDomainId?`Click hexes to add/remove from "${domainDefinitions.find(d=>d.id===domId)?.name}"`:'Domain mode off','hint');
 }
 function toggleHexDomain(hexId){
@@ -6066,22 +6074,34 @@ function toggleHexDomain(hexId){
   renderBoard();renderDomainList();scheduleAutoSave();
 }
 const MAX_DOMAINS = 3; // scope guard — max organizational areas per board
+// Counter-Mapping: click the top-band card to start enclosing hexes into an organizational area
+function startCounterMapping(){
+  if(domainDefinitions.length>=MAX_DOMAINS){ showToast(`Max ${MAX_DOMAINS} organizational areas per board — start another board (or one board per area) for more.`,'warning'); return; }
+  if(typeof currentView!=='undefined' && currentView!=='board') switchBoardView('board');
+  showModal('addDomainModal');
+}
 function createDomain(){
   if(domainDefinitions.length>=MAX_DOMAINS){ showToast(`Max ${MAX_DOMAINS} organizational areas per board — start another board (or one board per area) for more.`,'warning'); closeModal('addDomainModal'); return; }
   const name=document.getElementById('newDomainName').value.trim();
   if(!name){showToast('Enter a domain name','warning');return;}
   const color=selectedDomainColor||DOMAIN_COLORS[domainDefinitions.length%DOMAIN_COLORS.length];
-  domainDefinitions.push({id:'dom_'+Date.now(),name,color,hexIds:[]});
+  const _id='dom_'+Date.now();
+  domainDefinitions.push({id:_id,name,color,hexIds:[]});
+  // arm the new area for enclosing hexes (counter-mapping mode)
+  selectedDomainId=_id; selectedAgent=null; selectedMarker=null; selectedDriver=null;
+  document.querySelectorAll('.agent-pal,.marker-pal').forEach(e=>e.classList.remove('selected'));
   closeModal('addDomainModal');
   document.getElementById('newDomainName').value='';
   selectedDomainColor=null;
-  renderDomainList();scheduleAutoSave();
-  addLog(`Created domain "${name}"`,'success');
+  if(typeof currentView!=='undefined' && currentView!=='board') switchBoardView('board');
+  renderDomainList();renderBoard();scheduleAutoSave();syncCounterMappingCard();
+  addLog(`Created area "${name}" — click hexes to enclose`,'success');
+  showToast(`Area "${name}" armed — click hexes to draw its boundary (click the "${name}" chip again to stop)`,'hint');
 }
 function deleteDomain(domId){
   domainDefinitions=domainDefinitions.filter(d=>d.id!==domId);
   if(selectedDomainId===domId)selectedDomainId=null;
-  renderBoard();renderDomainList();scheduleAutoSave();
+  renderBoard();renderDomainList();scheduleAutoSave();syncCounterMappingCard();
 }
 function initDomainColorPicker(){
   const c=document.getElementById('domainColorPicker');
