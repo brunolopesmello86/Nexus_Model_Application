@@ -1771,6 +1771,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
     <div class="cap-sel-body" id="capSimpleBody"></div>
     <div class="cap-sel-footer">
       <button class="btn" style="color:var(--red);border-color:var(--red);margin-right:auto;" onclick="removeCapSimple()">✕ Remove</button>
+      <button class="btn" style="color:var(--cyan);border-color:var(--cyan);" onclick="buildCapExperiment()">🧪 Build Experiment</button>
       <button class="btn" onclick="closeCapSimple()">Cancel</button>
       <button class="btn btn-primary" onclick="saveCapSimple()">Link</button>
     </div>
@@ -3501,11 +3502,14 @@ function renderExperimentsPage() {
   const page = document.getElementById('expTrackerPage');
   if (!page) return;
 
-  // Gather all experiment keys: nexus connections with experiments + legacy boardMarker s2f
+  // Gather all experiment keys: capability-hex experiments (new) + nexus connections + legacy boardMarker s2f
   const nexusExpKeys  = connections.filter(c => c.type === 'nexus').flatMap(c => getConnExpKeys(c.id).filter(k => experimentResults[k]));
   const allOnBoard    = Object.values(gridState);
+  const onBoardSet    = new Set(allOnBoard);
+  // Capability-hex experiments: key `hexId::pracId` where hexId is a placed board instance (not a connection id)
+  const capExpKeys    = Object.keys(experimentResults).filter(k => k.includes('::') && onBoardSet.has(k.split('::')[0]));
   const legacyExpKeys = boardMarkers.filter(m => m.type === 's2f' && allOnBoard.includes(m.hexId)).map(m => m.hexId);
-  const allExpKeys    = [...nexusExpKeys, ...legacyExpKeys];
+  const allExpKeys    = [...new Set([...capExpKeys, ...nexusExpKeys, ...legacyExpKeys])];
 
   // Helper: get display title and capIds for a key (handles connId::pracId format)
   function getExpMeta(key) {
@@ -3522,9 +3526,13 @@ function renderExperimentsPage() {
       if (capIds.length === 0) capIds = getCapabilityIds(fromCap);
       return { title, icon: '🔗', capIds, isNexus: true };
     } else {
-      const item = resolveItem(key);
-      const capMk = boardMarkers.find(m => m.hexId === key && m.type === 'capability');
-      return { title: item?.name || key, icon: '⬡', capIds: getCapabilityIds(capMk), isNexus: false };
+      // Capability-hex experiment (`hexId::pracId`) or legacy hex key
+      const hexId = key.includes('::') ? key.split('::')[0] : key;
+      const item = resolveItem(hexId);
+      const capMk = boardMarkers.find(m => m.hexId === hexId && m.type === 'capability');
+      let capIds = getCapabilityIds(capMk);
+      if (item && item.type === 'capability' && item._capRef && !capIds.includes(item._capRef)) capIds = [...capIds, item._capRef];
+      return { title: item?.name || hexId, icon: '⬡', capIds, isNexus: false };
     }
   }
 
@@ -3540,7 +3548,7 @@ function renderExperimentsPage() {
     html += `<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text-muted);">
       <div style="font-size:36px;">🧪</div>
       <div style="font-size:13px;font-weight:600;">No experiments yet</div>
-      <div style="font-size:11px;">Drag the <strong>S2F</strong> marker onto a <strong>Nexus line</strong> to add an experiment</div>
+      <div style="font-size:11px;">Place a <strong>Capability</strong> hex on the board, click its <strong>C</strong> badge, then <strong>🧪 Build Experiment</strong> against one of its practices</div>
     </div>`;
     page.innerHTML = html;
     return;
@@ -3649,14 +3657,19 @@ function expReadiness(key) {
     }
   }
   const habits3 = pracId ? (pmHabits(pracId).length >= 3) : false;
-  const ready = capOnBoard && practiceSelected && nexusLink && habits3;
-  return { capOnBoard, practiceSelected, nexusLink, habits3, ready, gated: !!er.gated };
+  // Capability-hex experiment: built from a placed capability hex — no Nexus line required (3-condition gate).
+  const isCapExp = !!er.capExp || (key.includes('::') && Object.values(gridState).includes(key.split('::')[0]));
+  const ready = isCapExp
+    ? (capOnBoard && practiceSelected && habits3)
+    : (capOnBoard && practiceSelected && nexusLink && habits3);
+  return { capOnBoard, practiceSelected, nexusLink, habits3, ready, gated: !!er.gated, isCapExp };
 }
 function expReadinessChip(key) {
   const r = expReadiness(key);
   if (!r.gated) return '';
-  const n = [r.capOnBoard, r.practiceSelected, r.nexusLink, r.habits3].filter(Boolean).length;
-  return `<div class="exp-ready-chip ${r.ready?'ok':''}" onclick="event.stopPropagation();showReadinessModal('${escHtml(key)}')" title="Experiment readiness — click for details">${r.ready?'✓ READY':'◈ DRAFT · '+n+'/4'}</div>`;
+  const checks = r.isCapExp ? [r.capOnBoard, r.practiceSelected, r.habits3] : [r.capOnBoard, r.practiceSelected, r.nexusLink, r.habits3];
+  const n = checks.filter(Boolean).length;
+  return `<div class="exp-ready-chip ${r.ready?'ok':''}" onclick="event.stopPropagation();showReadinessModal('${escHtml(key)}')" title="Experiment readiness — click for details">${r.ready?'✓ READY':'◈ DRAFT · '+n+'/'+checks.length}</div>`;
 }
 function showReadinessModal(key) {
   const r = expReadiness(key);
@@ -3670,15 +3683,15 @@ function showReadinessModal(key) {
     <button class="codex-close" onclick="closeCardModal()">✕</button>
     <div class="cd-title" style="font-size:16px">🧪 Experiment Readiness ${r.ready?'— ready to run':'— not ready yet'}</div>
     <div class="rdy-list">
-      ${row(r.capOnBoard, 'Capability on the board', 'The capability this practice belongs to must be placed on the board (green hex or C-marker).')}
-      ${row(r.practiceSelected, 'Practice selected', 'Link a practice to this experiment on the Nexus line.')}
-      ${row(r.nexusLink, 'Transition Nexus link', 'The experiment must sit on a live Transition Nexus line between hexes.')}
+      ${row(r.capOnBoard, 'Capability on the board', 'The capability this practice belongs to must be placed on the board (capability hex or C-marker).')}
+      ${row(r.practiceSelected, 'One practice assigned', 'This experiment must have exactly one practice linked to it.')}
+      ${r.isCapExp ? '' : row(r.nexusLink, 'Transition Nexus link', 'The experiment must sit on a live Transition Nexus line between hexes.')}
       ${row(r.habits3, 'Practice evaluated — ≥3 good habits', `Score at least 3 good habits for this practice in the Practices tab (currently ${habitsN}).`)}
     </div>
     <div class="codex-actions">
       ${!r.habits3 && pracId ? `<button class="codex-btn" onclick="closeCardModal();switchBoardView('practices')">Open Practices tab →</button>` : ''}
       <button class="codex-btn primary" onclick="closeCardModal()">Got it</button>
-      <span class="codex-foot">All 4 required before the experiment can leave Pending</span>
+      <span class="codex-foot">All ${r.isCapExp ? 3 : 4} required before the experiment can leave Pending</span>
     </div>
   </div>`;
   div.addEventListener('click', e => { if (e.target === div) closeCardModal(); });
@@ -4233,9 +4246,75 @@ function openS2FModal(connIdOrHexId) {
 }
 function closeS2FModal() {
   _s2fKey = null;
+  _capExpHexId = null;
   document.getElementById('s2fPracticeModal').classList.remove('open');
 }
+// ── Build Experiment directly from a capability hex (no S2F marker / no nexus line) ──
+// Each experiment = 1 capability hex + 1 practice (key `hexId::practiceId`).
+let _capExpHexId = null;
+function capHexCapIds(hexId) {
+  const item = resolveItem(hexId);
+  const mk = boardMarkers.find(m => m.hexId === hexId && m.type === 'capability');
+  const ids = [...getCapabilityIds(mk)];
+  if (item && item.type === 'capability' && item._capRef && !ids.includes(item._capRef)) ids.push(item._capRef);
+  return ids;
+}
+function buildCapExperiment(hexId) {
+  hexId = hexId || _capSimpleHexId || _capSelHexId;
+  if (!hexId) return;
+  closeCapSimple();
+  _capExpHexId = hexId;
+  _s2fKey = null;
+  const item = resolveItem(hexId);
+  const capIds = capHexCapIds(hexId);
+  const pracsByCap = capIds.map(cid => {
+    const cap = capabilitiesLibrary.find(c => c.id === cid);
+    return cap ? { cap, practices: cap.practices } : null;
+  }).filter(Boolean);
+  document.getElementById('s2fModalTitle').textContent = 'Build Experiment — ' + (item?.name || hexId);
+  const existing = new Set(Object.keys(experimentResults)
+    .filter(k => k.startsWith(hexId + '::')).map(k => k.split('::')[1]));
+  const body = document.getElementById('s2fModalBody');
+  if (pracsByCap.length === 0) {
+    body.innerHTML = `<p style="font-size:12px;color:var(--text-muted);padding:12px;">No capability linked to this hex yet.<br><br>Link a capability first (the <strong>C</strong> badge), then build an experiment against one of its practices.</p>`;
+  } else {
+    body.innerHTML = pracsByCap.map(({cap, practices}) => `
+      <div style="margin-bottom:10px;">
+        <div style="font-size:10px;font-weight:700;color:var(--cyan);padding:6px 12px;background:var(--surface2);border-radius:4px;margin-bottom:4px;">◈ ${escHtml(cap.name)}</div>
+        ${practices.length === 0 ? `<div style="font-size:11px;color:var(--text-muted);padding:6px 12px;">No practices defined for this capability.</div>` : practices.map(p => {
+          const already = existing.has(p.id);
+          const h = pmHabits(p.id).length;
+          const ok3 = h >= 3;
+          return `
+          <label class="cap-sel-prac-row" style="padding:8px 12px;display:flex;gap:8px;align-items:flex-start;cursor:pointer;border-radius:6px;margin-bottom:2px;" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background=''">
+            <input type="checkbox" name="capexp_prac" id="capexp_${p.id}" value="${p.id}" ${already?'checked disabled':''} style="margin-top:2px;flex-shrink:0;">
+            <div>
+              <div class="cap-sel-prac-name">${escHtml(p.name)}${already?' <span style="font-size:9px;color:var(--cyan);">✓ experiment exists</span>':''}</div>
+              ${p.description?`<div class="cap-sel-prac-desc">${escHtml(p.description)}</div>`:''}
+              <div style="font-size:9px;margin-top:2px;color:${ok3?'#2d9d5e':'#E2801E'};">${ok3?`✓ ${h} good habits evaluated`:`⚠ ${h}/3 good habits — needs ≥3 before it can leave Pending`}</div>
+            </div>
+          </label>`;}).join('')}
+      </div>`).join('');
+  }
+  document.getElementById('s2fPracticeModal').classList.add('open');
+}
+function saveCapExperiment() {
+  const hexId = _capExpHexId;
+  if (!hexId) return;
+  const checked = [...document.querySelectorAll('input[name="capexp_prac"]:checked:not([disabled])')].map(i => i.value);
+  if (checked.length === 0) { showToast('Select at least one practice to build an experiment', 'info'); return; }
+  checked.forEach(pracId => {
+    const expKey = hexId + '::' + pracId;
+    if (!experimentResults[expKey]) experimentResults[expKey] = { stage: 'pending', practiceId: pracId, gated: true, capExp: true };
+  });
+  const item = resolveItem(hexId);
+  addLog(`Built experiment on "${item?.name || hexId}" (${checked.length} practice${checked.length>1?'s':''})`, 'success');
+  closeS2FModal();
+  renderAllZones(); renderExperimentsPage(); renderFitnessPanel(); updateStats(); scheduleAutoSave();
+  showToast(`Experiment${checked.length>1?'s':''} added to the tracker — open the 🧪 Experiments tab`, 'success');
+}
 function saveS2FExperiment() {
+  if (_capExpHexId) { saveCapExperiment(); return; }
   const key = _s2fKey;
   if (!key) return;
   const conn = connections.find(c => c.id === key);
@@ -5720,14 +5799,18 @@ function renderConnections() {
             ? `S2F: ${er?.practiceId ? (capabilitiesLibrary.flatMap(c=>c.practices).find(p=>p.id===er.practiceId)?.name || stagKey) : stagKey}`
             : `S2F: ${connExpKeys.length} experiments`)
         : 'Click to add S2F experiment';
-      g.appendChild(makeDot(
-        sp.x, sp.y,
-        hasExp ? stageColor + '44' : 'rgba(255,255,255,.05)',
-        hasExp ? stageColor : 'rgba(255,255,255,.25)',
-        'S', s2fTooltip,
-        () => openS2FModal(conn.id),
-        !hasExp
-      ));
+      // Legacy S2F path is retired — only show the dot for existing nexus experiments (view/edit), never to create new ones.
+      // New experiments are built from a Capability hex (its C badge → 🧪 Build Experiment).
+      if (hasExp) {
+        g.appendChild(makeDot(
+          sp.x, sp.y,
+          stageColor + '44',
+          stageColor,
+          'S', s2fTooltip,
+          () => openS2FModal(conn.id),
+          false
+        ));
+      }
 
       // Delete button at ~15% of line (near source hex, away from T and S dots)
       const fsx = fromR.x+fromR.w/2, fsy = fromR.cy, tex = toR.x+toR.w/2, tey = toR.cy;
