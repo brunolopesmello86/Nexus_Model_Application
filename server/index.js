@@ -264,7 +264,7 @@ const SEED_CAPABILITIES = [
   // ═══════════════════════════════════════════
   // STRATEGY & PORTFOLIO — 11 capabilities
   // ═══════════════════════════════════════════
-  { name: 'Portfolio Governance', domain: 'Strategy, Leadership & Direction', source: 'Nexus',
+  { name: 'Portfolio Governance', domain: 'Strategy & Portfolio', source: 'Nexus',
     description: 'Structures and rhythms for portfolio-level decisions, prioritisation and oversight.',
     practices: [
       { name: 'Portfolio Review Cadence', level: 'F', description: 'Establish a regular rhythm for reviewing the portfolio to maintain alignment and visibility.' },
@@ -275,7 +275,7 @@ const SEED_CAPABILITIES = [
       { name: 'Continuous Portfolio Rebalancing', level: 'A', description: 'Continuously adjust the portfolio mix as market conditions and learnings evolve.' },
     ]
   },
-  { name: 'Investment Logic', domain: 'Strategy, Leadership & Direction', source: 'Nexus',
+  { name: 'Investment Logic', domain: 'Strategy & Portfolio', source: 'Nexus',
     description: 'How investment cases are framed, evaluated and updated based on learning.',
     practices: [
       { name: 'Lean Business Case Template', level: 'F', description: 'Use a lightweight one-pager to frame the problem, hypothesis and expected outcome before committing investment.' },
@@ -286,7 +286,7 @@ const SEED_CAPABILITIES = [
       { name: 'Portfolio Learning Library', level: 'A', description: 'Capture and share lessons from past investments to improve future decision-making.' },
     ]
   },
-  { name: 'Strategic Rhythm', domain: 'Strategy, Leadership & Direction', source: 'Nexus',
+  { name: 'Strategic Rhythm', domain: 'Strategy & Portfolio', source: 'Nexus',
     description: 'Regular cadences for reviewing strategy, allocating resources and adjusting direction.',
     practices: [
       { name: 'Nested Cadence Design', level: 'F', description: 'Design nested planning cadences (weekly, quarterly, annual) that align team and portfolio rhythms.' },
@@ -297,7 +297,7 @@ const SEED_CAPABILITIES = [
       { name: 'Strategy Feedback Loop', level: 'A', description: 'Create systematic mechanisms to feed execution learnings back into strategic planning.' },
     ]
   },
-  { name: 'Course Correction', domain: 'Strategy, Leadership & Direction', source: 'Nexus',
+  { name: 'Course Correction', domain: 'Strategy & Portfolio', source: 'Nexus',
     description: 'Ability to detect misalignment early and change course without sunk-cost bias.',
     practices: [
       { name: 'Early Warning Indicators', level: 'F', description: 'Define leading indicators that signal when an initiative is drifting off track before it becomes critical.' },
@@ -308,7 +308,7 @@ const SEED_CAPABILITIES = [
       { name: 'Anti-Sunk-Cost Governance', level: 'A', description: 'Build governance guardrails that make it safe and expected to stop unviable investments.' },
     ]
   },
-  { name: 'Prioritisation', domain: 'Strategy, Leadership & Direction', source: 'Nexus',
+  { name: 'Prioritisation', domain: 'Strategy & Portfolio', source: 'Nexus',
     description: 'Mechanisms for ranking and sequencing initiatives across the portfolio.',
     practices: [
       { name: 'Weighted Scoring Model', level: 'F', description: 'Apply a consistent scoring model with weighted criteria to compare initiatives objectively.' },
@@ -319,7 +319,7 @@ const SEED_CAPABILITIES = [
       { name: 'Opportunity Cost Transparency', level: 'A', description: 'Make the opportunity cost of prioritisation decisions explicit to improve strategic trade-offs.' },
     ]
   },
-  { name: 'Resource Allocation', domain: 'Strategy, Leadership & Direction', source: 'Nexus',
+  { name: 'Resource Allocation', domain: 'Strategy & Portfolio', source: 'Nexus',
     description: 'How people, funding and capacity are assigned and rebalanced dynamically.',
     practices: [
       { name: 'Skill Inventory Mapping', level: 'F', description: 'Map the skills and capacity available across teams to inform allocation decisions.' },
@@ -330,7 +330,7 @@ const SEED_CAPABILITIES = [
       { name: 'Value-per-Person Metric', level: 'A', description: 'Track the value delivered per person to optimise team sizing and composition.' },
     ]
   },
-  { name: 'Strategic Clarity', domain: 'Strategy, Leadership & Direction', source: 'Nexus',
+  { name: 'Strategic Clarity', domain: 'Strategy & Portfolio', source: 'Nexus',
     description: 'Degree to which teams understand the "why" behind the strategy.',
     practices: [
       { name: 'Strategy on a Page', level: 'F', description: 'Distil the strategy into a single visual that teams can reference and share easily.' },
@@ -341,7 +341,7 @@ const SEED_CAPABILITIES = [
       { name: 'Living Strategy Document', level: 'A', description: 'Maintain a dynamic strategy document that is updated as learning evolves — not just annually.' },
     ]
   },
-  { name: 'OKR & Goals Mgmt', domain: 'Strategy, Leadership & Direction', source: 'Nexus',
+  { name: 'OKR & Goals Mgmt', domain: 'Strategy & Portfolio', source: 'Nexus',
     description: 'Frameworks for setting, aligning and tracking objectives at every level.',
     practices: [
       { name: 'OKR Three-Level Cascade', level: 'F', description: 'Cascade OKRs from company to team level ensuring each layer connects to the one above.' },
@@ -352,7 +352,7 @@ const SEED_CAPABILITIES = [
       { name: 'OKR Outcome Dashboard', level: 'A', description: 'Build a real-time dashboard showing OKR status and outcome progress across the organisation.' },
     ]
   },
-  { name: 'Customer Feedback', domain: 'Strategy, Leadership & Direction', source: 'Accelerate',
+  { name: 'Customer Feedback', domain: 'Strategy & Portfolio', source: 'Accelerate',
     description: 'Mechanisms to actively seek, gather and act on customer input to steer portfolio direction.',
     practices: [
       { name: 'Continuous Customer Interview Programme', level: 'F', description: 'Run ongoing customer interviews to continuously surface needs, pains and opportunities.' },
@@ -363,7 +363,7 @@ const SEED_CAPABILITIES = [
       { name: 'Customer Advisory Board', level: 'A', description: 'Establish a formal advisory board of key customers to co-shape product and portfolio direction.' },
     ]
   },
-  { name: 'Small Batch Work', domain: 'Strategy, Leadership & Direction', source: 'Accelerate',
+  { name: 'Small Batch Work', domain: 'Strategy & Portfolio', source: 'Accelerate',
     description: 'Decomposing work into small units of value to reduce risk and accelerate learning.',
     practices: [
       { name: 'Maximum Batch Size Policy', level: 'F', description: 'Define and enforce a maximum batch size for work items to keep delivery cycles short.' },
@@ -374,7 +374,7 @@ const SEED_CAPABILITIES = [
       { name: 'Value Increment Planning', level: 'A', description: 'Plan delivery in explicit value increments, each of which delivers standalone customer value.' },
     ]
   },
-  { name: 'Value Stream Visibility', domain: 'Strategy, Leadership & Direction', source: 'Accelerate',
+  { name: 'Value Stream Visibility', domain: 'Strategy & Portfolio', source: 'Accelerate',
     description: 'End-to-end visibility of how value flows from idea to customer outcome.',
     practices: [
       { name: 'Value Stream Mapping Workshop', level: 'F', description: 'Facilitate a cross-functional workshop to map the current state of a key value stream.' },
@@ -389,7 +389,7 @@ const SEED_CAPABILITIES = [
   // ═══════════════════════════════════════════
   // PRODUCT & DELIVERY — 14 capabilities
   // ═══════════════════════════════════════════
-  { name: 'Flow Optimisation', domain: 'Change & Adoption', source: 'Nexus',
+  { name: 'Flow Optimisation', domain: 'Product & Delivery', source: 'Nexus',
     description: 'Reducing waste and bottlenecks to maximise throughput of value.',
     practices: [
       { name: 'Flow Visualisation Board', level: 'F', description: 'Create a board that makes all work, queues and blockers visible across the delivery system.' },
@@ -400,7 +400,7 @@ const SEED_CAPABILITIES = [
       { name: 'Automated Flow Analytics', level: 'A', description: 'Automate collection and analysis of flow data to surface patterns and opportunities at scale.' },
     ]
   },
-  { name: 'Feedback Loops', domain: 'Change & Adoption', source: 'Nexus',
+  { name: 'Feedback Loops', domain: 'Product & Delivery', source: 'Nexus',
     description: 'Fast, reliable mechanisms to learn from users, markets and operations.',
     practices: [
       { name: 'Production Monitoring Alerts', level: 'F', description: 'Set up alerting on production systems so the team knows immediately when something goes wrong.' },
@@ -411,7 +411,7 @@ const SEED_CAPABILITIES = [
       { name: 'Automated Anomaly Detection', level: 'A', description: 'Use machine learning or statistical methods to automatically detect anomalies in user and system behaviour.' },
     ]
   },
-  { name: 'Cycle Time Mgmt', domain: 'Change & Adoption', source: 'Nexus',
+  { name: 'Cycle Time Mgmt', domain: 'Product & Delivery', source: 'Nexus',
     description: 'Measuring and shortening end-to-end delivery time across the value stream.',
     practices: [
       { name: 'Cycle Time Baseline', level: 'F', description: 'Measure and record the current average cycle time to establish a starting point for improvement.' },
@@ -422,7 +422,7 @@ const SEED_CAPABILITIES = [
       { name: 'Per-Story Cycle Time SLAs', level: 'A', description: 'Define service-level agreements for cycle time by story type and track compliance over time.' },
     ]
   },
-  { name: 'Team Topology', domain: 'Change & Adoption', source: 'Nexus',
+  { name: 'Team Topology', domain: 'Product & Delivery', source: 'Nexus',
     description: 'Designing team structures and interactions to enable fast, safe delivery.',
     practices: [
       { name: 'Team Type Classification', level: 'F', description: 'Classify all teams into stream-aligned, platform, enabling or complicated-subsystem types.' },
@@ -433,7 +433,7 @@ const SEED_CAPABILITIES = [
       { name: 'Thinnest Viable Platform', level: 'A', description: 'Design the internal platform to be as thin as possible while still reducing cognitive load for teams.' },
     ]
   },
-  { name: 'Experimentation', domain: 'Change & Adoption', source: 'Nexus',
+  { name: 'Experimentation', domain: 'Product & Delivery', source: 'Nexus',
     description: 'Culture and tooling to run safe-to-fail experiments at pace.',
     practices: [
       { name: 'Experiment Hypothesis Template', level: 'F', description: 'Standardise hypothesis writing using a template: "We believe X will result in Y, evidenced by Z."' },
@@ -444,7 +444,7 @@ const SEED_CAPABILITIES = [
       { name: 'Celebrating Failed Experiments', level: 'A', description: 'Formally celebrate well-designed experiments that fail to reinforce a learning culture.' },
     ]
   },
-  { name: 'Continuous Delivery', domain: 'Change & Adoption', source: 'Nexus',
+  { name: 'Continuous Delivery', domain: 'Product & Delivery', source: 'Nexus',
     description: 'Automated pipelines enabling frequent, low-risk releases.',
     practices: [
       { name: 'Deployment Pipeline Baseline', level: 'F', description: 'Establish a basic automated pipeline that builds, tests and deploys code on every commit.' },
@@ -455,7 +455,7 @@ const SEED_CAPABILITIES = [
       { name: 'Chaos Engineering Practice', level: 'A', description: 'Intentionally inject failures into the system to discover weaknesses before they cause incidents.' },
     ]
   },
-  { name: 'Quality Practices', domain: 'Change & Adoption', source: 'Nexus',
+  { name: 'Quality Practices', domain: 'Product & Delivery', source: 'Nexus',
     description: 'Test strategies and standards that build quality in rather than inspecting it out.',
     practices: [
       { name: 'Test Pyramid Implementation', level: 'F', description: 'Structure tests as a pyramid with many unit tests, fewer integration tests and fewer E2E tests.' },
@@ -466,7 +466,7 @@ const SEED_CAPABILITIES = [
       { name: 'Quality Engineering Culture', level: 'A', description: 'Shift quality ownership to the whole team, making quality engineering a shared discipline not a gate.' },
     ]
   },
-  { name: 'Roadmap Mgmt', domain: 'Change & Adoption', source: 'Nexus',
+  { name: 'Roadmap Mgmt', domain: 'Product & Delivery', source: 'Nexus',
     description: 'Communicating and adapting delivery plans with stakeholders over time.',
     practices: [
       { name: 'Now/Next/Later Format', level: 'F', description: 'Use the Now/Next/Later format to communicate roadmap priorities without false date precision.' },
@@ -477,7 +477,7 @@ const SEED_CAPABILITIES = [
       { name: 'Outcome-Based Roadmap', level: 'A', description: 'Shift the roadmap from features to outcomes, showing what business results will be achieved and when.' },
     ]
   },
-  { name: 'Version Control', domain: 'Change & Adoption', source: 'Accelerate',
+  { name: 'Version Control', domain: 'Product & Delivery', source: 'Accelerate',
     description: 'All production artefacts — code, config, scripts, docs — version-controlled.',
     practices: [
       { name: 'Everything-in-VCS Policy', level: 'F', description: 'Establish a policy that all production artefacts must be stored in version control.' },
@@ -488,7 +488,7 @@ const SEED_CAPABILITIES = [
       { name: 'Repository Standards', level: 'A', description: 'Define and enforce standards for repository structure, naming, and documentation across all teams.' },
     ]
   },
-  { name: 'Deploy Automation', domain: 'Change & Adoption', source: 'Accelerate',
+  { name: 'Deploy Automation', domain: 'Product & Delivery', source: 'Accelerate',
     description: 'Deployment process is fully automated; no manual steps to production.',
     practices: [
       { name: 'Deployment Pipeline Inventory', level: 'F', description: 'Inventory all existing deployment processes to identify gaps and manual steps.' },
@@ -499,7 +499,7 @@ const SEED_CAPABILITIES = [
       { name: 'Progressive Delivery', level: 'A', description: 'Use canary releases and progressive rollouts to reduce the blast radius of new deployments.' },
     ]
   },
-  { name: 'Continuous Integration', domain: 'Change & Adoption', source: 'Accelerate',
+  { name: 'Continuous Integration', domain: 'Product & Delivery', source: 'Accelerate',
     description: 'Developers integrate code to trunk at least daily, validated by automated build.',
     practices: [
       { name: 'Daily Commit Policy', level: 'F', description: 'Establish a team norm that every developer commits to the shared trunk at least once per day.' },
@@ -510,7 +510,7 @@ const SEED_CAPABILITIES = [
       { name: 'Merge Queue Management', level: 'A', description: 'Use a merge queue to serialise and validate all changes before they land on the main branch.' },
     ]
   },
-  { name: 'Trunk-Based Dev.', domain: 'Change & Adoption', source: 'Accelerate',
+  { name: 'Trunk-Based Dev.', domain: 'Product & Delivery', source: 'Accelerate',
     description: 'All developers work on a single trunk branch with very short-lived feature branches.',
     practices: [
       { name: 'Branch Lifetime Policy', level: 'F', description: 'Define and enforce a maximum branch lifetime (e.g. 1 day) to prevent long-lived divergence.' },
@@ -521,7 +521,7 @@ const SEED_CAPABILITIES = [
       { name: 'Continuous Code Review', level: 'A', description: 'Shift from batch code reviews to continuous small reviews that are completed within hours.' },
     ]
   },
-  { name: 'Test Automation', domain: 'Change & Adoption', source: 'Accelerate',
+  { name: 'Test Automation', domain: 'Product & Delivery', source: 'Accelerate',
     description: 'Automated test suite covers unit, integration and acceptance tests with fast feedback.',
     practices: [
       { name: 'Test Coverage Baseline', level: 'F', description: 'Measure and publish current test coverage to establish a baseline for improvement.' },
@@ -532,7 +532,7 @@ const SEED_CAPABILITIES = [
       { name: 'Test Analytics Dashboard', level: 'A', description: 'Build a dashboard showing test health trends: coverage, flakiness, failure rates over time.' },
     ]
   },
-  { name: 'Test Data Management', domain: 'Change & Adoption', source: 'Accelerate',
+  { name: 'Test Data Management', domain: 'Product & Delivery', source: 'Accelerate',
     description: 'Test data available on demand; production-like datasets handled safely in test environments.',
     practices: [
       { name: 'Synthetic Data Generators', level: 'F', description: 'Build generators that create realistic synthetic test data on demand without using production data.' },
@@ -650,7 +650,7 @@ const SEED_CAPABILITIES = [
   // ═══════════════════════════════════════════
   // PEOPLE, CULTURE & GOVERNANCE — 12 capabilities
   // ═══════════════════════════════════════════
-  { name: 'Psychological Safety', domain: 'Structure & Organization', source: 'Nexus',
+  { name: 'Psychological Safety', domain: 'People, Culture & Governance', source: 'Nexus',
     description: 'Creating conditions where people speak up, take risks and learn without fear.',
     practices: [
       { name: 'Psychological Safety Assessment', level: 'F', description: "Measure the team's current level of psychological safety using a validated survey instrument." },
@@ -661,7 +661,7 @@ const SEED_CAPABILITIES = [
       { name: 'Safety Climate Monitoring', level: 'A', description: 'Continuously monitor psychological safety climate using pulse surveys and behavioural indicators.' },
     ]
   },
-  { name: 'Power Distribution', domain: 'Structure & Organization', source: 'Nexus',
+  { name: 'Power Distribution', domain: 'People, Culture & Governance', source: 'Nexus',
     description: 'How authority and decision-making are distributed across the organisation.',
     practices: [
       { name: 'Decision Authority Mapping', level: 'F', description: 'Map who has authority over which decisions to make the current power distribution explicit.' },
@@ -672,7 +672,7 @@ const SEED_CAPABILITIES = [
       { name: 'Authority Audit', level: 'A', description: 'Run a regular audit to check whether decision authority is still appropriately distributed.' },
     ]
   },
-  { name: 'Culture Design', domain: 'Structure & Organization', source: 'Nexus',
+  { name: 'Culture Design', domain: 'People, Culture & Governance', source: 'Nexus',
     description: 'Intentional shaping of norms, rituals and artefacts to support transformation.',
     practices: [
       { name: 'Participatory Values Creation', level: 'F', description: 'Engage the whole organisation in defining values to build genuine commitment rather than compliance.' },
@@ -683,7 +683,7 @@ const SEED_CAPABILITIES = [
       { name: 'Culture Evolution Roadmap', level: 'A', description: 'Create an explicit roadmap for culture evolution with milestones and measurement checkpoints.' },
     ]
   },
-  { name: 'Leadership Dev.', domain: 'Structure & Organization', source: 'Nexus',
+  { name: 'Leadership Dev.', domain: 'People, Culture & Governance', source: 'Nexus',
     description: 'Growing leaders who can operate effectively in ambiguous, fast-changing contexts.',
     practices: [
       { name: 'Leadership Competency Framework', level: 'F', description: 'Define the competencies required for effective leadership in the transformation context.' },
@@ -694,7 +694,7 @@ const SEED_CAPABILITIES = [
       { name: 'Succession Planning', level: 'A', description: 'Build a proactive succession plan to ensure leadership continuity and develop the next generation.' },
     ]
   },
-  { name: 'Governance Patterns', domain: 'Structure & Organization', source: 'Nexus',
+  { name: 'Governance Patterns', domain: 'People, Culture & Governance', source: 'Nexus',
     description: 'Lightweight structures that guide behaviour without creating bureaucracy.',
     practices: [
       { name: 'Governance Inventory', level: 'F', description: 'Inventory all existing governance processes to identify which are necessary versus bureaucratic.' },
@@ -705,7 +705,7 @@ const SEED_CAPABILITIES = [
       { name: 'Governance Retrospectives', level: 'A', description: 'Run retrospectives on governance processes to continuously simplify and improve them.' },
     ]
   },
-  { name: 'Meaning Making', domain: 'Structure & Organization', source: 'Nexus',
+  { name: 'Meaning Making', domain: 'People, Culture & Governance', source: 'Nexus',
     description: 'Connecting daily work to purpose and strategy to sustain motivation.',
     practices: [
       { name: 'OKR Line-of-Sight Workshop', level: 'F', description: 'Run workshops to help each team see how their work connects to the company OKRs.' },
@@ -716,7 +716,7 @@ const SEED_CAPABILITIES = [
       { name: 'Purpose-Driven Retrospectives', level: 'A', description: 'Run retrospectives that connect improvements back to the team\'s purpose and the customer impact.' },
     ]
   },
-  { name: 'Change Readiness', domain: 'Structure & Organization', source: 'Nexus',
+  { name: 'Change Readiness', domain: 'People, Culture & Governance', source: 'Nexus',
     description: 'Organisational capacity to absorb and adapt to ongoing change.',
     practices: [
       { name: 'Change Readiness Assessment', level: 'F', description: 'Assess the organisation\'s readiness for change before launching major transformation initiatives.' },
@@ -727,7 +727,7 @@ const SEED_CAPABILITIES = [
       { name: 'Resilience Building Programme', level: 'A', description: 'Run a programme specifically designed to build individual and organisational resilience to change.' },
     ]
   },
-  { name: 'Team Health', domain: 'Structure & Organization', source: 'Nexus',
+  { name: 'Team Health', domain: 'People, Culture & Governance', source: 'Nexus',
     description: 'Monitoring and improving team dynamics, wellbeing and performance.',
     practices: [
       { name: 'Team Health Check Model', level: 'F', description: 'Use a structured health check model (e.g. Spotify Squad Health Check) to baseline team health.' },
@@ -738,7 +738,7 @@ const SEED_CAPABILITIES = [
       { name: 'Team Health Trend Dashboard', level: 'A', description: 'Build a dashboard showing team health trends over time to track the impact of interventions.' },
     ]
   },
-  { name: 'Learning & Dev.', domain: 'Structure & Organization', source: 'Nexus',
+  { name: 'Learning & Dev.', domain: 'People, Culture & Governance', source: 'Nexus',
     description: 'Systems for acquiring new skills and sharing knowledge at every level.',
     practices: [
       { name: 'Individual Development Plans', level: 'F', description: 'Create and maintain IDPs for every team member aligned to personal and organisational goals.' },
@@ -749,7 +749,7 @@ const SEED_CAPABILITIES = [
       { name: 'Learning Effectiveness Metrics', level: 'A', description: 'Measure whether learning investments are translating into behaviour change and performance improvement.' },
     ]
   },
-  { name: 'Generative Culture', domain: 'Structure & Organization', source: 'Accelerate',
+  { name: 'Generative Culture', domain: 'People, Culture & Governance', source: 'Accelerate',
     description: 'Westrum organisational culture typology: high cooperation, shared risks, bridging.',
     practices: [
       { name: 'Westrum Culture Survey', level: 'F', description: 'Use the Westrum culture survey to measure where the organisation sits on the pathological–generative spectrum.' },
@@ -760,7 +760,7 @@ const SEED_CAPABILITIES = [
       { name: 'Generative Culture Indicators', level: 'A', description: 'Define and track leading behavioural indicators of generative culture across the organisation.' },
     ]
   },
-  { name: 'Cross-Team Collaboration', domain: 'Structure & Organization', source: 'Accelerate',
+  { name: 'Cross-Team Collaboration', domain: 'People, Culture & Governance', source: 'Accelerate',
     description: 'Active, structured collaboration across team and organisational boundaries.',
     practices: [
       { name: 'Dependency Mapping', level: 'F', description: 'Map cross-team dependencies explicitly to make collaboration needs visible and manageable.' },
@@ -771,7 +771,7 @@ const SEED_CAPABILITIES = [
       { name: 'Org Network Analysis', level: 'A', description: 'Use organisational network analysis to understand and improve informal collaboration patterns.' },
     ]
   },
-  { name: 'Transformational Leadership', domain: 'Structure & Organization', source: 'Accelerate',
+  { name: 'Transformational Leadership', domain: 'People, Culture & Governance', source: 'Accelerate',
     description: 'Leaders who inspire, communicate clear vision, and support innovation and learning.',
     practices: [
       { name: 'Transformational Leadership Assessment', level: 'F', description: 'Assess leaders against a transformational leadership model to identify development needs.' },
@@ -786,7 +786,7 @@ const SEED_CAPABILITIES = [
   // ═══════════════════════════════════════════
   // OPERATIONS — 12 capabilities
   // ═══════════════════════════════════════════
-  { name: 'Operational Habits', domain: 'Learning', source: 'Nexus',
+  { name: 'Operational Habits', domain: 'Operations', source: 'Nexus',
     description: 'Day-to-day behaviours and rituals that reinforce the desired operating model.',
     practices: [
       { name: 'Operating Rhythm Design', level: 'F', description: 'Design the day-to-day and week-to-week rhythm of meetings, check-ins and ceremonies.' },
@@ -797,7 +797,7 @@ const SEED_CAPABILITIES = [
       { name: 'Operational Fitness Functions', level: 'A', description: 'Define automated fitness functions that continuously validate operational health.' },
     ]
   },
-  { name: 'Process Improvement', domain: 'Learning', source: 'Nexus',
+  { name: 'Process Improvement', domain: 'Operations', source: 'Nexus',
     description: 'Systematic identification and elimination of waste in operational processes.',
     practices: [
       { name: 'Continuous Improvement Backlog', level: 'F', description: 'Maintain a visible backlog of process improvement opportunities accessible to all teams.' },
@@ -808,7 +808,7 @@ const SEED_CAPABILITIES = [
       { name: 'Value Stream Optimisation', level: 'A', description: 'Apply value stream analysis to optimise end-to-end operational processes, not just local steps.' },
     ]
   },
-  { name: 'Tooling Adoption', domain: 'Learning', source: 'Nexus',
+  { name: 'Tooling Adoption', domain: 'Operations', source: 'Nexus',
     description: 'Ensuring tools are actually used effectively, not just installed.',
     practices: [
       { name: 'Tool Usage Metrics', level: 'F', description: 'Instrument tools to measure actual usage and identify where adoption has stalled.' },
@@ -819,7 +819,7 @@ const SEED_CAPABILITIES = [
       { name: 'Tool ROI Assessment', level: 'A', description: 'Assess the return on investment of key tools to make evidence-based decisions on continuation or replacement.' },
     ]
   },
-  { name: 'Performance Metrics', domain: 'Learning', source: 'Nexus',
+  { name: 'Performance Metrics', domain: 'Operations', source: 'Nexus',
     description: 'Measurement systems that inform decisions rather than just reporting status.',
     practices: [
       { name: 'Metrics Hierarchy Design', level: 'F', description: 'Design a hierarchy of metrics from strategic outcomes down to operational leading indicators.' },
@@ -830,7 +830,7 @@ const SEED_CAPABILITIES = [
       { name: 'Metric Sunset Reviews', level: 'A', description: 'Run periodic reviews to retire metrics that no longer drive useful action.' },
     ]
   },
-  { name: 'Communication Rhythms', domain: 'Learning', source: 'Nexus',
+  { name: 'Communication Rhythms', domain: 'Operations', source: 'Nexus',
     description: 'Structured cadences for information flow across teams and layers.',
     practices: [
       { name: 'Communication Calendar Audit', level: 'F', description: 'Audit all recurring meetings and communication channels to identify gaps and redundancy.' },
@@ -841,7 +841,7 @@ const SEED_CAPABILITIES = [
       { name: 'Communication Effectiveness Survey', level: 'A', description: 'Survey the organisation regularly on communication effectiveness to identify systemic issues.' },
     ]
   },
-  { name: 'Knowledge Mgmt', domain: 'Learning', source: 'Nexus',
+  { name: 'Knowledge Mgmt', domain: 'Operations', source: 'Nexus',
     description: 'Capturing and making accessible the institutional knowledge needed to operate.',
     practices: [
       { name: 'Knowledge Base Implementation', level: 'F', description: 'Implement a searchable knowledge base as the single source of truth for institutional knowledge.' },
@@ -852,7 +852,7 @@ const SEED_CAPABILITIES = [
       { name: 'Expert Maps', level: 'A', description: 'Create and maintain maps of expertise across the organisation so people know who to consult.' },
     ]
   },
-  { name: 'Incident Mgmt', domain: 'Learning', source: 'Nexus',
+  { name: 'Incident Mgmt', domain: 'Operations', source: 'Nexus',
     description: 'Responding to and learning from operational failures quickly and safely.',
     practices: [
       { name: 'Incident Response Playbook', level: 'F', description: 'Create a clear playbook that defines how incidents are detected, communicated and resolved.' },
@@ -863,7 +863,7 @@ const SEED_CAPABILITIES = [
       { name: 'Game Day Exercises', level: 'A', description: 'Run regular Game Day exercises that simulate production failures to test and improve response capability.' },
     ]
   },
-  { name: 'Lightweight Change Approval', domain: 'Learning', source: 'Accelerate',
+  { name: 'Lightweight Change Approval', domain: 'Operations', source: 'Accelerate',
     description: 'Lightweight, risk-based process for authorising changes; no heavyweight CAB for standard changes.',
     practices: [
       { name: 'Change Classification System', level: 'F', description: 'Classify all changes into standard, normal and emergency categories with different approval paths.' },
@@ -874,7 +874,7 @@ const SEED_CAPABILITIES = [
       { name: 'Change Failure Rate vs Speed', level: 'A', description: 'Track the relationship between change speed and failure rate to validate that faster is also safer.' },
     ]
   },
-  { name: 'Infra & App Monitoring', domain: 'Learning', source: 'Accelerate',
+  { name: 'Infra & App Monitoring', domain: 'Operations', source: 'Accelerate',
     description: 'Comprehensive monitoring of system health and business metrics with actionable alerts.',
     practices: [
       { name: 'Four Golden Signals', level: 'F', description: 'Instrument all services with the four golden signals: latency, traffic, errors and saturation.' },
@@ -885,7 +885,7 @@ const SEED_CAPABILITIES = [
       { name: 'Distributed Tracing', level: 'A', description: 'Implement distributed tracing to enable end-to-end request visibility across all services.' },
     ]
   },
-  { name: 'Proactive Sys. Health', domain: 'Learning', source: 'Accelerate',
+  { name: 'Proactive Sys. Health', domain: 'Operations', source: 'Accelerate',
     description: 'Proactively managing system capacity, health and reliability before issues arise.',
     practices: [
       { name: 'Capacity Planning Cadence', level: 'F', description: 'Establish a regular cadence for capacity planning to prevent resource exhaustion surprises.' },
@@ -896,7 +896,7 @@ const SEED_CAPABILITIES = [
       { name: 'Reliability Engineering Sprints', level: 'A', description: 'Run dedicated reliability engineering sprints focused on improving system resilience.' },
     ]
   },
-  { name: 'WIP Limits', domain: 'Learning', source: 'Accelerate',
+  { name: 'WIP Limits', domain: 'Operations', source: 'Accelerate',
     description: 'Explicit limits on work-in-progress to expose bottlenecks and improve flow.',
     practices: [
       { name: 'WIP Limit Definition', level: 'F', description: 'Define explicit WIP limits for each stage of the workflow and make them visible on the board.' },
@@ -907,7 +907,7 @@ const SEED_CAPABILITIES = [
       { name: 'Portfolio-Level WIP Limits', level: 'A', description: 'Apply WIP limits at the portfolio level to prevent too many initiatives running simultaneously.' },
     ]
   },
-  { name: 'Work Visualization', domain: 'Learning', source: 'Accelerate',
+  { name: 'Work Visualization', domain: 'Operations', source: 'Accelerate',
     description: 'Visual boards and radiators making work, flow and blockers visible to the whole team.',
     practices: [
       { name: 'Team Kanban Board', level: 'F', description: 'Implement a team Kanban board that makes all work, its status and blockers visible.' },
@@ -922,7 +922,7 @@ const SEED_CAPABILITIES = [
   // ═══════════════════════════════════════════
   // AGILITY (Scrum · XP · Agnostic Agility) — 2 capabilities
   // ═══════════════════════════════════════════
-  { name: 'Agility', domain: 'Change & Adoption', source: 'Scrum · XP · Agnostic Agility',
+  { name: 'Agility', domain: 'Agility', source: 'Scrum · XP · Agnostic Agility',
     description: 'Team-level agile delivery — the deduplicated blend of Scrum, Extreme Programming and Agnostic Agility patterns that generate good delivery habits.',
     practices: [
       { name: 'Sprint', level: 'F', description: 'Work in a fixed-length timebox that produces a Done, potentially releasable increment each cycle.' },
@@ -976,7 +976,7 @@ const SEED_CAPABILITIES = [
       { name: 'The Law of the Customer', level: 'D', description: 'Anchor everything in empathy, dialogue and collaboration with the customer.' },
     ]
   },
-  { name: 'Agility at Scale', domain: 'Strategy, Leadership & Direction', source: 'Scrum@Scale · Nexus · Agnostic Agility',
+  { name: 'Agility at Scale', domain: 'Agility', source: 'Scrum@Scale · Nexus · Agnostic Agility',
     description: 'Coordinating many agile teams as one network of teams — the practices that scale team-level agility across an organisation while minimising dependencies.',
     practices: [
       { name: 'The Law of the Network', level: 'F', description: 'Treat the organisation as a network of interacting teams and agents rather than a hierarchy of silos.' },
@@ -1049,6 +1049,38 @@ async function seedCapabilitiesIfEmpty(force = false) {
     console.error('Seed error:', err.message);
   }
 }
+
+// Non-destructive: realign each seeded capability's org domain by name.
+// Corrects the live DB to the canonical org domains (Strategy & Portfolio,
+// Product & Delivery, …) without deleting capabilities or practices.
+async function remapCapabilityDomains() {
+  try {
+    await db.query('ALTER TABLE capabilities ADD COLUMN IF NOT EXISTS domain TEXT');
+    const names   = SEED_CAPABILITIES.map(c => c.name);
+    const domains = SEED_CAPABILITIES.map(c => c.domain);
+    const { rowCount } = await db.query(
+      `UPDATE capabilities AS c
+         SET domain = m.domain
+        FROM unnest($1::text[], $2::text[]) AS m(name, domain)
+       WHERE c.name = m.name
+         AND c.domain IS DISTINCT FROM m.domain`,
+      [names, domains]
+    );
+    if (rowCount > 0) console.log(`Capability domains realigned: ${rowCount} updated`);
+  } catch (err) {
+    console.error('Domain remap error:', err.message);
+  }
+}
+
+// Manually trigger the non-destructive domain realignment
+app.post('/api/admin/remap-domains', async (req, res) => {
+  try {
+    await remapCapabilityDomains();
+    const { rows } = await db.query(
+      `SELECT domain, COUNT(*)::int AS n FROM capabilities GROUP BY domain ORDER BY domain`);
+    res.json({ ok: true, domains: rows });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
 
 // Force-reseed the capabilities library (call when DB is out of sync)
 app.post('/api/admin/seed-capabilities', async (req, res) => {
@@ -1147,12 +1179,13 @@ app.delete('/api/practices/:id', async (req, res) => {
 
 // ── Start (local dev) or export for Vercel ──
 if (process.env.VERCEL) {
-  seedCapabilitiesIfEmpty();
+  seedCapabilitiesIfEmpty().then(remapCapabilityDomains);
   module.exports = app;
 } else {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, async () => {
     console.log(`Nexus server running on http://localhost:${PORT}`);
     await seedCapabilitiesIfEmpty();
+    await remapCapabilityDomains();
   });
 }
