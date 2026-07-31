@@ -3457,12 +3457,16 @@ function pmAddHabit(pid) {
   const p = pmEnsure(pid);
   p.habits.push({ id: 'hab_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7), name: 'New Good Habit', score: 50 });
   renderPracticesPage();
+  updateStats();
+  if (typeof renderFitnessPanel === 'function') renderFitnessPanel();
   scheduleAutoSave();
 }
 function pmDeleteHabit(pid, hid) {
   const p = practiceMaturity[pid]; if (!p) return;
   p.habits = (p.habits || []).filter(h => h.id !== hid);
   renderPracticesPage();
+  updateStats();
+  if (typeof renderFitnessPanel === 'function') renderFitnessPanel();
   scheduleAutoSave();
 }
 function pmUpdateHabitName(pid, hid, val) {
@@ -3487,6 +3491,10 @@ function pmUpdateHabitScore(pid, hid, val, fromSlider) {
       if (num2) { num2.textContent = m; num2.className = 'am-maturity-num ' + amMaturityBucket(m); }
     }
   }
+  // Habit scores feed the practice's fitness → the Organizational Fitness average.
+  // Refresh the headline score + panel (not the practices list, to keep slider focus).
+  updateStats();
+  if (typeof renderFitnessPanel === 'function') renderFitnessPanel();
   scheduleAutoSave();
 }
 function pmAdjustReps(pid, delta) {
