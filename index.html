@@ -2567,7 +2567,7 @@ async function loadGame(gameId) {
     if (!allItems.find(i => i.id === a.backlogItemId)) {
       const mat = amAnchorMaturity(a);
       const kind = amAnchorKind(a);
-      const patternsN = (a.practices||[]).reduce((s,p) => s + (p.patterns||[]).length, 0);
+      const patternsN = (a.practices||[]).reduce((s,p) => s + amStoreHabits(p, false).length, 0);
       const item = {
         id: a.backlogItemId,
         type: kind,
@@ -2670,14 +2670,53 @@ const KANBAN_STAGES = [
 // ══════════════════════════════════════════
 const AM_DOMAINS = CLASSES;
 
+// ── Shared habit store ──────────────────────────────────────────────────
+// A library-capability anchor practice is CONNECTED to its Practices-tab
+// practice: both read/write the SAME habits via practiceMaturity[pracId].habits.
+// amResolve links an anchor practice to its library practice id (by id or name).
+function amResolve(pr) {
+  if (!pr) return null;
+  if (pr.capPracticeId) return pr.capPracticeId;
+  const a = anchors.find(x => (x.practices||[]).includes(pr));
+  if (a && a.source === 'library' && a.capabilityId) {
+    const cap = capabilitiesLibrary.find(c => c.id === a.capabilityId);
+    const lp = cap && (cap.practices||[]).find(p => p.id === pr.id || p.name === pr.name);
+    if (lp) pr.capPracticeId = lp.id;
+  }
+  return pr.capPracticeId || null;
+}
+// Returns the habit array for a practice — the shared Practices-tab store when
+// the practice is library-linked, otherwise the anchor-local patterns[].
+// Migrates any legacy local patterns into the shared store the first time.
+function amStoreHabits(pr, create) {
+  const pid = amResolve(pr);
+  if (pid) {
+    const hasLegacy = pr.patterns && pr.patterns.length;
+    let pm = practiceMaturity[pid];
+    if (!pm && (create || hasLegacy)) pm = practiceMaturity[pid] = { habits: [] };
+    if (pm) {
+      if (!pm.habits) pm.habits = [];
+      if (hasLegacy) {
+        const seen = new Set(pm.habits.map(h => h.id));
+        pr.patterns.forEach(p => { if (!seen.has(p.id)) pm.habits.push({ id: p.id, name: p.name, score: Number(p.score)||1 }); });
+        delete pr.patterns;
+      }
+      return pm.habits;
+    }
+    return pr.patterns || [];
+  }
+  if (!pr.patterns) pr.patterns = [];
+  return pr.patterns;
+}
 function amPracticeMaturity(prac) {
-  if (!prac || !prac.patterns || !prac.patterns.length) return 0;
-  const sum = prac.patterns.reduce((s,p) => s + (Number(p.score)||0), 0);
-  return Math.round(sum / prac.patterns.length);
+  const habits = amStoreHabits(prac, false);
+  if (!habits || !habits.length) return 0;
+  const sum = habits.reduce((s,p) => s + (Number(p.score)||0), 0);
+  return Math.round(sum / habits.length);
 }
 function amAnchorMaturity(a) {
   if (!a || !a.practices || !a.practices.length) return 0;
-  const scored = a.practices.filter(p => p.patterns && p.patterns.length);
+  const scored = a.practices.filter(p => amStoreHabits(p, false).length);
   if (!scored.length) return 0;
   const sum = scored.reduce((s,p) => s + amPracticeMaturity(p), 0);
   return Math.round(sum / scored.length);
@@ -2700,7 +2739,7 @@ function renderAnchorsPage() {
   const backlogCount = anchors.filter(a => a.inBacklog).length;
   const scored = anchors.filter(a => amAnchorMaturity(a) > 0);
   const avgMat = scored.length ? Math.round(scored.reduce((s,a) => s + amAnchorMaturity(a), 0)/scored.length) : 0;
-  const patternsCount = anchors.reduce((s,a) => s + (a.practices||[]).reduce((ss,p) => ss + (p.patterns||[]).length, 0), 0);
+  const patternsCount = anchors.reduce((s,a) => s + (a.practices||[]).reduce((ss,p) => ss + amStoreHabits(p, false).length, 0), 0);
 
   const capOptions = capabilitiesLibrary
     .filter(c => !anchors.some(a => a.source==='library' && a.capabilityId===c.id))
@@ -2780,7 +2819,7 @@ function amRenderCard(a) {
   const mat = amAnchorMaturity(a);
   const bucket = amMaturityBucket(mat);
   const isExp = _amExpandedId === a.id;
-  const patternsN = (a.practices||[]).reduce((s,p) => s + (p.patterns||[]).length, 0);
+  const patternsN = (a.practices||[]).reduce((s,p) => s + amStoreHabits(p, false).length, 0);
   return `
     <div class="am-card ${isExp?'expanded':''} ${a.inBacklog?'backlog':''}" data-id="${a.id}">
       <div class="am-card-hdr" onclick="amToggleExpand('${a.id}')">
@@ -2823,8 +2862,8 @@ function amRenderPractice(anchorId, pr) {
         <button class="am-icon-btn" onclick="amDeletePractice('${anchorId}','${pr.id}')" title="Remove practice">✕</button>
       </div>
       ${pr.description ? `<div class="am-practice-desc">${amEsc(pr.description)}</div>` : ''}
-      <div class="am-patterns-lbl">Good patterns teams should follow (score each 1–100)</div>
-      ${(pr.patterns||[]).map(pat => `
+      <div class="am-patterns-lbl">Good habits teams should follow (score each 1–100) · synced with the Practices tab</div>
+      ${amStoreHabits(pr, false).map(pat => `
         <div class="am-pattern-row" data-pat="${pat.id}">
           <div class="am-pattern-name"><input value="${amEscAttr(pat.name)}" onchange="amUpdatePatternName('${anchorId}','${pr.id}','${pat.id}',this.value)"></div>
           <input type="range" min="1" max="100" value="${pat.score||1}" class="am-slider" oninput="amUpdatePatternScore('${anchorId}','${pr.id}','${pat.id}',this.value,true)">
@@ -2859,6 +2898,7 @@ function amAddFromLibrary() {
     domain: cap.domain || DEFAULT_CLASS,
     practices: (cap.practices||[]).map(p => ({
       id: 'prac_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+      capPracticeId: p.id,           // link to the library practice → shared habits with the Practices tab
       name: p.name,
       description: p.description || '',
       patterns: []
@@ -2951,29 +2991,32 @@ function amDeletePractice(anchorId, pracId) {
 function amAddPattern(anchorId, pracId) {
   const a = anchors.find(x => x.id === anchorId); if (!a) return;
   const pr = (a.practices||[]).find(p => p.id === pracId); if (!pr) return;
-  pr.patterns = pr.patterns || [];
-  pr.patterns.push({ id:'pat_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), name:'New Good Habit', score: 50 });
+  const store = amStoreHabits(pr, true);
+  store.push({ id:'pat_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), name:'New Good Habit', score: 50 });
   renderAnchorsPage();
+  if (pr.capPracticeId) { updateStats(); if (typeof renderFitnessPanel === 'function') renderFitnessPanel(); }
   scheduleAutoSave();
 }
 function amDeletePattern(anchorId, pracId, patId) {
   const a = anchors.find(x => x.id === anchorId); if (!a) return;
   const pr = (a.practices||[]).find(p => p.id === pracId); if (!pr) return;
-  pr.patterns = (pr.patterns||[]).filter(x => x.id !== patId);
+  const store = amStoreHabits(pr, true);
+  const idx = store.findIndex(x => x.id === patId); if (idx >= 0) store.splice(idx, 1);
   renderAnchorsPage();
+  if (pr.capPracticeId) { updateStats(); if (typeof renderFitnessPanel === 'function') renderFitnessPanel(); }
   scheduleAutoSave();
 }
 function amUpdatePatternName(anchorId, pracId, patId, val) {
   const a = anchors.find(x => x.id === anchorId); if (!a) return;
   const pr = (a.practices||[]).find(p => p.id === pracId); if (!pr) return;
-  const pat = (pr.patterns||[]).find(x => x.id === patId); if (!pat) return;
+  const pat = amStoreHabits(pr, true).find(x => x.id === patId); if (!pat) return;
   pat.name = val;
   scheduleAutoSave();
 }
 function amUpdatePatternScore(anchorId, pracId, patId, val, fromSlider) {
   const a = anchors.find(x => x.id === anchorId); if (!a) return;
   const pr = (a.practices||[]).find(p => p.id === pracId); if (!pr) return;
-  const pat = (pr.patterns||[]).find(x => x.id === patId); if (!pat) return;
+  const pat = amStoreHabits(pr, true).find(x => x.id === patId); if (!pat) return;
   let n = Math.max(1, Math.min(100, Math.round(Number(val)||1)));
   pat.score = n;
   // Update paired input value without full re-render for smoother slider feel
@@ -3000,6 +3043,8 @@ function amUpdatePatternScore(anchorId, pracId, patId, val, fromSlider) {
       if (num2) { num2.textContent = am; num2.className = 'am-maturity-num ' + amMaturityBucket(am); }
     }
   }
+  // Habit scores are shared with the Practices tab → refresh the org fitness.
+  if (pr.capPracticeId) { updateStats(); if (typeof renderFitnessPanel === 'function') renderFitnessPanel(); }
   scheduleAutoSave();
 }
 function amToggleBacklog(id) {
@@ -3026,7 +3071,7 @@ function amAddBacklogItemFor(a) {
   a.backlogItemId = itemId;
   // Replace existing
   allItems = allItems.filter(i => i.id !== itemId);
-  const patternsN = (a.practices||[]).reduce((s,p) => s + (p.patterns||[]).length, 0);
+  const patternsN = (a.practices||[]).reduce((s,p) => s + amStoreHabits(p, false).length, 0);
   const item = {
     id: itemId,
     type: kind,
