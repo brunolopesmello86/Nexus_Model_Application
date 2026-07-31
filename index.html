@@ -62,7 +62,7 @@
 [data-theme="light"] .zone-bg { border-color:rgba(0,0,0,.06); }
 [data-theme="light"] .zone-bg.zb-current { background:linear-gradient(90deg,rgba(217,74,74,.08),rgba(217,74,74,.02)); }
 [data-theme="light"] .zone-bg.zb-desired { background:linear-gradient(270deg,rgba(45,157,94,.08),rgba(45,157,94,.02)); }
-[data-theme="light"] .lane-divider { background:rgba(0,0,0,.08); }
+[data-theme="light"] .lane-divider { background:none; border-top-color:rgba(120,90,45,.55); box-shadow:none; }
 [data-theme="light"] .lane-label-abs { border-color:rgba(0,0,0,.06); }
 [data-theme="light"] .hex-card:hover { box-shadow:0 4px 12px rgba(0,0,0,.1); }
 [data-theme="light"] .hex-card.foundational { border-left-color:rgba(0,0,0,.25); }
@@ -393,7 +393,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .zone-bg.zb-desired { background:linear-gradient(270deg, rgba(45,157,94,.07), rgba(45,157,94,.02)); }
 
 /* Lane divider and labels */
-.lane-divider { position:absolute; left:36px; right:0; height:1px; background:rgba(255,255,255,.08); z-index:1; pointer-events:none; }
+.lane-divider { position:absolute; left:36px; right:0; height:0; background:none; border-top:2px dotted rgba(127,227,221,.55); box-shadow:0 0 6px rgba(127,227,221,.22); z-index:3; pointer-events:none; }
 .lane-label-abs { position:absolute; left:0; width:36px; display:flex; align-items:center; justify-content:center; z-index:2; border-right:1px solid rgba(255,255,255,.06); background:var(--surface); }
 .lane-label-abs .ll-text { writing-mode:vertical-lr; transform:rotate(180deg); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1.2px; text-align:center; white-space:nowrap; }
 .lane-label-abs .ll-sub { display:block; font-size:6px; font-weight:400; opacity:.4; letter-spacing:.5px; text-transform:none; margin-top:6px; }
