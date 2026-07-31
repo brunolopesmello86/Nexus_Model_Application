@@ -1318,9 +1318,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .zone-col-header .zone-tag { letter-spacing:1.6px; }
 .cr-zone-hdr { letter-spacing:1.4px; cursor:pointer; }
 /* open field — backlog collapses to a slim drawer (dark only; poster: one open field) */
-:root:not([data-theme="light"]) #hexBoardArea:not(.bl-open) .cr-backlog { width:0; min-width:0; padding:0; border:none; overflow:hidden; }
-:root:not([data-theme="light"]) #hexBoardArea:not(.bl-open) .cr-zone-hdr { width:32px; min-width:32px; overflow:hidden; white-space:nowrap; color:var(--accent); }
-:root:not([data-theme="light"]) #hexBoardArea.bl-open .cr-zone-hdr::after { content:' ✕'; opacity:.6; }
+#hexBoardArea:not(.bl-open) .cr-backlog { width:0; min-width:0; padding:0; border:none; overflow:hidden; }
+#hexBoardArea:not(.bl-open) .cr-zone-hdr { width:32px; min-width:32px; overflow:hidden; white-space:nowrap; color:var(--accent); }
+#hexBoardArea.bl-open .cr-zone-hdr::after { content:' ✕'; opacity:.6; }
 /* left rail = poster CODEX: centered header, AXIS B gradient strip, clean cards */
 .toolbox-title { justify-content:center; text-align:center; letter-spacing:4px; color:var(--text-muted); }
 .codex-divider { height:1px; background:#1E4266; opacity:.7; margin:8px 4px 12px; }
@@ -1502,7 +1502,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 /* light (executive) theme — poster layer fully off */
 [data-theme="light"] #bioField, [data-theme="light"] #posterVignette, [data-theme="light"] #posterFrame,
 [data-theme="light"] #posterGrain, [data-theme="light"] .field-contours, [data-theme="light"] .cell-tag,
-[data-theme="light"] #hexBoardArea::after { display:none; }
+[data-theme="light"] #hexBoardArea::after { display:block; background:rgba(243,234,211,.92); border-color:rgba(120,90,45,.55); color:#3B2F1C; }
 [data-theme="light"] #hexScrollArea { background:transparent; border:none; margin:0; box-shadow:none; border-radius:0; }
 [data-theme="light"] .board-map { background:var(--bg); }
 [data-theme="light"] .hex-cell-bg::before { display:none; }
@@ -4487,16 +4487,21 @@ function renderFitnessPanel() {
   const panel = document.getElementById('fitnessPanel');
   if (!panel) return;
   const allOnBoard = Object.values(gridState);
+  const onBoardSet = new Set(allOnBoard);
   const capIds = boardMarkers.filter(m=>m.type==='capability').map(m=>m.hexId).filter(id=>allOnBoard.includes(id));
-  const expIds = boardMarkers.filter(m=>m.type==='s2f').map(m=>m.hexId).filter(id=>allOnBoard.includes(id));
-  // Collect unique practices: only from S2F experiments that have a practice selected
+  const legacyS2fIds = boardMarkers.filter(m=>m.type==='s2f').map(m=>m.hexId).filter(id=>allOnBoard.includes(id));
+  // Unified experiment keys across every type: capability-hex (hexId::pracId),
+  // nexus line (connId::pracId), and legacy S2F markers.
+  const nexusExpKeys = connections.filter(c => c.type === 'nexus').flatMap(c => getConnExpKeys(c.id).filter(k => experimentResults[k]));
+  const capExpKeys   = Object.keys(experimentResults).filter(k => k.includes('::') && onBoardSet.has(k.split('::')[0]));
+  const allExpKeys   = [...new Set([...capExpKeys, ...nexusExpKeys, ...legacyS2fIds])];
+  const expCount     = allExpKeys.length;
+  // Collect unique practices across all experiment types
   const allLinkedPracs = (() => {
     const seen = new Map();
-    const nexusExpKeys  = connections.filter(c => c.type === 'nexus').flatMap(c => getConnExpKeys(c.id).filter(k => experimentResults[k]));
-    const legacyExpKeys = boardMarkers.filter(m => m.type === 's2f' && allOnBoard.includes(m.hexId)).map(m => m.hexId);
-    [...nexusExpKeys, ...legacyExpKeys].forEach(key => {
+    allExpKeys.forEach(key => {
       const er = experimentResults[key] || {};
-      // practiceId embedded in key suffix (connId::pracId) or stored in er
+      // practiceId embedded in key suffix (…::pracId) or stored in er
       const pracId = er.practiceId || (key.includes('::') ? key.split('::')[1] : null);
       if (!pracId || seen.has(pracId)) return;
       const prac = capabilitiesLibrary.flatMap(c => c.practices).find(p => p.id === pracId);
@@ -4554,7 +4559,7 @@ function renderFitnessPanel() {
       `</div>` +
       `<div class="fp-summary">` +
         `<div class="fp-sum-item"><div class="fp-sum-val" style="color:var(--cyan)">${capIds.length}</div><div class="fp-sum-lbl">Capabilities</div></div>` +
-        `<div class="fp-sum-item"><div class="fp-sum-val" style="color:var(--orange)">${expIds.length}</div><div class="fp-sum-lbl">Experiments</div></div>` +
+        `<div class="fp-sum-item"><div class="fp-sum-val" style="color:var(--orange)">${expCount}</div><div class="fp-sum-lbl">Experiments</div></div>` +
         `<div class="fp-sum-item"><div class="fp-sum-val" style="color:var(--purple)">${allLinkedPracs.length}</div><div class="fp-sum-lbl">Practices</div></div>` +
         `<div class="fp-sum-item"><div class="fp-sum-val" style="color:var(--green)">${totalReps}</div><div class="fp-sum-lbl">Total Reps</div></div>` +
       `</div>` +
@@ -4609,14 +4614,18 @@ function renderFitnessPanel() {
           return html;
         })()) +
       `</div>` +
-      `<div class="fp-section"><h3>Experiments (${expIds.length})</h3>` +
-        (expIds.length===0 ? `<div class="fp-empty">Mark hexes with S2F to track experiments</div>` :
-          expIds.map(id=>{
+      `<div class="fp-section"><h3>Experiments (${expCount})</h3>` +
+        (allExpKeys.length===0 ? `<div class="fp-empty">Build an experiment from a Capability hex (its C badge → 🧪 Build Experiment)</div>` :
+          allExpKeys.map(id=>{
             const er=experimentResults[id]||{};
             const st=er.status||'';
-            const linkedPracId=er.practiceId||'';
-            const cardItem = resolveItem(id);
-            const cardName = cardItem?.name || id;
+            const linkedPracId=er.practiceId||(id.includes('::')?id.split('::')[1]:'');
+            // Resolve a display name: nexus conn title, or the hex's item name
+            const baseId = id.includes('::') ? id.split('::')[0] : id;
+            const _conn = connections.find(c=>c.id===baseId);
+            const cardName = _conn
+              ? `${resolveItem(_conn.from)?.name||'?'} → ${resolveItem(_conn.to)?.name||'?'}`
+              : (resolveItem(baseId)?.name || baseId);
             // Build practice options: show board-linked practices first, then divider + all others
             const boardPracIds = new Set(allLinkedPracs.map(p=>p.id));
             const boardPracOpts = allLinkedPracs.map(p =>
