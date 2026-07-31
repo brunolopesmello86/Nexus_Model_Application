@@ -4549,8 +4549,8 @@ function renderFitnessPanel() {
     `<div class="fp-body">` +
     destHtml +
       `<div class="fp-section">` +
-        `<h3>Transformation Goals</h3>` +
-        horizons.map(h=>`<div class="fp-horizon"><div class="fp-horizon-label">${h.label}</div><textarea class="fp-horizon-input" placeholder="What does fitness look like in ${h.label}?" oninput="setHorizon('${h.key}',this.value)">${(transformationHorizons[h.key]||'').replace(/</g,'&lt;')}</textarea></div>`).join('') +
+        `<h3>Organizational Goals (OKRs / KPIs)</h3>` +
+        horizons.map(h=>`<div class="fp-horizon"><div class="fp-horizon-label">${h.label}</div><textarea class="fp-horizon-input" placeholder="Which OKRs / KPIs should this drive in ${h.label}?" oninput="setHorizon('${h.key}',this.value)">${(transformationHorizons[h.key]||'').replace(/</g,'&lt;')}</textarea></div>`).join('') +
       `</div>` +
       `<div class="fp-summary">` +
         `<div class="fp-sum-item"><div class="fp-sum-val" style="color:var(--cyan)">${capIds.length}</div><div class="fp-sum-lbl">Capabilities</div></div>` +
