@@ -1655,6 +1655,44 @@ async function ensureCapabilities(list, label) {
 async function ensureAICapabilities() { return ensureCapabilities(AI_CAPABILITIES, 'AI capabilities'); }
 async function ensureOpsCapabilities() { return ensureCapabilities(OPS_CAPABILITIES, 'Ops capabilities'); }
 
+// Merge the older short-named Operations capabilities into the new card
+// capabilities: move each old capability's distinct practices onto the new one,
+// then delete the (now-empty-of-distinct-practices) old capability. Idempotent —
+// once merged, the old capability no longer exists so the step is skipped.
+const OPS_MERGE = [
+  ['Incident Mgmt', 'Incident Management'],
+  ['Knowledge Mgmt', 'Knowledge Management'],
+  ['Process Improvement', 'Continuous Improvement'],
+  ['Infra & App Monitoring', 'Continuous Monitoring'],
+  ['Proactive Sys. Health', 'Reliability Engineering'],
+  ['Lightweight Change Approval', 'Change Management'],
+];
+async function reconcileOpsCapabilities() {
+  try {
+    let moved = 0, dropped = 0;
+    for (const [oldName, newName] of OPS_MERGE) {
+      const o = await db.query("SELECT id FROM capabilities WHERE name=$1 AND domain='Operations'", [oldName]);
+      const n = await db.query("SELECT id FROM capabilities WHERE name=$1 AND domain='Operations'", [newName]);
+      if (!o.rows.length || !n.rows.length) continue;
+      const oldId = o.rows[0].id, newId = n.rows[0].id;
+      // Move practices whose name isn't already present under the new capability
+      const up = await db.query(
+        `UPDATE practices SET capability_id=$1
+          WHERE capability_id=$2
+            AND name NOT IN (SELECT name FROM practices WHERE capability_id=$1)`,
+        [newId, oldId]
+      );
+      moved += up.rowCount || 0;
+      // Delete the old capability (cascades any remaining duplicate practices)
+      await db.query('DELETE FROM capabilities WHERE id=$1', [oldId]);
+      dropped += 1;
+    }
+    if (moved || dropped) console.log(`OPS reconcile: moved ${moved} practices, merged ${dropped} old capabilities`);
+  } catch (err) {
+    console.error('OPS reconcile error:', err.message);
+  }
+}
+
 // Manually trigger the AI capabilities insert (idempotent, non-destructive)
 app.post('/api/admin/seed-ai', async (req, res) => {
   try {
@@ -1665,15 +1703,16 @@ app.post('/api/admin/seed-ai', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Manually trigger the Ops test capabilities insert (idempotent, non-destructive)
+// Manually trigger the Ops capabilities insert + merge (idempotent, non-destructive)
 app.post('/api/admin/seed-ops', async (req, res) => {
   try {
     await ensureOpsCapabilities();
+    await reconcileOpsCapabilities();
     const { rows } = await db.query(
       `SELECT c.name, COUNT(p.*)::int AS practices FROM capabilities c
          LEFT JOIN practices p ON p.capability_id = c.id
-        WHERE c.name = 'Incident Management' GROUP BY c.name`);
-    res.json({ ok: true, capability: rows[0] || null });
+        WHERE c.domain='Operations' GROUP BY c.name ORDER BY c.name`);
+    res.json({ ok: true, operationsCapabilities: rows.length, capabilities: rows });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -1784,7 +1823,7 @@ app.delete('/api/practices/:id', async (req, res) => {
 
 // ── Start (local dev) or export for Vercel ──
 if (process.env.VERCEL) {
-  seedCapabilitiesIfEmpty().then(remapCapabilityDomains).then(ensureAICapabilities).then(ensureOpsCapabilities);
+  seedCapabilitiesIfEmpty().then(remapCapabilityDomains).then(ensureAICapabilities).then(ensureOpsCapabilities).then(reconcileOpsCapabilities);
   module.exports = app;
 } else {
   const PORT = process.env.PORT || 3000;
@@ -1794,5 +1833,6 @@ if (process.env.VERCEL) {
     await remapCapabilityDomains();
     await ensureAICapabilities();
     await ensureOpsCapabilities();
+    await reconcileOpsCapabilities();
   });
 }

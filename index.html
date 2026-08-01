@@ -6068,6 +6068,1869 @@ const PRACTICE_CARDS = {
    "Retrospective question: facilitated by Scrum Master (becomes standard practice after 2–3 sprints)"
   ],
   "scenario": "After the DORA Culture Programme, a product engineer raises in a sprint review: 'I noticed that the feature we just shipped required a 2-day staging review cycle because we had to wait for a shared test environment. That's adding to our lead time. Can we request a dedicated test environment from the platform team?' Before the culture programme, the same engineer would not have framed the problem in DORA terms — it would have been an informal complaint about a slow process. The DORA framing turns an informal frustration into a structured improvement proposal with a metric attached. The platform team prioritises the dedicated environment. Lead time for this team's features drops 1.5 days."
+ },
+ "Incident Response Playbook": {
+  "cat": "Incident Management",
+  "level": "F",
+  "code": "IM7",
+  "what": [
+   "A single documented playbook defining how incidents are detected, declared, communicated and resolved — from first alert to closure",
+   "Covers roles, severity, escalation paths, communication channels and the decision points during an incident",
+   "Lives where responders already work (wiki + pinned in the incident channel) and is versioned like code"
+  ],
+  "why": [
+   "Improvised incident response is slow and inconsistent — the playbook removes 'what do we do now?' from the worst possible moment",
+   "A shared playbook lets any on-call engineer run an incident to the same standard, not just the veterans",
+   "It is the artefact every other incident practice (post-mortems, game days) improves over time"
+  ],
+  "how": [
+   "Draft the playbook from your last 5 real incidents — capture what actually happened, then standardise it",
+   "Keep it to one page of flow plus links; long playbooks are not read under pressure",
+   "Review and update after every significant incident so it never goes stale"
+  ],
+  "who": [
+   "Owned by: SRE / Engineering Lead",
+   "Followed by: all on-call engineers",
+   "Improved by: whoever ran the last incident"
+  ],
+  "scenario": "A new engineer is paged at 2am for their first P1. Instead of freezing, they open the pinned playbook: declare severity, page the commander, open the bridge, post the first customer update from the template. The incident is contained in 20 minutes — not because they were experienced, but because the playbook made experience unnecessary.",
+  "deck": "OPERATIONS"
+ },
+ "MTTD and MTTR Tracking": {
+  "cat": "Incident Management",
+  "level": "F",
+  "code": "IM8",
+  "what": [
+   "Systematic measurement of Mean Time To Detect and Mean Time To Recover across every incident, by severity",
+   "Detect = problem start → first alert; Recover = declaration → resolution — both pulled from incident timelines",
+   "Trends published monthly so the team can see whether response is getting faster or slower"
+  ],
+  "why": [
+   "What gets measured gets improved — teams that track MTTD/MTTR consistently drive them down; teams that don't, don't",
+   "The two numbers separate two different problems: detection (monitoring) vs recovery (response and tooling)",
+   "They are the objective evidence that incident investments (game days, runbooks) are actually working"
+  ],
+  "how": [
+   "Capture start/detect/resolve timestamps in every post-mortem — no timeline, no data",
+   "Compute MTTD and MTTR per severity monthly; watch the trend, not any single incident",
+   "When a metric worsens, trace it to a cause (a monitoring gap, a slow escalation) and fix that"
+  ],
+  "who": [
+   "Owned by: SRE Lead",
+   "Data from: every incident's post-mortem",
+   "Reviewed by: Engineering Lead + team monthly"
+  ],
+  "scenario": "MTTR for P2 incidents has crept from 40 to 95 minutes over a quarter. The trend — not any single incident — triggers a look: three recent P2s stalled waiting for a database expert. The team adds a second trained responder and MTTR drops back below 45 minutes. Without the trend line, the slow drift would have stayed invisible.",
+  "deck": "OPERATIONS"
+ },
+ "Blameless Post-Mortems": {
+  "cat": "Incident Management",
+  "level": "D",
+  "code": "IM9",
+  "what": [
+   "A structured review after every significant incident that focuses on systemic causes, not individual blame",
+   "Produces a written timeline, contributing factors, and concrete action items with owners and dates",
+   "Explicitly blameless: the question is 'how did the system allow this?', never 'who broke it?'"
+  ],
+  "why": [
+   "Blame drives information underground — engineers hide mistakes, and the organisation stops learning",
+   "Most incidents are caused by systems and conditions, not careless people; fixing the person fixes nothing",
+   "Blameless reviews turn every incident into durable improvement instead of a one-off scare"
+  ],
+  "how": [
+   "Run within 3 working days while memory is fresh; facilitator keeps the tone systemic",
+   "Use a fixed template: timeline, what went well, what was hard, contributing factors, actions",
+   "Track action items to done — a post-mortem with no closed actions is theatre"
+  ],
+  "who": [
+   "Facilitated by: someone not directly involved",
+   "Attended by: all responders + Engineering Lead",
+   "Actions owned by: named individuals"
+  ],
+  "scenario": "An engineer runs a command that takes production down for 8 minutes. In a blame culture they'd quietly hope no one noticed. Instead, the blameless review finds the real cause: a dangerous command had no confirmation guardrail and no dry-run. The guardrail is added; the same mistake becomes impossible for everyone. The engineer, unpunished, becomes the practice's biggest advocate.",
+  "deck": "OPERATIONS"
+ },
+ "Incident Trend Retrospectives": {
+  "cat": "Incident Management",
+  "level": "D",
+  "code": "IM10",
+  "what": [
+   "A recurring review of incidents in aggregate — looking across many incidents for patterns a single post-mortem can't reveal",
+   "Groups incidents by service, cause, time-of-day and severity to find recurring hot-spots",
+   "Feeds a prioritised list of systemic fixes into the engineering backlog"
+  ],
+  "why": [
+   "Individual post-mortems fix single incidents; trend retrospectives fix whole classes of incidents",
+   "Patterns (same service failing monthly, same cause recurring) are invisible one incident at a time",
+   "It turns reactive firefighting into proactive investment where it will pay off most"
+  ],
+  "how": [
+   "Monthly or quarterly, pull the incident set and cluster by cause and service",
+   "Rank clusters by frequency × impact; pick the top one or two for dedicated engineering work",
+   "Close the loop: does the fix actually reduce that cluster next quarter?"
+  ],
+  "who": [
+   "Owned by: SRE / Engineering Lead",
+   "Input: all incidents since last review",
+   "Fixes prioritised with: product + engineering"
+  ],
+  "scenario": "Individually, twelve small incidents over a quarter each looked minor. Clustered in the trend retro, nine of them trace to the same flaky message queue. The team invests two weeks hardening it — and the following quarter that entire cluster of incidents disappears. No single post-mortem would have justified the fix; the trend did.",
+  "deck": "OPERATIONS"
+ },
+ "Runbook Automation": {
+  "cat": "Incident Management",
+  "level": "A",
+  "code": "IM11",
+  "what": [
+   "Turning manual runbook steps into automated, one-click (or zero-click) actions responders can trigger during incidents",
+   "Common remediations — restart, failover, scale-out, clear cache — become scripts or bots, not copy-pasted commands",
+   "Automation is safe-by-design: guarded, logged, and reversible"
+  ],
+  "why": [
+   "Manual runbook steps are slow and error-prone under pressure — automation removes both the delay and the typo",
+   "It democratises response: a junior responder can safely trigger an expert-designed remediation",
+   "Every automated step is one less thing to get wrong at 3am, directly cutting MTTR"
+  ],
+  "how": [
+   "Automate the most-run runbook steps first (measure which ones), starting with the safest",
+   "Wrap each action with guardrails: confirmation, blast-radius limits, and an audit log",
+   "Test automations in game days so responders trust them when it matters"
+  ],
+  "who": [
+   "Built by: platform / SRE team",
+   "Triggered by: any on-call responder",
+   "Reviewed by: Engineering Lead for safety"
+  ],
+  "scenario": "A recurring memory leak used to mean a 15-step manual failover only two senior engineers could run. The team wraps it in a single guarded command. Now the junior on-call triggers the failover in 30 seconds, the incident is contained, and the seniors sleep through it. The runbook didn't just get faster — it stopped depending on specific people.",
+  "deck": "OPERATIONS"
+ },
+ "Knowledge Base Implementation": {
+  "cat": "Knowledge Management",
+  "level": "F",
+  "code": "KM7",
+  "what": [
+   "A single, searchable home for how the team builds and runs its systems — decisions, runbooks, how-tos and context",
+   "One tool, clear structure, and a culture that 'if it isn't written down, it doesn't exist'",
+   "Optimised for retrieval: good search, clear titles, and ownership per page"
+  ],
+  "why": [
+   "Knowledge locked in individuals' heads is a single point of failure — it leaves when they do",
+   "Answering the same questions repeatedly is pure waste a knowledge base eliminates",
+   "It is the foundation every other knowledge practice (audits, onboarding, expert maps) builds on"
+  ],
+  "how": [
+   "Pick one tool and resist fragmentation across five wikis and a Slack graveyard",
+   "Seed it with the questions people actually ask, not an idealised taxonomy",
+   "Assign every page an owner and a review date so it stays trustworthy"
+  ],
+  "who": [
+   "Owned by: Engineering Lead",
+   "Contributed to by: whole team",
+   "Curated by: rotating documentation owner"
+  ],
+  "scenario": "A team loses a senior engineer and expects months of pain. Instead, because architecture decisions and runbooks were captured in the knowledge base, the replacement is productive in two weeks. The knowledge stayed even though the person left.",
+  "deck": "OPERATIONS"
+ },
+ "Documentation in Definition of Done": {
+  "cat": "Knowledge Management",
+  "level": "F",
+  "code": "KM8",
+  "what": [
+   "Documentation is a non-negotiable part of 'done' — a change isn't complete until its docs are updated",
+   "Applies to APIs, runbooks, config and decisions — not just user-facing features",
+   "Checked in review: 'where are the docs?' is a standard question, not an afterthought"
+  ],
+  "why": [
+   "Docs written 'later' are never written — baking them into Done is the only reliable mechanism",
+   "It keeps documentation current by construction, so the knowledge base stays trusted",
+   "It spreads the cost across every change instead of a dreaded quarterly documentation sprint"
+  ],
+  "how": [
+   "Add a documentation line item to the team's Definition of Done and enforce it in review",
+   "Keep the bar proportional — a paragraph and an updated runbook, not an essay",
+   "Reject or flag PRs that change behaviour but not the docs"
+  ],
+  "who": [
+   "Enforced by: reviewers",
+   "Agreed by: the whole team",
+   "Owned by: Engineering Lead"
+  ],
+  "scenario": "Six months after shipping, no one remembers how a payment retry actually behaves. On the new team's next change, the reviewer blocks the PR: 'update the runbook first.' From then on the docs track reality change-by-change, and the 'nobody knows how this works' problem simply stops recurring.",
+  "deck": "OPERATIONS"
+ },
+ "Knowledge Audit": {
+  "cat": "Knowledge Management",
+  "level": "D",
+  "code": "KM9",
+  "what": [
+   "A periodic review that finds where critical knowledge is missing, stale or trapped in one person's head",
+   "Maps knowledge risk: which systems have a single expert, which docs are outdated, which areas are dark",
+   "Produces a prioritised list of documentation and knowledge-sharing actions"
+  ],
+  "why": [
+   "You cannot fix knowledge gaps you cannot see — the audit makes the risk visible",
+   "It surfaces key-person dependencies before they become a resignation crisis",
+   "It keeps the knowledge base honest by flagging rot before people stop trusting it"
+  ],
+  "how": [
+   "Quarterly, map each critical system to its documentation and its number of experts",
+   "Flag any system with one expert or docs older than N months as a risk",
+   "Turn the top risks into concrete pairing, writing or bus-factor actions"
+  ],
+  "who": [
+   "Run by: Engineering Lead",
+   "Input from: the whole team",
+   "Actions owned by: system owners"
+  ],
+  "scenario": "A knowledge audit reveals the billing system has exactly one person who understands it and docs two years stale. Rather than wait for them to quit, the team schedules pairing and documentation over a month. When that engineer later moves teams, the transition is a non-event.",
+  "deck": "OPERATIONS"
+ },
+ "Knowledge Sharing Rituals": {
+  "cat": "Knowledge Management",
+  "level": "D",
+  "code": "KM10",
+  "what": [
+   "Regular, lightweight forums where engineers teach each other — brown-bags, demos, tech talks, learning sessions",
+   "A predictable cadence and low-friction format so sharing is a habit, not a heroic effort",
+   "Topics come from real work: a tricky bug, a new tool, a design decision"
+  ],
+  "why": [
+   "Tacit knowledge — the how and why — spreads through conversation, not just documents",
+   "Rituals build a learning culture and break down silos between people and teams",
+   "They raise the whole team's level, reducing key-person risk cheaply"
+  ],
+  "how": [
+   "Fix a recurring slot (e.g. 30 minutes weekly) and protect it from being cancelled",
+   "Rotate presenters; keep the bar low — 'show us what you learned' beats polished talks",
+   "Record sessions and link them from the knowledge base for those who miss them"
+  ],
+  "who": [
+   "Owned by: Agile Coach / Eng Lead",
+   "Presented by: everyone in rotation",
+   "Attended by: the team"
+  ],
+  "scenario": "A weekly 30-minute 'show and tell' starts as three people. Within a quarter it's the most valued half-hour on the calendar: engineers learn the codebase faster, duplicate solutions drop, and new joiners ramp in weeks instead of months — all from a habit that costs almost nothing.",
+  "deck": "OPERATIONS"
+ },
+ "Knowledge Base Health Metrics": {
+  "cat": "Knowledge Management",
+  "level": "A",
+  "code": "KM11",
+  "what": [
+   "Measuring whether the knowledge base is actually useful: freshness, coverage, search success and usage",
+   "Tracks stale pages, orphaned pages, failed searches and most-viewed content",
+   "Turns 'is our documentation any good?' into numbers the team can act on"
+  ],
+  "why": [
+   "A knowledge base people don't trust is worse than none — metrics keep it trustworthy",
+   "Failed searches reveal exactly what people need and can't find — a free backlog",
+   "Freshness and ownership metrics prevent the slow rot that kills wikis"
+  ],
+  "how": [
+   "Instrument search (what did people look for and not find?) and page freshness",
+   "Review the health dashboard monthly; assign stale/high-traffic pages to owners",
+   "Fill the top failed-search gaps as a standing documentation task"
+  ],
+  "who": [
+   "Owned by: documentation owner",
+   "Data from: the KB tooling",
+   "Reviewed by: Engineering Lead"
+  ],
+  "scenario": "The health dashboard shows 200 searches a month for 'deploy rollback' returning nothing useful. That single failed-search signal becomes a crisp task: write the rollback guide. Views spike, related incidents drop, and the team starts treating documentation as a product with users, not a dumping ground.",
+  "deck": "OPERATIONS"
+ },
+ "Expert Maps": {
+  "cat": "Knowledge Management",
+  "level": "A",
+  "code": "KM12",
+  "what": [
+   "A living map of who knows what — the go-to people for each system, domain and tool",
+   "Makes expertise (and its concentration) visible across the team",
+   "Doubles as a bus-factor risk view: which areas have only one expert"
+  ],
+  "why": [
+   "When you don't know who to ask, questions bounce around and answers come slowly",
+   "It exposes dangerous single points of knowledge before they bite",
+   "It accelerates onboarding — new joiners know exactly who to learn from"
+  ],
+  "how": [
+   "Map each critical area to its experts and their depth (primary / secondary)",
+   "Highlight single-expert areas as explicit risks to mitigate through pairing",
+   "Keep it current — review alongside the knowledge audit"
+  ],
+  "who": [
+   "Maintained by: Engineering Lead",
+   "Populated by: the team",
+   "Used by: everyone, especially new joiners"
+  ],
+  "scenario": "A production issue touches the search subsystem at 9pm. Instead of paging five people hoping one knows it, the responder checks the expert map, pings the single named expert, and the issue is triaged in minutes. The same map also flags that search has only one expert — so pairing is scheduled the next week.",
+  "deck": "OPERATIONS"
+ },
+ "Continuous Improvement Backlog": {
+  "cat": "Continuous Improvement",
+  "level": "F",
+  "code": "CI7",
+  "what": [
+   "A visible, prioritised backlog of improvement ideas — separate from feature work but treated as real work",
+   "Anyone can add to it; items come from retros, incidents, and everyday friction",
+   "Improvement capacity is reserved each iteration so the backlog actually moves"
+  ],
+  "why": [
+   "Improvement ideas raised in retros die unless they land somewhere with owners and priority",
+   "A dedicated backlog makes 'making things better' a first-class activity, not a spare-time hope",
+   "Reserving capacity prevents feature pressure from crowding out all improvement"
+  ],
+  "how": [
+   "Create one backlog for improvements; make adding to it frictionless",
+   "Reserve a fixed slice of each iteration (e.g. 10–15%) for improvement items",
+   "Prioritise by pain × frequency and review it in every retro"
+  ],
+  "who": [
+   "Owned by: the team",
+   "Curated by: Agile Coach / Eng Lead",
+   "Fed by: everyone"
+  ],
+  "scenario": "For a year the same complaints surfaced in every retro and vanished by Monday. The team creates an improvement backlog and reserves one day a sprint. Within two months the flakiest test suite is fixed and the slowest build halved — because the ideas finally had a place to live and time to get done.",
+  "deck": "OPERATIONS"
+ },
+ "Waste Identification Exercise": {
+  "cat": "Continuous Improvement",
+  "level": "F",
+  "code": "CI8",
+  "what": [
+   "A structured session to find waste in how work flows — waiting, handoffs, rework, context-switching, over-processing",
+   "Uses a shared vocabulary of waste types so teams can name what they see",
+   "Outputs concrete waste items for the improvement backlog"
+  ],
+  "why": [
+   "Teams normalise waste until it's invisible — a deliberate exercise makes it namable and fixable",
+   "Naming waste types turns vague frustration into specific, actionable targets",
+   "It focuses improvement on flow, where most delivery time is actually lost"
+  ],
+  "how": [
+   "Walk a recent piece of work end-to-end and mark every wait, handoff and rework loop",
+   "Categorise each with the waste vocabulary; quantify the time lost where you can",
+   "Feed the biggest wastes into the improvement backlog"
+  ],
+  "who": [
+   "Facilitated by: Agile Coach",
+   "Participants: the delivery team",
+   "Actions to: improvement backlog"
+  ],
+  "scenario": "Mapping a single feature's journey, the team discovers it spent 3 days in active work and 11 days waiting — mostly for a manual approval and an environment. Seeing the 11 days makes the fix obvious: automate the approval and self-serve the environment. Lead time nearly halves without anyone working harder.",
+  "deck": "OPERATIONS"
+ },
+ "Kaizen Events": {
+  "cat": "Continuous Improvement",
+  "level": "D",
+  "code": "CI9",
+  "what": [
+   "Focused, time-boxed improvement events where a team tackles one specific problem intensively",
+   "A small group, a clear problem, and a few days to design and implement a fix",
+   "Ends with a measurable change in place, not just recommendations"
+  ],
+  "why": [
+   "Some improvements need concentrated effort that normal iteration can't provide",
+   "Time-boxed events create momentum and a clear before/after that builds belief in improvement",
+   "They train the team in structured problem-solving they can reuse"
+  ],
+  "how": [
+   "Pick one high-pain problem with a measurable baseline",
+   "Dedicate a small cross-functional group for 2–3 days to fix it",
+   "Measure the result and standardise the new way of working"
+  ],
+  "who": [
+   "Sponsored by: Engineering Lead",
+   "Run by: a small cross-functional team",
+   "Facilitated by: Agile Coach"
+  ],
+  "scenario": "Deploys take 90 nerve-wracking minutes. A three-day kaizen event pulls two engineers off features to attack it. They script the manual steps and add smoke checks. Deploys drop to 12 minutes and stop being scary. The concentrated push achieved in days what 'we'll get to it' hadn't in a year.",
+  "deck": "OPERATIONS"
+ },
+ "A3 Problem Solving": {
+  "cat": "Continuous Improvement",
+  "level": "D",
+  "code": "CI10",
+  "what": [
+   "A one-page, structured method for working a problem: context, current state, root cause, countermeasures, results",
+   "Forces clear thinking and evidence over jumping to solutions",
+   "The A3 becomes a shared artefact for aligning and learning"
+  ],
+  "why": [
+   "Teams often fix symptoms; A3 drives to root cause before acting",
+   "One page forces clarity — if it doesn't fit, the thinking isn't done",
+   "It builds a durable problem-solving muscle, not a one-off fix"
+  ],
+  "how": [
+   "Use the A3 template for any non-trivial recurring problem",
+   "Insist on data for current state and a verified root cause before countermeasures",
+   "Review results against the target and iterate if the cause was wrong"
+  ],
+  "who": [
+   "Authored by: the problem owner",
+   "Coached by: Agile Coach / Eng Lead",
+   "Reviewed with: stakeholders"
+  ],
+  "scenario": "A team keeps 'fixing' a recurring outage by restarting a service. An A3 forces them past the symptom to a connection-pool exhaustion root cause. The real countermeasure — pool sizing plus back-pressure — ends the outages for good. The one page turned reactive restarts into a permanent fix.",
+  "deck": "OPERATIONS"
+ },
+ "Improvement Velocity Tracking": {
+  "cat": "Continuous Improvement",
+  "level": "A",
+  "code": "CI11",
+  "what": [
+   "Measuring the rate at which the team actually completes improvements — not just ideas raised, but changes shipped",
+   "Tracks improvement items closed per period and their measured impact",
+   "Makes the team's improvement engine itself visible and improvable"
+  ],
+  "why": [
+   "Teams that don't measure improvement throughput quietly stop improving under delivery pressure",
+   "Seeing the rate creates accountability and protects reserved improvement capacity",
+   "Impact tracking proves improvement is worth the time, sustaining investment"
+  ],
+  "how": [
+   "Count improvement items completed per iteration and tag their measured effect",
+   "Watch the trend; a falling rate is an early warning that delivery pressure is winning",
+   "Report impact (time saved, incidents avoided) to keep the investment funded"
+  ],
+  "who": [
+   "Owned by: Agile Coach",
+   "Reviewed by: the team + Eng Lead",
+   "Data from: the improvement backlog"
+  ],
+  "scenario": "Improvement velocity was steady until a big release quarter, when it fell to zero — every improvement slot got eaten by feature work. The metric makes the trade-off explicit to leadership, who re-protect the reserved capacity. Improvement resumes before the team's flow quietly rots.",
+  "deck": "OPERATIONS"
+ },
+ "Value Stream Optimisation": {
+  "cat": "Continuous Improvement",
+  "level": "A",
+  "code": "CI12",
+  "what": [
+   "Improving the whole end-to-end flow from idea to production, not just isolated steps",
+   "Maps the value stream, measures flow efficiency, and attacks the biggest delays",
+   "Optimises the system, avoiding local improvements that don't help the whole"
+  ],
+  "why": [
+   "Local optimisation often makes the whole slower — only the value stream view shows the real bottleneck",
+   "Flow efficiency (active vs wait time) is usually shockingly low and the biggest lever",
+   "It aligns improvement with customer outcomes, not internal busyness"
+  ],
+  "how": [
+   "Map the full value stream and measure active vs waiting time at each stage",
+   "Attack the largest wait, not the loudest complaint",
+   "Re-measure flow efficiency after each change to confirm the whole got faster"
+  ],
+  "who": [
+   "Facilitated by: Agile Coach",
+   "Owned by: Engineering + Product",
+   "Reviewed by: leadership"
+  ],
+  "scenario": "Engineers optimise their coding step and are baffled that delivery doesn't speed up. The value-stream map shows coding was never the bottleneck — a two-week integration-test queue was. Fixing the queue cuts lead time by 40%; the earlier local win had done nothing for the customer.",
+  "deck": "OPERATIONS"
+ },
+ "Four Golden Signals": {
+  "cat": "Continuous Monitoring",
+  "level": "F",
+  "code": "MO7",
+  "what": [
+   "Monitoring every service on the four signals that matter: latency, traffic, errors and saturation",
+   "A consistent, minimal baseline applied to all services rather than ad-hoc dashboards",
+   "The starting point for alerting, SLOs and capacity work"
+  ],
+  "why": [
+   "Most monitoring is either missing or a wall of noise — the golden signals are the proven minimum that catches real problems",
+   "A consistent signal set makes services comparable and on-call simpler",
+   "They map directly to user pain, so alerts on them tend to be actionable"
+  ],
+  "how": [
+   "Instrument latency, traffic, errors and saturation for every service as a standard",
+   "Build one dashboard template and apply it everywhere",
+   "Alert on the golden signals before adding anything more exotic"
+  ],
+  "who": [
+   "Owned by: platform / SRE",
+   "Applied by: every service team",
+   "Reviewed by: Engineering Lead"
+  ],
+  "scenario": "A service degrades and the team scrambles across a dozen unrelated graphs. After adopting the golden signals, the next degradation is obvious in seconds: latency and saturation both spiking means the pool is exhausted. Diagnosis that took an hour now takes a glance.",
+  "deck": "OPERATIONS"
+ },
+ "Service Level Objectives": {
+  "cat": "Continuous Monitoring",
+  "level": "F",
+  "code": "MO8",
+  "what": [
+   "Explicit targets for the reliability users should expect — e.g. 99.9% of requests succeed under 300ms",
+   "Derived from user needs, not gut feel, and measured continuously",
+   "The shared definition of 'reliable enough' for each service"
+  ],
+  "why": [
+   "Without an SLO, every incident is argued from opinion; with one, reliability is a fact you're meeting or not",
+   "SLOs turn reliability into a budget you can spend deliberately on velocity",
+   "They align engineering and product on the same reliability bar"
+  ],
+  "how": [
+   "Pick a few user-centric SLIs per service and set realistic objectives",
+   "Measure them continuously and make them visible",
+   "Use them to drive alerting and prioritisation, not vanity dashboards"
+  ],
+  "who": [
+   "Defined by: service owner + product",
+   "Measured by: monitoring stack",
+   "Reviewed by: SRE Lead"
+  ],
+  "scenario": "Two teams argue whether 99.5% availability is 'good'. Once a user-derived SLO of 99.9% is set, the argument ends: they're at 99.7%, so it's a gap with a number. The SLO turns a subjective debate into a concrete, trackable target.",
+  "deck": "OPERATIONS"
+ },
+ "Observability Stack Implementation": {
+  "cat": "Continuous Monitoring",
+  "level": "D",
+  "code": "MO9",
+  "what": [
+   "A coherent stack for metrics, logs and traces that lets engineers answer questions they didn't predict",
+   "Beyond dashboards: the ability to explore and ask 'why' during an incident",
+   "Standardised instrumentation so all services are observable the same way"
+  ],
+  "why": [
+   "Traditional monitoring answers known questions; observability lets you debug the unknown-unknowns that cause real incidents",
+   "Correlated metrics, logs and traces cut diagnosis time dramatically",
+   "A shared stack means on-call skills transfer across services"
+  ],
+  "how": [
+   "Adopt one metrics/logs/traces stack and standard instrumentation libraries",
+   "Ensure trace, log and metric can be correlated by a common request id",
+   "Make the stack the default — new services are observable from day one"
+  ],
+  "who": [
+   "Owned by: platform team",
+   "Used by: all engineers",
+   "Standardised by: SRE Lead"
+  ],
+  "scenario": "An intermittent error defies the dashboards. With the observability stack, an engineer pivots from a metric spike to the exact traces to the correlated logs in minutes, and finds one misbehaving downstream dependency. The 'we can't reproduce it' incident is solved the same afternoon.",
+  "deck": "OPERATIONS"
+ },
+ "SLO-Based Alerting": {
+  "cat": "Continuous Monitoring",
+  "level": "D",
+  "code": "MO10",
+  "what": [
+   "Alerting on symptoms that threaten SLOs (and error-budget burn rate), not on every raw metric blip",
+   "Pages fire when users are (or soon will be) affected, not when a disk hits 80%",
+   "Burn-rate alerts distinguish 'fix now' from 'look at this later'"
+  ],
+  "why": [
+   "Cause-based alerting creates noise and alert fatigue; SLO-based alerting pages only on things that matter",
+   "It ties every page to user impact, so responders take them seriously",
+   "Burn-rate alerting gives the right urgency instead of one-size-fits-all paging"
+  ],
+  "how": [
+   "Define alerts on SLO burn rate rather than raw thresholds",
+   "Use multiple burn-rate windows so fast and slow burns get appropriate urgency",
+   "Delete cause-based alerts that never correspond to user impact"
+  ],
+  "who": [
+   "Owned by: SRE Lead",
+   "Tuned with: service owners",
+   "Reviewed in: alert quality reviews"
+  ],
+  "scenario": "On-call was drowning in 40 pages a night, most ignorable. Switching to SLO burn-rate alerting cuts it to 3 — and every one is real. Responders stop tuning out their pager, and the incidents that matter get caught faster.",
+  "deck": "OPERATIONS"
+ },
+ "Distributed Tracing": {
+  "cat": "Continuous Monitoring",
+  "level": "A",
+  "code": "MO11",
+  "what": [
+   "End-to-end tracing that follows a single request across every service it touches",
+   "Reveals where latency accrues and which dependency failed in a distributed call",
+   "Ties logs and metrics together along the real request path"
+  ],
+  "why": [
+   "In microservices, a slow or failing request is invisible without tracing — you can't guess which of 15 hops broke",
+   "Tracing turns cross-service debugging from hours of correlation into a single view",
+   "It exposes hidden dependencies and latency hot-spots for optimisation"
+  ],
+  "how": [
+   "Propagate a trace context through every service and async boundary",
+   "Sample intelligently to control cost while keeping the interesting traces",
+   "Make traces one click from an alert or a slow request"
+  ],
+  "who": [
+   "Owned by: platform team",
+   "Instrumented by: every service",
+   "Used by: on-call + performance work"
+  ],
+  "scenario": "A checkout request is slow but every individual service looks healthy. A single trace shows 800ms hiding in a rarely-noticed recommendation call three hops deep. The team makes it async, and checkout latency drops by half — a fix that was invisible without the trace.",
+  "deck": "OPERATIONS"
+ },
+ "Capacity Planning Cadence": {
+  "cat": "Reliability Engineering",
+  "level": "F",
+  "code": "RE7",
+  "what": [
+   "A regular rhythm of forecasting demand and ensuring capacity is provisioned ahead of need",
+   "Reviews growth trends, upcoming events and headroom on a fixed schedule",
+   "Turns capacity from a surprise into a plan"
+  ],
+  "why": [
+   "Capacity surprises cause outages and emergency spend — a cadence prevents both",
+   "Regular review catches slow growth before it hits a limit",
+   "Planned headroom is far cheaper than firefighting a saturation incident"
+  ],
+  "how": [
+   "Review utilisation and growth trends on a fixed cadence (e.g. monthly)",
+   "Forecast against upcoming launches and seasonal peaks; provision ahead",
+   "Track headroom as a metric with an explicit threshold to act on"
+  ],
+  "who": [
+   "Owned by: SRE / platform",
+   "Input from: product roadmap",
+   "Reviewed by: Engineering Lead"
+  ],
+  "scenario": "A marketing campaign triples traffic. Because the monthly capacity review had already forecast the launch and added headroom, the system absorbs it without a blip. The team that skipped capacity planning the year before had spent that same launch night in a saturation incident.",
+  "deck": "OPERATIONS"
+ },
+ "Disaster Recovery Runbooks": {
+  "cat": "Reliability Engineering",
+  "level": "F",
+  "code": "RE8",
+  "what": [
+   "Tested, step-by-step procedures for recovering from major failures — region loss, data corruption, total outage",
+   "Defines RTO/RPO targets and the exact steps to meet them",
+   "Rehearsed, not just written, so they work when it counts"
+  ],
+  "why": [
+   "Disasters are rare and high-stakes — improvising recovery under that pressure fails",
+   "Untested DR plans give false confidence; rehearsal is the only proof",
+   "Clear RTO/RPO targets align the business on acceptable loss and downtime"
+  ],
+  "how": [
+   "Document recovery steps for each major failure mode with explicit RTO/RPO",
+   "Rehearse them (at least on paper, ideally live) on a schedule",
+   "Fix every gap the rehearsal exposes before the real event"
+  ],
+  "who": [
+   "Owned by: SRE Lead",
+   "Rehearsed by: on-call + platform",
+   "Signed off by: Engineering Lead"
+  ],
+  "scenario": "A cloud region goes down hard. Because the DR runbook had been rehearsed quarterly, failover to the secondary region is executed calmly in 25 minutes against a 30-minute RTO. The rehearsal, not luck, is why it was a controlled event instead of a company-wide crisis.",
+  "deck": "OPERATIONS"
+ },
+ "Availability Tracking": {
+  "cat": "Reliability Engineering",
+  "level": "D",
+  "code": "RE9",
+  "what": [
+   "Continuous measurement of actual availability against targets, per service and end-to-end",
+   "Distinguishes user-perceived availability from component uptime",
+   "Feeds reliability reporting and error-budget decisions"
+  ],
+  "why": [
+   "You can't manage reliability you don't measure — and component uptime lies about user experience",
+   "Trends reveal creeping degradation before it becomes an outage",
+   "Honest availability data grounds reliability investment in fact"
+  ],
+  "how": [
+   "Measure availability from the user's perspective, not just server uptime",
+   "Report per-service and end-to-end availability against targets",
+   "Trend it monthly and act when the trajectory threatens the SLO"
+  ],
+  "who": [
+   "Owned by: SRE Lead",
+   "Measured by: monitoring stack",
+   "Reviewed by: team + product"
+  ],
+  "scenario": "Every component reports 99.99% uptime, yet customers complain. User-perspective availability tracking reveals the real number is 99.4% — the gaps live in the integration between healthy components. Measuring what users actually experience redirects the reliability work to where it matters.",
+  "deck": "OPERATIONS"
+ },
+ "Self-Healing Automation": {
+  "cat": "Reliability Engineering",
+  "level": "A",
+  "code": "RE10",
+  "what": [
+   "Automation that detects and remediates common failures without human intervention — restarts, failovers, scaling",
+   "The system recovers from known issues on its own, escalating only when it can't",
+   "Guarded and observable so automated actions are safe and auditable"
+  ],
+  "why": [
+   "Humans are slow and expensive for well-understood, repetitive failures — automation recovers in seconds",
+   "It frees on-call from routine toil to focus on novel problems",
+   "It directly improves availability by shrinking recovery time to near-zero for known failures"
+  ],
+  "how": [
+   "Automate remediation for your most common, well-understood failures first",
+   "Guard every automated action with limits, logging and an escalation fallback",
+   "Track how often self-healing fires and whether it's masking a real problem"
+  ],
+  "who": [
+   "Built by: SRE / platform",
+   "Reviewed for safety by: Eng Lead",
+   "Monitored by: on-call"
+  ],
+  "scenario": "A pod crashes nightly from a slow memory leak. Instead of paging someone at 3am, self-healing automation detects the pattern and recycles it cleanly, logging each event. On-call sleeps; the logged pattern also makes the underlying leak easy to prioritise and fix for good.",
+  "deck": "OPERATIONS"
+ },
+ "Reliability Engineering Sprints": {
+  "cat": "Reliability Engineering",
+  "level": "A",
+  "code": "RE11",
+  "what": [
+   "Dedicated sprints (or reserved capacity) focused purely on reliability work, not features",
+   "Tackles error-budget debt, resilience gaps and toil in a concentrated push",
+   "Triggered by error-budget burn or on a regular cadence"
+  ],
+  "why": [
+   "Reliability work loses every fight with feature pressure unless it gets protected time",
+   "Concentrated effort makes meaningful resilience improvements that scattered hours can't",
+   "Tying them to error-budget burn creates a principled trigger, not a political one"
+  ],
+  "how": [
+   "Reserve capacity or whole sprints for reliability on a cadence or budget trigger",
+   "Prioritise by risk and error-budget impact",
+   "Measure the reliability outcome, not just the tickets closed"
+  ],
+  "who": [
+   "Sponsored by: Engineering Lead",
+   "Run by: the team",
+   "Triggered by: error-budget policy"
+  ],
+  "scenario": "The service blows its error budget two months running. The error-budget policy triggers a reliability sprint: feature work pauses, and the team fixes the top three failure modes. Availability recovers, the budget stops burning, and reliability stops being the thing everyone agreed mattered but no one had time for.",
+  "deck": "OPERATIONS"
+ },
+ "Change Classification System": {
+  "cat": "Change Management",
+  "level": "F",
+  "code": "CH7",
+  "what": [
+   "A scheme that classifies changes by risk — standard, normal, emergency — each with a proportional approval path",
+   "Low-risk standard changes are pre-approved; only genuinely risky changes get scrutiny",
+   "Clear criteria so classification isn't a judgement call"
+  ],
+  "why": [
+   "Treating every change as high-risk creates a bottleneck that slows delivery and, ironically, batches risk",
+   "Proportional approval speeds the 90% of changes that are routine",
+   "It focuses scarce review attention where risk actually is"
+  ],
+  "how": [
+   "Define standard / normal / emergency categories with objective criteria",
+   "Pre-approve standard changes so they need no ceremony",
+   "Reserve heavier review for the genuinely risky normal/emergency ones"
+  ],
+  "who": [
+   "Defined by: Change owner + Eng Lead",
+   "Applied by: every engineer",
+   "Audited by: the team"
+  ],
+  "scenario": "Every deploy used to wait for the same approval, so teams batched a week of changes into one risky release. With classification, routine changes ship immediately as 'standard'. Batches shrink, risk per release drops, and the approval process finally protects only the changes that need it.",
+  "deck": "OPERATIONS"
+ },
+ "Standard Change Library": {
+  "cat": "Change Management",
+  "level": "F",
+  "code": "CH8",
+  "what": [
+   "A catalogue of pre-approved, repeatable changes with known steps and low risk",
+   "Common operations (config toggles, routine deploys) are documented and pre-blessed",
+   "Grows as more change types prove themselves safe and repeatable"
+  ],
+  "why": [
+   "Re-approving the same safe change every time is pure waste",
+   "A standard library makes routine change fast and consistent",
+   "It shrinks the set of changes that need real review to the ones that are genuinely novel"
+  ],
+  "how": [
+   "Document each proven, low-risk change as a standard entry with its steps",
+   "Pre-approve library entries so they ship without ceremony",
+   "Promote changes into the library once they've shown they're safe and repeatable"
+  ],
+  "who": [
+   "Owned by: Change owner",
+   "Contributed by: the team",
+   "Reviewed by: Eng Lead"
+  ],
+  "scenario": "Rotating a credential used to trigger a full approval every quarter. Once it's a standard-library entry with documented steps, it becomes a two-minute routine. Multiply that across dozens of repeatable changes and the team reclaims days of approval overhead a month.",
+  "deck": "OPERATIONS"
+ },
+ "Peer Review as Approval": {
+  "cat": "Change Management",
+  "level": "D",
+  "code": "CH9",
+  "what": [
+   "Using code/change peer review as the approval mechanism, replacing a separate approval board for most changes",
+   "The reviewer who understands the change is the approver — approval happens where the knowledge is",
+   "Audit trail comes from the review record itself"
+  ],
+  "why": [
+   "Separate approval boards add delay without adding safety — the reviewer already assessed the risk",
+   "Approval-at-review keeps decisions close to the people who understand the change",
+   "It removes a handoff and a queue while keeping (better) accountability"
+  ],
+  "how": [
+   "Make a completed peer review the approval of record for standard/normal changes",
+   "Require the review to explicitly cover risk and rollback, not just correctness",
+   "Retain the review as the audit trail"
+  ],
+  "who": [
+   "Done by: peer reviewers",
+   "Enabled by: Eng Lead",
+   "Audited via: review records"
+  ],
+  "scenario": "Changes used to sit two days waiting for a weekly approval board that mostly rubber-stamped what reviewers had already vetted. Making peer review the approval removes the board for routine changes: lead time drops from days to hours, and the person approving is the one who actually understood the change.",
+  "deck": "OPERATIONS"
+ },
+ "Change Lead Time Tracking": {
+  "cat": "Change Management",
+  "level": "D",
+  "code": "CH10",
+  "what": [
+   "Measuring the time from change ready to change in production — a core flow and DORA metric",
+   "Broken down by stage to expose where changes wait",
+   "Trended to show whether the change process is speeding up or clogging"
+  ],
+  "why": [
+   "Change lead time is a direct measure of delivery agility and a DORA elite differentiator",
+   "Stage breakdown pinpoints the exact queue causing delay",
+   "Trending it keeps process improvements honest"
+  ],
+  "how": [
+   "Instrument timestamps from 'ready' to 'in production' for every change",
+   "Break the total into waiting vs active time by stage",
+   "Attack the largest wait; re-measure to confirm improvement"
+  ],
+  "who": [
+   "Owned by: Eng Lead",
+   "Data from: CI/CD + tracking",
+   "Reviewed by: the team"
+  ],
+  "scenario": "Change lead time averages 4 days and no one knows why. The stage breakdown shows 3 of those days are a change sitting in an approval queue. That single insight redirects effort to the queue, not to making engineers code faster — and lead time falls to under a day.",
+  "deck": "OPERATIONS"
+ },
+ "CAB Elimination Review": {
+  "cat": "Change Management",
+  "level": "A",
+  "code": "CH11",
+  "what": [
+   "A deliberate review to retire or shrink a heavyweight Change Advisory Board in favour of lightweight controls",
+   "Assesses whether the CAB actually reduces failures or just adds delay",
+   "Replaces ceremony with automated checks, peer review and standard changes"
+  ],
+  "why": [
+   "Research (DORA) shows heavyweight CABs correlate with slower delivery and no better stability",
+   "Removing low-value gates speeds delivery and reduces risky batching",
+   "It shifts control to mechanisms that actually prevent failures"
+  ],
+  "how": [
+   "Measure the CAB's real effect on change-failure rate — does it help?",
+   "Replace it with automated policy checks, peer approval and a standard-change library",
+   "Keep only the minimum human review for genuinely high-risk changes"
+  ],
+  "who": [
+   "Sponsored by: Eng Lead + Change owner",
+   "Analysed with: DORA metrics",
+   "Agreed by: leadership"
+  ],
+  "scenario": "Data shows the weekly CAB delays every change by days but the change-failure rate is identical whether it met or not. Armed with the numbers, the team replaces it with automated checks and peer approval. Deployment frequency rises sharply and stability doesn't move — proving the CAB had been pure drag.",
+  "deck": "OPERATIONS"
+ },
+ "Change Failure Rate vs Speed": {
+  "cat": "Change Management",
+  "level": "A",
+  "code": "CH12",
+  "what": [
+   "Tracking change-failure rate alongside deployment frequency to prove speed and stability rise together",
+   "Counters the myth that shipping faster must mean breaking more",
+   "Uses the two DORA metrics as a balanced pair"
+  ],
+  "why": [
+   "Teams slow themselves down fearing that speed causes failures — the data usually shows the opposite",
+   "Watching both metrics together prevents optimising one at the other's expense",
+   "It gives leadership evidence to back faster, safer delivery"
+  ],
+  "how": [
+   "Measure deployment frequency and change-failure rate on the same dashboard",
+   "Show the correlation over time as delivery practices improve",
+   "Use it to justify smaller, more frequent, safer changes"
+  ],
+  "who": [
+   "Owned by: Eng Lead",
+   "Data from: CI/CD + incidents",
+   "Reviewed by: team + leadership"
+  ],
+  "scenario": "Leadership fears that increasing deploy frequency will spike failures. The paired dashboard shows the truth over two quarters: as deploys go from weekly to daily, change-failure rate actually drops — smaller changes are safer. The chart ends the 'slow down to be safe' argument with evidence.",
+  "deck": "OPERATIONS"
+ },
+ "Operating Rhythm Design": {
+  "cat": "Operational Habits",
+  "level": "F",
+  "code": "OH1",
+  "what": [
+   "A deliberately designed cadence of the team's recurring events — standups, planning, review, retro — that fit together",
+   "Each ceremony has a clear purpose, owner and output; nothing runs out of habit alone",
+   "The rhythm is reviewed and tuned, not inherited unquestioned"
+  ],
+  "why": [
+   "An accidental meeting calendar fragments focus and wastes hours; a designed rhythm creates flow",
+   "Clear purpose per event prevents zombie ceremonies no one benefits from",
+   "A shared rhythm makes the team predictable to itself and its stakeholders"
+  ],
+  "how": [
+   "List every recurring event and state its purpose, owner and output; cut any without one",
+   "Arrange them to protect large blocks of focus time",
+   "Review the rhythm quarterly and adjust"
+  ],
+  "who": [
+   "Designed by: team + Agile Coach",
+   "Owned by: the team",
+   "Reviewed by: Engineering Lead"
+  ],
+  "scenario": "A team's week is death by a thousand meetings, focus shredded. They redesign the operating rhythm: two ceremonies merge, one is deleted, and mornings become meeting-free. Output rises noticeably the next sprint — not from working more, but from a rhythm designed instead of accreted.",
+  "deck": "OPERATIONS"
+ },
+ "Visual Management Board": {
+  "cat": "Operational Habits",
+  "level": "F",
+  "code": "OH2",
+  "what": [
+   "A shared visual board that shows the team's work, status and key signals at a glance",
+   "Physical or digital, but always current and always visible",
+   "The single source of truth for 'what's happening right now'"
+  ],
+  "why": [
+   "Work you can't see, you can't manage — a visual board makes flow and blockers obvious",
+   "Shared visibility replaces status meetings and DM archaeology",
+   "It creates collective ownership of the work, not just individual queues"
+  ],
+  "how": [
+   "Model your real workflow as columns; put every active item on the board",
+   "Keep it current — an out-of-date board is quickly ignored",
+   "Use it to run standups and surface blockers"
+  ],
+  "who": [
+   "Owned by: the team",
+   "Facilitated by: Agile Coach",
+   "Read by: everyone incl. stakeholders"
+  ],
+  "scenario": "Status is scattered across tickets, chats and heads, and standup is a round of guesses. A visual board pulls it into one view: suddenly a blocked item stuck for days is impossible to miss. The team clears it that morning — the board turned an invisible stall into an obvious action.",
+  "deck": "OPERATIONS"
+ },
+ "Operating Model Retrospectives": {
+  "cat": "Operational Habits",
+  "level": "D",
+  "code": "OH3",
+  "what": [
+   "Periodic retrospectives on how the team operates — its roles, rhythm and ways of working, not just the last sprint",
+   "Steps back from delivery to ask whether the operating model itself still fits",
+   "Produces changes to how the team runs, with owners"
+  ],
+  "why": [
+   "Teams optimise within their operating model but rarely question the model itself",
+   "As context changes, an unexamined operating model quietly becomes a constraint",
+   "Regular reflection keeps ways of working deliberate, not inherited"
+  ],
+  "how": [
+   "Every quarter, retro the operating model: roles, cadence, decision-making, tooling",
+   "Pick one or two operating changes to try and review next time",
+   "Treat the operating model as a product that evolves"
+  ],
+  "who": [
+   "Facilitated by: Agile Coach",
+   "Participants: whole team",
+   "Actions owned by: named people"
+  ],
+  "scenario": "The team keeps running the ceremonies that suited a five-person group — but they're twelve now and drowning. An operating-model retro surfaces the mismatch and they split into two sub-teams with a lighter shared sync. The problem wasn't effort; it was an operating model that had outgrown its design.",
+  "deck": "OPERATIONS"
+ },
+ "Toil Reduction Programme": {
+  "cat": "Operational Habits",
+  "level": "D",
+  "code": "OH4",
+  "what": [
+   "A standing programme to identify and eliminate toil — manual, repetitive, automatable operational work",
+   "Quantifies toil, then systematically automates or removes the biggest sources",
+   "Protects a share of capacity for toil reduction so it actually happens"
+  ],
+  "why": [
+   "Toil scales with the system and silently consumes the capacity you need for real work",
+   "Left unchecked it burns out engineers and caps how much a team can run",
+   "Reducing it compounds — every automated task pays back forever"
+  ],
+  "how": [
+   "Measure where operational time actually goes; name the top toil sources",
+   "Automate or eliminate the biggest ones first; reserve capacity to do so",
+   "Track toil as a percentage of time and drive it down"
+  ],
+  "who": [
+   "Owned by: SRE / Eng Lead",
+   "Done by: the team",
+   "Reviewed by: leadership"
+  ],
+  "scenario": "Engineers spend 40% of their week on manual toil and morale is sinking. A toil-reduction programme measures it, then automates the top three tasks over a month. Toil drops to 15%, reclaiming a day and a half per person per week — and the team stops feeling like a help desk for its own systems.",
+  "deck": "OPERATIONS"
+ },
+ "Habit Stacking for Change": {
+  "cat": "Operational Habits",
+  "level": "A",
+  "code": "OH5",
+  "what": [
+   "Embedding new behaviours by attaching them to existing habits and rituals, rather than adding standalone processes",
+   "New practices ride on events the team already does, lowering adoption friction",
+   "Change becomes 'one more small thing here', not a separate initiative"
+  ],
+  "why": [
+   "New processes bolted on as extra ceremonies get dropped under pressure",
+   "Attaching change to existing habits makes it stick with far less willpower",
+   "It respects that behaviour change, not tooling, is what makes transformation real"
+  ],
+  "how": [
+   "Identify the habit a new behaviour can attach to (e.g. add a security check to code review)",
+   "Make the new step tiny and automatic within the existing ritual",
+   "Reinforce until it's invisible, then stack the next one"
+  ],
+  "who": [
+   "Designed by: Agile Coach",
+   "Adopted by: the team",
+   "Sponsored by: Eng Lead"
+  ],
+  "scenario": "A push to 'do more security' as a separate step fizzles for months. Instead the team stacks it: a two-line security checklist becomes part of the code review they already do every day. Because it rides an existing habit, adoption is near-total within a fortnight — no new meeting required.",
+  "deck": "OPERATIONS"
+ },
+ "Operational Fitness Functions": {
+  "cat": "Operational Habits",
+  "level": "A",
+  "code": "OH6",
+  "what": [
+   "Automated checks that continuously verify the system still meets key operational qualities — performance, reliability, cost, architecture",
+   "Fitness functions fail the build or alert when a quality regresses",
+   "Guardrails that keep operational health from silently eroding"
+  ],
+  "why": [
+   "Operational qualities decay invisibly one small change at a time until an incident reveals it",
+   "Automated fitness functions catch regressions the moment they happen",
+   "They make non-functional requirements executable, not aspirational"
+  ],
+  "how": [
+   "Encode key operational thresholds (latency, error rate, cost, coupling) as automated checks",
+   "Run them in CI/CD and in production; fail or alert on breach",
+   "Evolve the functions as the system's priorities change"
+  ],
+  "who": [
+   "Built by: platform / architects",
+   "Enforced in: CI/CD + prod",
+   "Owned by: Eng Lead"
+  ],
+  "scenario": "Latency creeps up 5ms per release — imperceptible until it's suddenly 200ms too slow. A fitness function that fails any build regressing p95 latency catches the very first offending change. The slow erosion that used to end in a performance incident now can't get past the pipeline.",
+  "deck": "OPERATIONS"
+ },
+ "Tool Usage Metrics": {
+  "cat": "Tooling Adoption",
+  "level": "F",
+  "code": "TA1",
+  "what": [
+   "Measuring how (and whether) purchased tools are actually used — active users, key-feature adoption, frequency",
+   "Turns tool ROI from anecdote into data",
+   "Reveals shelfware and underused capability"
+  ],
+  "why": [
+   "Organisations buy tools and assume value; usage data reveals how much is wasted",
+   "It grounds renewal and consolidation decisions in fact",
+   "Low adoption is an early signal of a rollout or fit problem to fix"
+  ],
+  "how": [
+   "Instrument or pull usage data for each significant tool",
+   "Track active usage and key-feature adoption, not just licences bought",
+   "Review regularly and act on low-usage tools"
+  ],
+  "who": [
+   "Owned by: platform / Eng Lead",
+   "Data from: tool admin consoles",
+   "Reviewed with: finance"
+  ],
+  "scenario": "A team pays for 200 seats of an expensive platform. Usage metrics show 40 people actually log in. The finding drives a renegotiation to 60 seats and a push to either drive adoption or drop it — reclaiming budget that had been quietly evaporating on shelfware.",
+  "deck": "OPERATIONS"
+ },
+ "Tool Onboarding Sprints": {
+  "cat": "Tooling Adoption",
+  "level": "F",
+  "code": "TA2",
+  "what": [
+   "Focused, time-boxed efforts to get a team genuinely productive on a new tool, not just licensed",
+   "Hands-on setup, real workflows and support concentrated into a short window",
+   "Ends with the team using the tool in anger, not in theory"
+  ],
+  "why": [
+   "Tools rolled out without onboarding get low adoption and blamed for being 'bad'",
+   "A concentrated onboarding beats a scattered 'figure it out yourself'",
+   "Early productive use is what converts a purchase into value"
+  ],
+  "how": [
+   "Run a short, hands-on onboarding using the team's real work, not toy demos",
+   "Provide a champion and quick support during the ramp",
+   "Confirm real adoption at the end, then withdraw the scaffolding"
+  ],
+  "who": [
+   "Run by: tool champion",
+   "Supported by: platform",
+   "Sponsored by: Eng Lead"
+  ],
+  "scenario": "A new observability tool sat unused for a quarter — 'too complex'. A two-day onboarding sprint sets it up on the team's actual services and walks through real incidents. By the end they're relying on it daily. The tool hadn't been bad; it had never been properly onboarded.",
+  "deck": "OPERATIONS"
+ },
+ "Tool Champions Network": {
+  "cat": "Tooling Adoption",
+  "level": "D",
+  "code": "TA3",
+  "what": [
+   "A network of designated champions who drive adoption and support for key tools across teams",
+   "Local experts who help peers, gather feedback and spread good practice",
+   "The human layer that makes tooling stick"
+  ],
+  "why": [
+   "Central tool teams can't support everyone; champions scale help peer-to-peer",
+   "Adoption spreads socially — a trusted local champion beats a mandate",
+   "Champions surface real friction back to the tool owners"
+  ],
+  "how": [
+   "Recruit a champion per team for each key tool; give them time and recognition",
+   "Connect them in a network to share tips and escalate issues",
+   "Route tool feedback and improvements through them"
+  ],
+  "who": [
+   "Coordinated by: platform",
+   "Champions from: each team",
+   "Sponsored by: Eng Lead"
+  ],
+  "scenario": "A CI platform has one overwhelmed owner and slow adoption. Standing up a champions network — one enthusiast per team — turns adoption social: questions get answered locally in minutes, good patterns spread, and the owner finally has time to improve the platform instead of firefighting support tickets.",
+  "deck": "OPERATIONS"
+ },
+ "Tool NPS Tracking": {
+  "cat": "Tooling Adoption",
+  "level": "D",
+  "code": "TA4",
+  "what": [
+   "Regularly surveying how much engineers would recommend the tools they're given — an internal Net Promoter Score",
+   "Treats developers as customers of internal tooling",
+   "Turns tool satisfaction into a trackable signal"
+  ],
+  "why": [
+   "Bad internal tools quietly tax every engineer every day, and no one measures it",
+   "Tool NPS surfaces friction before it drives workarounds or attrition",
+   "It prioritises tooling investment by real developer pain, not loudest voice"
+  ],
+  "how": [
+   "Survey tool satisfaction on a light, regular cadence",
+   "Track NPS per tool over time; dig into detractor comments",
+   "Fix or replace persistently low-scoring tools"
+  ],
+  "who": [
+   "Owned by: platform / DevEx",
+   "Respondents: all engineers",
+   "Reviewed by: Eng Lead"
+  ],
+  "scenario": "Tool NPS surfaces that the internal deploy tool is despised — a deeply negative score with comments about flakiness. It had never come up in planning because everyone just suffered quietly. The data justifies a rebuild; the next survey shows the biggest jump of any tool, and daily friction drops for the whole team.",
+  "deck": "OPERATIONS"
+ },
+ "Zero-Usage Retirement Policy": {
+  "cat": "Tooling Adoption",
+  "level": "A",
+  "code": "TA5",
+  "what": [
+   "A standing policy that tools with no meaningful usage are retired on a schedule",
+   "Sunsets shelfware automatically instead of paying for it indefinitely",
+   "Reduces cost, security surface and cognitive clutter"
+  ],
+  "why": [
+   "Unused tools accumulate cost, licences, integrations and attack surface for zero value",
+   "A default-retire policy removes the inertia that keeps zombie tools alive",
+   "Fewer tools mean a simpler, safer, cheaper stack"
+  ],
+  "how": [
+   "Define a usage threshold and a grace period below which tools are retired",
+   "Notify owners, then decommission on schedule if usage doesn't recover",
+   "Reclaim licences, integrations and secrets on retirement"
+  ],
+  "who": [
+   "Owned by: platform / Eng Lead",
+   "Data from: usage metrics",
+   "Approved by: tool owners"
+  ],
+  "scenario": "A security review finds 15 forgotten SaaS tools, each an active integration and credential nobody uses. A zero-usage retirement policy sunsets them over a quarter, shrinking the attack surface and cutting spend — and turning 'we should clean this up someday' into an automatic default.",
+  "deck": "OPERATIONS"
+ },
+ "Tool ROI Assessment": {
+  "cat": "Tooling Adoption",
+  "level": "A",
+  "code": "TA6",
+  "what": [
+   "A structured evaluation of whether each significant tool delivers value worth its total cost",
+   "Weighs licence, integration and cognitive cost against measured benefit",
+   "Feeds renew / consolidate / drop decisions"
+  ],
+  "why": [
+   "Tool spend grows unchecked without a habit of asking 'is this worth it?'",
+   "Total cost is more than the licence — integration and cognitive load count",
+   "ROI assessment enables deliberate consolidation instead of accretion"
+  ],
+  "how": [
+   "List each tool's full cost and its measurable benefit (time saved, risk reduced)",
+   "Assess ROI on renewal and consolidate overlapping tools",
+   "Cut tools whose value doesn't justify their cost"
+  ],
+  "who": [
+   "Owned by: Eng Lead + finance",
+   "Input from: usage + NPS",
+   "Decided with: teams"
+  ],
+  "scenario": "Three overlapping tools each do a slice of the same job. An ROI assessment tallies their combined cost and thin individual value, then consolidates to one. Spend drops, integrations simplify, and engineers stop context-switching between redundant tools — a decision that only the ROI lens made obvious.",
+  "deck": "OPERATIONS"
+ },
+ "Metrics Hierarchy Design": {
+  "cat": "Performance Metrics",
+  "level": "F",
+  "code": "PM1",
+  "what": [
+   "A deliberate hierarchy linking team metrics up to outcomes and business goals",
+   "Every metric has a clear parent — it exists to move something that matters",
+   "Prevents a sprawl of disconnected numbers"
+  ],
+  "why": [
+   "Metrics without a hierarchy multiply into noise no one acts on",
+   "A hierarchy shows how daily work connects to business outcomes",
+   "It reveals which metrics are actually load-bearing and which are vanity"
+  ],
+  "how": [
+   "Start from the business outcome and decompose into the metrics that drive it",
+   "Give each metric a parent and an owner; drop orphans",
+   "Review the hierarchy as goals change"
+  ],
+  "who": [
+   "Designed by: Eng Lead + Product",
+   "Owned by: metric owners",
+   "Reviewed by: leadership"
+  ],
+  "scenario": "A team tracks 30 metrics and acts on none. Building a hierarchy from the one business outcome down leaves 6 metrics that actually connect to it and retires the rest. Reviews get sharper immediately — every number on the wall now clearly matters.",
+  "deck": "OPERATIONS"
+ },
+ "Leading vs Lagging Indicators": {
+  "cat": "Performance Metrics",
+  "level": "F",
+  "code": "PM2",
+  "what": [
+   "Deliberately balancing lagging outcome metrics with leading indicators that predict them",
+   "Lagging tells you where you ended up; leading tells you where you're heading",
+   "Every key outcome gets at least one actionable leading indicator"
+  ],
+  "why": [
+   "Managing only by lagging metrics is driving by the rear-view mirror — too late to steer",
+   "Leading indicators give time to act before the outcome is fixed",
+   "The pairing turns metrics from scorekeeping into steering"
+  ],
+  "how": [
+   "For each lagging outcome, identify a leading indicator you can influence now",
+   "Watch leading indicators frequently; review lagging ones periodically",
+   "Act on leading signals rather than waiting for the lagging result"
+  ],
+  "who": [
+   "Chosen by: Eng Lead + team",
+   "Owned by: metric owners",
+   "Reviewed by: leadership"
+  ],
+  "scenario": "A team only sees quarterly customer-churn (lagging) — always too late to react. They add a leading indicator: weekly support-ticket sentiment. When sentiment dips, they intervene weeks before churn would show. The lagging number finally becomes something they can steer, not just report.",
+  "deck": "OPERATIONS"
+ },
+ "Action-Oriented Metrics": {
+  "cat": "Performance Metrics",
+  "level": "D",
+  "code": "PM3",
+  "what": [
+   "Ensuring every tracked metric has a clear 'so what' — an owner and a defined action when it moves",
+   "Metrics that don't change a decision are candidates for deletion",
+   "Each metric comes with thresholds and a response"
+  ],
+  "why": [
+   "Most dashboards are full of numbers that trigger no decision — pure overhead",
+   "An action per metric forces the question 'would we do anything differently?'",
+   "It keeps attention on the few metrics that actually drive behaviour"
+  ],
+  "how": [
+   "For each metric, define who owns it and what happens when it crosses a threshold",
+   "Delete or archive metrics with no associated action",
+   "Review that actions actually fire when thresholds are hit"
+  ],
+  "who": [
+   "Owned by: metric owners",
+   "Curated by: Eng Lead",
+   "Reviewed by: the team"
+  ],
+  "scenario": "A dashboard has 20 charts and drives zero decisions. Requiring an owner and an action per metric collapses it to 5 that each trigger a real response. Reviews go from a passive read-out to a short list of decisions — the metrics finally do work instead of just existing.",
+  "deck": "OPERATIONS"
+ },
+ "Real-Time Operational Dashboard": {
+  "cat": "Performance Metrics",
+  "level": "D",
+  "code": "PM4",
+  "what": [
+   "A live dashboard showing the operational health and key metrics the team acts on, updated in real time",
+   "One glance answers 'are we healthy right now?'",
+   "Curated to the few signals that matter, not everything available"
+  ],
+  "why": [
+   "Stale or buried metrics get ignored; a live, curated view gets used",
+   "Real-time visibility shortens the time from problem to response",
+   "A shared operational picture aligns the team instantly"
+  ],
+  "how": [
+   "Curate the handful of real-time signals the team actually acts on",
+   "Make it visible and glanceable (a wall screen or pinned tab)",
+   "Keep it focused — resist the urge to add every metric"
+  ],
+  "who": [
+   "Built by: platform / team",
+   "Owned by: Eng Lead",
+   "Watched by: everyone"
+  ],
+  "scenario": "During incidents the team used to open six tools to piece together status. A single real-time operational dashboard now shows health at a glance, so the next incident starts with everyone looking at the same picture. Time-to-orient drops from minutes of tool-hopping to seconds.",
+  "deck": "OPERATIONS"
+ },
+ "Metric Credibility Check": {
+  "cat": "Performance Metrics",
+  "level": "A",
+  "code": "PM5",
+  "what": [
+   "A discipline of validating that metrics are accurate, well-defined and not gameable before trusting them",
+   "Checks definitions, data quality and perverse incentives",
+   "Protects decisions from being made on bad numbers"
+  ],
+  "why": [
+   "Decisions built on wrong or gamed metrics are worse than no metrics at all",
+   "Ambiguous definitions make teams argue about numbers instead of acting",
+   "A credibility habit keeps the whole metric system trustworthy"
+  ],
+  "how": [
+   "Verify each key metric's definition, data source and edge cases",
+   "Ask how it could be gamed and whether the incentive is healthy",
+   "Fix or retire metrics that fail the check"
+  ],
+  "who": [
+   "Owned by: Eng Lead",
+   "Reviewed by: the team",
+   "Audited: periodically"
+  ],
+  "scenario": "A 'velocity is up 30%' claim drives a big decision — until a credibility check finds teams had quietly inflated estimates. The metric was measuring estimation, not output. Catching it before the decision saved a bad bet, and the team fixes the definition so the number means something again.",
+  "deck": "OPERATIONS"
+ },
+ "Metric Sunset Reviews": {
+  "cat": "Performance Metrics",
+  "level": "A",
+  "code": "PM6",
+  "what": [
+   "Periodic reviews that retire metrics that have stopped being useful",
+   "Prunes the metric set so attention stays on what matters now",
+   "Prevents dashboards from becoming museums of obsolete numbers"
+  ],
+  "why": [
+   "Metrics accumulate forever unless deliberately retired, diluting focus",
+   "Old metrics can mislead when the context that made them relevant is gone",
+   "A leaner metric set is a sharper one"
+  ],
+  "how": [
+   "Review the metric portfolio periodically; ask which still drive action",
+   "Retire the ones that don't, archiving history if needed",
+   "Confirm each surviving metric still ties to a current goal"
+  ],
+  "who": [
+   "Owned by: Eng Lead",
+   "Reviewed by: the team",
+   "Cadence: quarterly"
+  ],
+  "scenario": "A dashboard still prominently tracks a metric from a project that ended a year ago, subtly anchoring conversations to old priorities. A sunset review retires it and three others. The remaining metrics all map to current goals — and reviews stop being haunted by last year's concerns.",
+  "deck": "OPERATIONS"
+ },
+ "Communication Calendar Audit": {
+  "cat": "Communication Rhythms",
+  "level": "F",
+  "code": "CR1",
+  "what": [
+   "A review of all recurring meetings and communications to cut, merge or shorten the low-value ones",
+   "Maps where the team's synchronous time actually goes",
+   "Reclaims focus time by pruning the calendar deliberately"
+  ],
+  "why": [
+   "Meeting load accretes until calendars are full and focus is gone — an audit resets it",
+   "Much recurring communication outlives its purpose but never gets cancelled",
+   "Reclaimed hours go straight back into real work"
+  ],
+  "how": [
+   "List every recurring meeting with its purpose, attendees and cost in person-hours",
+   "Cut, merge or shorten those without a clear, current purpose",
+   "Re-audit periodically to stop the calendar re-filling"
+  ],
+  "who": [
+   "Run by: Agile Coach / Eng Lead",
+   "Input from: the team",
+   "Reviewed: quarterly"
+  ],
+  "scenario": "A calendar audit tallies 14 recurring meetings costing the team 22 person-hours a week. Half have no clear current purpose. Cutting and merging them recovers a full day per person weekly — focus time that had been lost to meetings no one had thought to question.",
+  "deck": "OPERATIONS"
+ },
+ "Async-First Communication": {
+  "cat": "Communication Rhythms",
+  "level": "F",
+  "code": "CR2",
+  "what": [
+   "Defaulting to asynchronous, written communication and reserving synchronous time for what truly needs it",
+   "Decisions and context are written down and durable, not trapped in a call",
+   "Meetings become the exception justified by real need"
+  ],
+  "why": [
+   "Synchronous-by-default fragments deep work and excludes people across time zones",
+   "Written-first communication creates a searchable record and better decisions",
+   "It protects the long focus blocks engineering actually needs"
+  ],
+  "how": [
+   "Make the default 'write it down' — a doc or thread before a meeting",
+   "Reserve synchronous time for debate, alignment and relationship, not status",
+   "Model it: leaders answer async and protect focus time"
+  ],
+  "who": [
+   "Championed by: Eng Lead",
+   "Adopted by: the team",
+   "Supported by: Agile Coach"
+  ],
+  "scenario": "A distributed team runs on calls, so half the members are always in the wrong time zone and focus is shredded. Shifting to async-first — decisions in threaded docs, meetings only when needed — gives everyone durable context and long focus blocks. Throughput rises and the time-zone tax largely disappears.",
+  "deck": "OPERATIONS"
+ },
+ "Weekly Written Updates": {
+  "cat": "Communication Rhythms",
+  "level": "D",
+  "code": "CR3",
+  "what": [
+   "A short, regular written update per person or team summarising progress, plans and blockers",
+   "Replaces status meetings with a durable, skimmable record",
+   "Keeps stakeholders informed without interrupting the team"
+  ],
+  "why": [
+   "Status meetings are expensive and evaporate; written updates are cheap and durable",
+   "Writing forces clarity about what actually moved and what's stuck",
+   "Stakeholders self-serve status instead of pulling it out of the team"
+  ],
+  "how": [
+   "Adopt a light template: done, next, blockers, risks",
+   "Publish on a fixed cadence to a shared, searchable place",
+   "Read and respond async; escalate blockers, not everything"
+  ],
+  "who": [
+   "Written by: each person/team",
+   "Read by: stakeholders",
+   "Owned by: Eng Lead"
+  ],
+  "scenario": "A weekly status meeting for stakeholders ate an hour of the whole team every Monday. Replaced by a five-minute written update each, the meeting disappears, stakeholders stay better informed than before, and blockers surface in writing where they can be actioned — not lost in a verbal round-robin.",
+  "deck": "OPERATIONS"
+ },
+ "Communication Charter": {
+  "cat": "Communication Rhythms",
+  "level": "D",
+  "code": "CR4",
+  "what": [
+   "A team agreement on how and where different kinds of communication happen — channels, response norms, urgency",
+   "Sets expectations: what goes where, and what 'urgent' really means",
+   "Removes ambiguity that causes both noise and missed messages"
+  ],
+  "why": [
+   "Without shared norms, everything feels urgent and important messages get lost",
+   "A charter reduces anxiety about response times and channel-hopping",
+   "It makes communication predictable, so people can focus without fear of missing things"
+  ],
+  "how": [
+   "Agree channels for each communication type and expected response times",
+   "Define what counts as genuinely urgent and how to signal it",
+   "Write it down, onboard new joiners to it, and revisit it"
+  ],
+  "who": [
+   "Agreed by: the team",
+   "Owned by: Eng Lead",
+   "Onboarded via: Agile Coach"
+  ],
+  "scenario": "Everything arrives everywhere marked 'urgent', so people either stay glued to chat or miss real emergencies. A communication charter defines channels and what urgent actually means. Anxiety drops, focus improves, and when something truly is urgent, the agreed signal makes it unmissable.",
+  "deck": "OPERATIONS"
+ },
+ "Deep Work Protection": {
+  "cat": "Communication Rhythms",
+  "level": "A",
+  "code": "CR5",
+  "what": [
+   "Deliberately protecting blocks of uninterrupted focus time for engineering work",
+   "No-meeting periods, quiet hours and norms that defend concentration",
+   "Treats focus as a first-class resource, not a residual"
+  ],
+  "why": [
+   "Complex engineering needs long, unbroken focus that a fragmented day destroys",
+   "Constant interruption slashes both quality and throughput",
+   "Protecting focus is one of the highest-leverage productivity moves a team can make"
+  ],
+  "how": [
+   "Establish protected no-meeting blocks or days the whole team honours",
+   "Set norms around interruptions and async response during focus time",
+   "Have leaders model and defend it against creeping meetings"
+  ],
+  "who": [
+   "Agreed by: the team",
+   "Defended by: Eng Lead",
+   "Supported by: Agile Coach"
+  ],
+  "scenario": "Engineers can't find two uninterrupted hours, and hard problems drag for weeks. The team institutes meeting-free mornings and focus norms. Suddenly gnarly work that used to stall gets finished in a single deep session — the constraint was never talent or effort, it was fragmented time.",
+  "deck": "OPERATIONS"
+ },
+ "Communication Effectiveness Survey": {
+  "cat": "Communication Rhythms",
+  "level": "A",
+  "code": "CR6",
+  "what": [
+   "Periodically measuring whether communication is actually working — clarity, signal-to-noise, inclusion",
+   "Treats communication health as something to measure and improve",
+   "Surfaces where information isn't reaching people or is drowning them"
+  ],
+  "why": [
+   "Broken communication is a top cause of rework and misalignment, yet rarely measured",
+   "A survey reveals gaps (excluded people, lost decisions, noise) before they cause failures",
+   "It closes the loop on communication changes — did they help?"
+  ],
+  "how": [
+   "Survey communication clarity, noise and inclusion on a light cadence",
+   "Act on the biggest pain points; feed them into the charter and rhythm",
+   "Re-survey to confirm changes worked"
+  ],
+  "who": [
+   "Owned by: Eng Lead / Agile Coach",
+   "Respondents: the team",
+   "Reviewed: quarterly"
+  ],
+  "scenario": "A communication survey reveals remote members consistently feel out of the loop on decisions made in the office. The signal — invisible before — drives a shift to writing decisions down in a shared channel. The next survey shows the inclusion gap has closed, and cross-office rework drops.",
+  "deck": "OPERATIONS"
+ },
+ "WIP Limit Definition": {
+  "cat": "WIP Limits",
+  "level": "F",
+  "code": "WL1",
+  "what": [
+   "Setting explicit limits on how many items the team works on at once, per workflow stage",
+   "Caps concurrent work to expose bottlenecks and force finishing",
+   "The foundational lever for improving flow"
+  ],
+  "why": [
+   "Too much work-in-progress destroys flow — everything is started, nothing finishes",
+   "Limits force the team to finish before starting, cutting context-switching",
+   "They make bottlenecks visible instead of hiding them in giant queues"
+  ],
+  "how": [
+   "Set an initial WIP limit per stage based on team size (start low)",
+   "Agree that hitting the limit means help finish, don't start new work",
+   "Tune the limits as you learn where flow actually stalls"
+  ],
+  "who": [
+   "Agreed by: the team",
+   "Facilitated by: Agile Coach",
+   "Owned by: the team"
+  ],
+  "scenario": "A team of six has 20 items 'in progress' and delivers almost nothing. Setting a WIP limit of 4 forces them to finish before starting. Within two sprints, throughput rises and lead time falls — the work was always there; too much of it started at once was the problem.",
+  "deck": "OPERATIONS"
+ },
+ "Board Enforcement": {
+  "cat": "WIP Limits",
+  "level": "F",
+  "code": "WL2",
+  "what": [
+   "Actually enforcing WIP limits on the board rather than treating them as suggestions",
+   "The board (or tool) blocks or flags starting work beyond the limit",
+   "Makes the limit real, not decorative"
+  ],
+  "why": [
+   "WIP limits ignored are worthless — enforcement is what changes behaviour",
+   "A visible block turns the limit into a team conversation about finishing",
+   "Consistent enforcement builds the finish-first habit"
+  ],
+  "how": [
+   "Configure the board/tool to flag or block over-limit columns",
+   "When the limit is hit, swarm to finish rather than override",
+   "Treat overrides as exceptions that get discussed, not the norm"
+  ],
+  "who": [
+   "Enforced by: the team",
+   "Facilitated by: Agile Coach",
+   "Owned by: Eng Lead"
+  ],
+  "scenario": "The team sets WIP limits but keeps starting new work anyway, so nothing changes. Once the board actually blocks a fifth in-progress item, the next time they hit the limit they swarm to finish two stuck cards instead. Enforcement — not the number — is what finally shifts the behaviour.",
+  "deck": "OPERATIONS"
+ },
+ "WIP Age Tracking": {
+  "cat": "WIP Limits",
+  "level": "D",
+  "code": "WL3",
+  "what": [
+   "Tracking how long each in-progress item has been active, to spot and clear aging work",
+   "Surfaces items that started but stalled — the silent flow killers",
+   "Focuses attention on finishing the oldest work first"
+  ],
+  "why": [
+   "Old in-progress items quietly rot, blocking flow and hiding risk",
+   "Age is a better health signal than count — an old item is usually a stuck one",
+   "Clearing aging work restores flow faster than starting anything new"
+  ],
+  "how": [
+   "Show each item's age on the board; highlight items past a threshold",
+   "Review the oldest items first in standup and unblock them",
+   "Track average and max WIP age as flow-health metrics"
+  ],
+  "who": [
+   "Owned by: the team",
+   "Facilitated by: Agile Coach",
+   "Reviewed in: standup"
+  ],
+  "scenario": "Standup always discusses the newest, loudest work while a card quietly ages 18 days in 'in progress'. WIP-age tracking flags it, standup pivots to unblocking it, and it ships that day. Making age visible changes the team's instinct from starting new work to finishing old work.",
+  "deck": "OPERATIONS"
+ },
+ "Stop Starting Retrospectives": {
+  "cat": "WIP Limits",
+  "level": "D",
+  "code": "WL4",
+  "what": [
+   "Retrospectives focused specifically on the team's habit of starting work instead of finishing it",
+   "Examines why WIP creeps up and what pulls people onto new items",
+   "Reinforces the 'stop starting, start finishing' mindset"
+  ],
+  "why": [
+   "The urge to start new work is cultural and needs deliberate reflection to change",
+   "Understanding why WIP creeps lets the team fix the cause, not just the symptom",
+   "It embeds flow thinking as a value, not just a board rule"
+  ],
+  "how": [
+   "Periodically retro specifically on starting vs finishing behaviour",
+   "Identify what pressures pull people onto new work prematurely",
+   "Agree concrete countermeasures and check them next time"
+  ],
+  "who": [
+   "Facilitated by: Agile Coach",
+   "Participants: the team",
+   "Actions owned by: the team"
+  ],
+  "scenario": "WIP keeps creeping back up despite limits. A 'stop starting' retro uncovers the cause: stakeholders keep injecting urgent asks mid-sprint. The team agrees a buffer policy for interruptions. Addressing the real pressure — not just the board — is what finally keeps WIP down for good.",
+  "deck": "OPERATIONS"
+ },
+ "WIP Limit Experiments": {
+  "cat": "WIP Limits",
+  "level": "A",
+  "code": "WL5",
+  "what": [
+   "Deliberately experimenting with different WIP limits to find the setting that optimises flow",
+   "Treats the limit as a variable to tune with data, not a fixed rule",
+   "Uses flow metrics to judge each experiment"
+  ],
+  "why": [
+   "The 'right' WIP limit is contextual and found by experiment, not decree",
+   "Tuning it can unlock significant flow improvements",
+   "Experimenting builds the team's empirical, data-driven muscle"
+  ],
+  "how": [
+   "Change the WIP limit by one and observe flow metrics over a few iterations",
+   "Compare lead time and throughput before and after",
+   "Keep the setting that flows best; keep experimenting as context shifts"
+  ],
+  "who": [
+   "Run by: the team",
+   "Coached by: Agile Coach",
+   "Judged with: flow metrics"
+  ],
+  "scenario": "The team assumes a WIP limit of 5 is right. An experiment dropping it to 3 for two sprints cuts lead time by a third with no loss of throughput. The data overturns the assumption — and the team keeps the tighter limit only because they tested it rather than argued about it.",
+  "deck": "OPERATIONS"
+ },
+ "Portfolio-Level WIP Limits": {
+  "cat": "WIP Limits",
+  "level": "A",
+  "code": "WL6",
+  "what": [
+   "Applying WIP limits above the team — capping how many initiatives are in flight across the portfolio",
+   "Stops the organisation from starting more than it can finish",
+   "Brings flow discipline to strategy, not just team boards"
+  ],
+  "why": [
+   "Organisations start far too many initiatives, spreading everyone thin and finishing little",
+   "Portfolio WIP limits force prioritisation and faster delivery of what matters",
+   "They cure the 'everything is a priority' disease at its source"
+  ],
+  "how": [
+   "Cap the number of concurrent initiatives the portfolio may have in flight",
+   "When at the cap, finish or explicitly stop something before starting new",
+   "Make in-flight initiatives and the limit visible to leadership"
+  ],
+  "who": [
+   "Owned by: leadership",
+   "Facilitated by: portfolio/Agile lead",
+   "Respected by: all teams"
+  ],
+  "scenario": "Twelve strategic initiatives are 'in progress' and none is landing, because every team is split across several. A portfolio WIP limit of four forces leadership to sequence them. The first four finish in a quarter — more than the twelve had delivered in a year of being simultaneously half-done.",
+  "deck": "OPERATIONS"
+ },
+ "Team Kanban Board": {
+  "cat": "Work Visualization",
+  "level": "F",
+  "code": "WV1",
+  "what": [
+   "A Kanban board that models the team's real workflow and shows every item's state",
+   "Columns reflect actual stages, not an idealised process",
+   "The operational heartbeat the team runs from"
+  ],
+  "why": [
+   "You can't improve flow you can't see; the board makes the whole workflow visible",
+   "Modelling the real process (not the wished-for one) exposes where work actually waits",
+   "It creates shared ownership of flow, not just individual tasks"
+  ],
+  "how": [
+   "Map your real stages as columns, including the waiting/queue states",
+   "Put every active item on the board and keep it current",
+   "Run standups and flow reviews from it"
+  ],
+  "who": [
+   "Owned by: the team",
+   "Facilitated by: Agile Coach",
+   "Read by: stakeholders"
+  ],
+  "scenario": "A team 'does Kanban' with three columns that hide two hidden approval queues. Redrawing the board to match reality — including the queues — instantly reveals that most lead time is spent waiting, not working. The honest board turns a vague sense of slowness into a specific, fixable bottleneck.",
+  "deck": "OPERATIONS"
+ },
+ "Blocker Swim Lane": {
+  "cat": "Work Visualization",
+  "level": "F",
+  "code": "WV2",
+  "what": [
+   "A dedicated lane or marker on the board that makes blocked work impossible to ignore",
+   "Blocked items are visually separated and their wait time tracked",
+   "Turns blockers into the team's top priority"
+  ],
+  "why": [
+   "Blocked work hidden among active work quietly kills flow and lead time",
+   "A visible blocker lane forces the team to unblock before doing anything else",
+   "Tracking blocker age exposes systemic sources of delay"
+  ],
+  "how": [
+   "Add a blocker lane or bold marker; move blocked items there immediately",
+   "Make unblocking the first agenda item in standup",
+   "Track how long and how often things block, and fix recurring causes"
+  ],
+  "who": [
+   "Owned by: the team",
+   "Facilitated by: Agile Coach",
+   "Escalated by: Eng Lead"
+  ],
+  "scenario": "Blocked cards used to sit unremarked in the 'in progress' column for days. A blocker swim lane makes them glaring, and standup starts with them. The average time a card stays blocked drops from days to hours — the blockers were always there, just invisible.",
+  "deck": "OPERATIONS"
+ },
+ "Cumulative Flow Diagrams": {
+  "cat": "Work Visualization",
+  "level": "D",
+  "code": "WV3",
+  "what": [
+   "A chart showing work in each stage over time, revealing bottlenecks, WIP growth and stability",
+   "Widening bands expose where work is piling up",
+   "A quantitative view of flow health over weeks"
+  ],
+  "why": [
+   "Snapshots hide trends; the CFD shows flow problems building before they hurt",
+   "Growing bands pinpoint the exact stage where work accumulates",
+   "It grounds flow conversations in data, not vibes"
+  ],
+  "how": [
+   "Generate a CFD from board history",
+   "Watch for widening bands (WIP growth) and diverging lines (bottlenecks)",
+   "Investigate the stage whose band is growing and relieve it"
+  ],
+  "who": [
+   "Generated by: tooling",
+   "Read by: the team",
+   "Reviewed by: Agile Coach"
+  ],
+  "scenario": "The team feels 'busy but slow' and can't say why. The CFD makes it obvious: the testing band widens week over week — work pours in faster than it clears. That single visual redirects effort to test capacity, and the band stabilises as flow recovers.",
+  "deck": "OPERATIONS"
+ },
+ "Board Health Reviews": {
+  "cat": "Work Visualization",
+  "level": "D",
+  "code": "WV4",
+  "what": [
+   "Regular reviews of the board itself — is it accurate, current, and reflecting reality?",
+   "Checks for stale cards, mismodelled stages and gaming",
+   "Keeps the board trustworthy so the team keeps using it"
+  ],
+  "why": [
+   "A board that drifts from reality gets ignored, and with it the whole flow system",
+   "Regular hygiene catches stale cards and wrong columns before trust erodes",
+   "A healthy board is the precondition for every other flow practice"
+  ],
+  "how": [
+   "Periodically review the board for stale items, accuracy and correct stages",
+   "Fix mismodelled columns and clear zombie cards",
+   "Confirm the board still matches how work really flows"
+  ],
+  "who": [
+   "Owned by: the team",
+   "Facilitated by: Agile Coach",
+   "Cadence: fortnightly"
+  ],
+  "scenario": "Over months the board quietly drifts — cards linger in wrong columns, a stage no longer matches reality. A board health review resets it, and people start trusting standup again. The board only works as a source of truth if someone keeps it true.",
+  "deck": "OPERATIONS"
+ },
+ "Radiator Design": {
+  "cat": "Work Visualization",
+  "level": "A",
+  "code": "WV5",
+  "what": [
+   "Designing information radiators — big, visible displays of key flow and health signals",
+   "Passive, glanceable displays that push information to the team and stakeholders",
+   "Thoughtfully designed for signal, not clutter"
+  ],
+  "why": [
+   "Information people have to go looking for is information they mostly ignore",
+   "Radiators push the vital signs into everyone's field of view continuously",
+   "Well-designed, they align the team without a single meeting"
+  ],
+  "how": [
+   "Choose the few signals worth constant visibility (flow, health, goals)",
+   "Display them big and glanceable where the team and stakeholders pass",
+   "Design for clarity — a cluttered radiator radiates nothing"
+  ],
+  "who": [
+   "Designed by: team + Agile Coach",
+   "Owned by: the team",
+   "Seen by: everyone"
+  ],
+  "scenario": "Status lived in tools nobody opened between meetings. A well-designed radiator on the team's main screen shows flow, blockers and the sprint goal at a glance. Stakeholders stop interrupting to ask for status — they just look — and the team stays oriented without another sync.",
+  "deck": "OPERATIONS"
+ },
+ "Automated Board Analytics": {
+  "cat": "Work Visualization",
+  "level": "A",
+  "code": "WV6",
+  "what": [
+   "Automated analytics on top of the board — flow metrics, forecasts and anomaly alerts generated for you",
+   "Cycle time, throughput and flow efficiency computed continuously from board data",
+   "Turns the board from a status tool into a predictive one"
+  ],
+  "why": [
+   "Manually computing flow metrics is slow and rarely done; automation makes them always-on",
+   "Continuous analytics surface flow problems and forecasts without effort",
+   "Data-driven forecasting beats gut-feel commitments to stakeholders"
+  ],
+  "how": [
+   "Connect analytics tooling to the board to compute flow metrics automatically",
+   "Surface cycle time, throughput and probabilistic forecasts",
+   "Alert on anomalies (aging WIP, throughput drops) automatically"
+  ],
+  "who": [
+   "Built by: platform / tooling",
+   "Used by: the team + Eng Lead",
+   "Reviewed: continuously"
+  ],
+  "scenario": "Asked 'when will this be done?', the team used to guess. Automated board analytics compute a probabilistic forecast from actual throughput, so they answer '85% chance by the 20th' with data. Commitments get more honest and more trusted — and aging-WIP alerts catch stalls before anyone has to notice manually.",
+  "deck": "OPERATIONS"
  }
 };
 const PM_LEVEL_LABEL = { F:'F · FOUNDATIONAL', D:'D · DEVELOPING', A:'A · ADVANCED' };
