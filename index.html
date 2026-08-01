@@ -1499,6 +1499,38 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .cl-prac-hex-name { font-size:8.5px; font-weight:600; color:var(--text); line-height:1.15; max-height:32px; overflow:hidden; }
 .cl-circle-add { width:94px; height:82px; }
 .cl-prac-detail { border:1.6px solid var(--dc); border-top-width:5px; border-radius:10px; background:var(--surface2); padding:12px 14px; margin-top:12px; }
+/* ══ Two-faced practice card (Codex) ══ */
+.pcard-modal { position:fixed; inset:0; z-index:500; display:flex; align-items:center; justify-content:center; padding:24px; background:rgba(2,7,14,.8); backdrop-filter:blur(4px); animation:gsFadeIn .18s ease-out; }
+.pcard-scene { position:relative; width:560px; max-width:96vw; height:min(84vh,780px); perspective:2200px; }
+.pcard-scene > .pcard-close { position:absolute; top:-14px; right:-14px; z-index:6; width:34px; height:34px; border-radius:50%; border:1px solid rgba(120,160,210,.6); background:#0a1626; color:#cfe0f5; cursor:pointer; font-size:14px; box-shadow:0 4px 14px rgba(0,0,0,.5); }
+.pcard-scene > .pcard-close:hover { color:#fff; border-color:#7FE3DD; }
+.pcard { position:relative; width:100%; height:100%; transform-style:preserve-3d; transition:transform .6s cubic-bezier(.4,.15,.2,1); }
+.pcard.flipped { transform:rotateY(180deg); }
+.pcard-face { position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; display:flex; flex-direction:column; border-radius:18px; padding:22px 24px 14px; overflow:hidden;
+  background:linear-gradient(160deg,#0b1a2e 0%,#0a1424 60%,#0c1220 100%); border:1.5px solid rgba(60,110,180,.5); box-shadow:0 26px 70px rgba(0,0,0,.6), inset 0 0 0 4px rgba(30,66,102,.35); color:#dfe9f5; }
+.pcard-front { box-shadow:0 26px 70px rgba(0,0,0,.6), inset 0 0 0 4px var(--lvl-c); }
+.pcard-back { transform:rotateY(180deg); }
+.pcard-hdr { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; flex-shrink:0; }
+.pcard-cat { font-size:10.5px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:#C9A24B; }
+.pcard-title { font-size:23px; font-weight:800; line-height:1.12; color:#fff; margin-top:8px; }
+.pcard-code { flex-shrink:0; width:46px; height:52px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; color:#0a1424; background:var(--lvl-c); clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%); }
+.pcard-level { align-self:flex-start; margin:14px 0 4px; font-size:10.5px; font-weight:800; letter-spacing:2px; color:var(--lvl-c); border:1.4px solid var(--lvl-c); border-radius:999px; padding:5px 14px; }
+.pcard-scroll { flex:1; overflow-y:auto; margin:8px -6px 6px; padding:0 6px; }
+.pcard-scroll::-webkit-scrollbar { width:6px; } .pcard-scroll::-webkit-scrollbar-thumb { background:rgba(120,160,210,.3); border-radius:3px; }
+.pcard-sec { font-size:12px; font-weight:800; letter-spacing:4px; margin:14px 0 7px; padding-bottom:5px; border-bottom:1px solid rgba(255,255,255,.09); }
+.pcard-sec:first-child { margin-top:2px; }
+.pcard-sec.what, .pcard-sec.how { color:#7FE3DD; }
+.pcard-sec.why, .pcard-sec.scenario { color:#E2A24B; }
+.pcard-sec.who { color:#6FB3E0; }
+.pcard-list { list-style:none; margin:0; padding:0; }
+.pcard-li { position:relative; padding:4px 0 4px 20px; font-size:13px; line-height:1.5; color:#cdd9e8; }
+.pcard-li::before { content:'◆'; position:absolute; left:0; top:4px; font-size:10px; }
+.pcard-li.what::before, .pcard-li.how::before, .pcard-li.who::before { color:#7FE3DD; }
+.pcard-li.why::before { color:#E2A24B; }
+.pcard-scenario { font-size:12.5px; font-style:italic; line-height:1.6; color:#b9c6d8; padding:2px 2px 6px; }
+.pcard-foot { flex-shrink:0; display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:8px; padding-top:10px; border-top:1px solid rgba(255,255,255,.08); font-size:9px; letter-spacing:1.5px; color:#7f93ab; }
+.pcard-flip { font-size:10px; font-weight:800; letter-spacing:.8px; color:#0a1424; background:var(--lvl-c); border:none; border-radius:999px; padding:7px 14px; cursor:pointer; }
+.pcard-flip:hover { filter:brightness(1.08); }
 /* type icons inside the deck hexes + chips */
 .deck-hexicon svg { width:58%; height:58%; color:#fff; }
 .deck-slot.capability .deck-hexicon svg { color:#050D18; }
@@ -3800,6 +3832,151 @@ const CAP_DOMAINS = [
   { name:'People, Culture & Governance',   color:'#2d9d5e' },
   { name:'Operations',                     color:'#e8943a' },
 ];
+
+// ── Practice cards (two-faced Codex cards) — keyed by practice name ──────────
+// Front face = WHAT + WHY; back face = HOW + WHO + SCENARIO. Practices without
+// an entry fall back to the simple inline detail. Test set: Incident Management.
+const PRACTICE_CARDS = {
+  'Incident Severity Classification': { code:'IM1', cat:'Incident Management', level:'F', deck:'OPERATIONS',
+    what:[
+      'A defined, shared taxonomy for classifying incident severity — P1 through P4 with explicit criteria for each level',
+      'P1: complete service unavailability affecting all users or critical data loss; P2: significant degradation affecting many users; P3: minor degradation affecting some users; P4: no customer impact but early warning signal',
+      'Classification made by the first responder immediately upon detection — determines the response protocol',
+      'Criteria include: customer impact scope, revenue impact, SLO budget consumption rate, and regulatory implications'],
+    why:[
+      'Incidents classified inconsistently create response inconsistency — a P2 treated as a P3 means hours before a senior engineer is engaged',
+      'Clear classification criteria enable the first responder (who may be junior) to make the right call — without needing to escalate the classification question itself',
+      'Classification drives communication: P1 triggers executive notification; P4 does not — incorrect classification leads to either alarm fatigue or insufficient executive awareness',
+      'Post-incident analysis requires consistent severity data: trend analysis across incident history is meaningless if severity classifications are subjective'],
+    how:[
+      'Define P1–P4 criteria in the incident runbook: objective, observable criteria (not judgment calls)',
+      'Train: all engineers walk through 5 historical incidents and classify them against the criteria — adjust criteria where classifications are inconsistent',
+      'First responder protocol: the first engineer who detects the incident classifies it within 5 minutes and initiates the appropriate response protocol',
+      'Severity can be upgraded (never downgraded) during an incident as more information arrives'],
+    who:[
+      'Criteria defined by: Engineering Lead + SRE lead',
+      'Training: all engineers + on-call rotation members',
+      'First responder: any on-call engineer (they classify and initiate)',
+      'Severity upgrade: Incident Commander during the incident'],
+    scenario:"Without classification criteria, a junior on-call engineer spends 40 minutes investigating a payment failure before escalating — by which time 2,000 customers have been affected. With the severity criteria: the same engineer sees 'payment service returning errors for all users' and immediately classifies it P1, pages the Incident Commander, and sends the standard P1 customer communication within 12 minutes of detection. Total additional customer impact from the classification delay: zero." },
+
+  'On-Call Rotation Design': { code:'IM2', cat:'Incident Management', level:'F', deck:'OPERATIONS',
+    what:[
+      'A structured, equitable on-call rotation that distributes the operational burden across the engineering team — nobody is permanently on-call',
+      'Rotation structure: primary on-call (first responder) and secondary on-call (escalation target) in each rotation slot',
+      'On-call schedule: weekly rotations; published 6 weeks in advance; swaps allowed and tracked',
+      'Rotation quality standards: no engineer on primary call for more than 1 week in every 4; off-hours alerts reviewed monthly (excessive off-hours alerting is a system problem, not a staffing problem)'],
+    why:[
+      'Permanent on-call responsibility on a small group is a burnout and retention risk — and concentrates operational knowledge dangerously',
+      'Distributed on-call builds resilience: more engineers know how to respond to production incidents, reducing key person risk',
+      'Rotation design that limits consecutive on-call weeks prevents the fatigue that leads to slow response and poor decisions',
+      'The monthly off-hours alert review is the key health indicator: if on-call is consistently waking people up, the alerts need tuning, not the rotation'],
+    how:[
+      'Design: use a rotation tool (PagerDuty, OpsGenie, or Rootly); configure primary + secondary for each week',
+      'Publish: 6-week advance schedule; everyone can see who is on call when',
+      'Swap protocol: direct swap between engineers of similar experience; manager informed but approval not required for like-for-like swaps',
+      'Monthly alert review: Agile Coach pulls off-hours alert data; any week with >2 wakeups triggers an alert quality review'],
+    who:[
+      'Rotation designed by: Engineering Lead + team',
+      'Maintained in: PagerDuty or OpsGenie',
+      'Monthly alert review: Engineering Lead + SRE lead',
+      'Swap approvals: peer agreement (manager informed)'],
+    scenario:"An on-call rotation design review reveals one senior engineer has been primary on-call for 6 of the last 8 weeks — because others kept requesting swaps with her (they trusted her to handle incidents). The Engineering Lead redesigns the rotation with strict 1-in-4 constraints and adds a required 'shadow on-call' programme for less experienced engineers. Within 3 months, 3 additional engineers are fully capable of independent P1 incident response. The single point of dependency is eliminated." },
+
+  'Incident Commander Role': { code:'IM3', cat:'Incident Management', level:'D', deck:'OPERATIONS',
+    what:[
+      'A defined Incident Commander (IC) role for all P1 and P2 incidents — a single person who owns incident coordination, decision-making, and communication while others focus on technical resolution',
+      'IC responsibilities: declare incident severity, coordinate responders, manage stakeholder communication, and make decisions when the technical team is conflicted',
+      'IC is explicitly not the person doing the technical work — they observe, coordinate, and communicate',
+      'IC rotation: all senior engineers train in the IC role; it rotates with the on-call rotation'],
+    why:[
+      'Without an Incident Commander, senior engineers both debug the problem and manage communication simultaneously — doing both badly',
+      'The IC pattern separates two fundamentally different cognitive tasks: technical problem-solving and communication/coordination',
+      'A well-run IC reduces MTTR by preventing the most common incident slow-downs: unclear ownership, missing communication, and uncoordinated parallel debugging',
+      "The IC role also builds incident management capability across the team — not just in a small group of 'incident heroes'"],
+    how:[
+      'Define: IC responsibilities in the incident runbook (1 page); IC does NOT debug — they coordinate',
+      'Training: tabletop exercise where senior engineers practice the IC role in a simulated incident',
+      'On-call rotation: IC is always the secondary on-call (the primary handles the technical investigation; IC coordinates)',
+      'Incident review: IC files the post-incident report — owning the narrative as well as the coordination'],
+    who:[
+      'IC role defined by: Engineering Lead + SRE Lead',
+      'Trained: all senior engineers (6+ months experience)',
+      'Active IC: secondary on-call engineer during P1/P2 incidents',
+      'Post-incident report: authored by IC; reviewed by Engineering Lead'],
+    scenario:'A P1 database incident involves 5 engineers: 2 on the database, 2 on the application side, 1 on infrastructure. Without an IC: all 5 are in the same Slack channel, talking over each other, with no clear ownership. Resolution time: 3.5 hours. With an Incident Commander: IC assigns specific investigation areas, runs a structured 10-minute check-in every 15 minutes, manages stakeholder communication, and calls the resolution decision. Same incident type, same engineers: 45-minute MTTR.' },
+
+  'Incident Communication Templates': { code:'IM4', cat:'Incident Management', level:'D', deck:'OPERATIONS',
+    what:[
+      'Pre-written, structured templates for all incident communication types: initial notification, status update (every 30 minutes during P1/P2), and resolution notification',
+      'Templates include: fill-in-the-blank fields (what is affected, current status, next update time, workaround if available) and fixed language that has been pre-approved by legal and communications teams',
+      'Stored in the incident runbook — accessible in under 30 seconds during an active incident',
+      'Tone guidance: honest, factual, no speculation about cause until confirmed, clear next-update commitment'],
+    why:[
+      'Writing effective communication from scratch during a production incident is cognitively expensive and produces inconsistent quality',
+      'Pre-written templates reduce cognitive load at the worst possible time — the on-call engineer can fill in 4 fields and send a professional update in 2 minutes',
+      'Templates ensure consistent, appropriate tone: no speculation, no blame, no over-promising — all common failure modes of improvised incident communication',
+      'Pre-approved language prevents the legal/comms review bottleneck that can delay external communication by hours in regulated industries'],
+    how:[
+      'Draft templates for: initial notification (internal), initial notification (external/customer-facing), 30-min status update (internal and external), resolution notification (internal and external)',
+      'Review with: legal, communications, and customer success teams — pre-approve the template language',
+      'Store in: the incident runbook (first page, immediately findable)',
+      'Practice: tabletop exercises include sending communications using the templates — builds the habit'],
+    who:[
+      'Templates authored by: Engineering Lead + Communications + Legal',
+      'Pre-approved by: Legal + Communications (once; templates are stable)',
+      'Used by: Incident Commander during every P1/P2 incident',
+      'Templates reviewed annually: are they still appropriate? Any language updates needed?'],
+    scenario:'A junior engineer is first on the P1 incident call while waiting for the IC. Without templates: she writes a customer notification that includes speculation about the root cause. The message creates more alarm than the incident itself. With communication templates: she fills in 3 fields in the template, sends a factual, professional customer communication in 90 seconds, and focuses on the technical investigation. The template removes both the cognitive burden and the risk of improvised communication under pressure.' },
+
+  'Mean Time to Detect Optimisation': { code:'IM5', cat:'Incident Management', level:'A', deck:'OPERATIONS',
+    what:[
+      'A focused programme to reduce the average time between when a problem begins and when the team first knows about it — MTTD',
+      'Current MTTD baseline: measured from production data (when did the issue start? when was the first alert?), expressed per incident severity level',
+      'Improvement levers: reducing alert evaluation latency, closing monitoring gaps, improving alert threshold calibration, and adding anomaly detection',
+      'Progress tracked monthly: MTTD trend by severity level; target the DORA Elite benchmark (under 1 hour for P1)'],
+    why:[
+      'MTTD is the silent multiplier of incident cost: every minute of undetected degradation affects more users and creates more recovery work',
+      'Most MTTD improvement opportunities are in monitoring gaps and alert configuration, not in engineer response speed — this is a systems problem, not a people problem',
+      'DORA research shows MTTD is a key differentiator between elite and low-performing organisations — elite teams detect problems in minutes, not hours',
+      'Systematic MTTD reduction compounds: each improvement prevents customer impact in every subsequent incident of the same type'],
+    how:[
+      'Baseline: calculate current MTTD from incident post-mortem data (last 6 months)',
+      'Gap analysis: for incidents with MTTD > 15 minutes, was there a monitoring gap? An alert threshold issue? A detection lag?',
+      'Improvement backlog: monitoring gaps and threshold issues identified in gap analysis; prioritised by frequency × impact',
+      'Monthly: recalculate MTTD; is the trend improving? Adjust the backlog priority based on most recent incident data'],
+    who:[
+      'Programme owned by: SRE Lead + Engineering Lead',
+      'Baseline and gap analysis: SRE Lead',
+      'Monitoring improvements: platform team + service-owning engineering teams',
+      'Monthly review: Engineering Lead + SRE Lead'],
+    scenario:'MTTD analysis shows P2 database incidents have an average MTTD of 47 minutes — meaning customers experience degraded performance for 47 minutes before the team knows about it. Gap analysis: replication lag is not monitored; 3 incidents were caused by undetected replication lag. Adding a replication lag alert with a 30-second threshold reduces P2 database MTTD to 4 minutes. The same 4-minute investment in alerting prevents 43 minutes of customer impact per incident — for every subsequent incident of this type.' },
+
+  'Game Day Exercises': { code:'IM6', cat:'Incident Management', level:'A', deck:'OPERATIONS',
+    what:[
+      'Quarterly, planned exercises where the team simulates major incident scenarios to practise and improve their incident response capabilities in a safe, controlled environment',
+      'Format: facilitator declares an incident scenario; team responds as if it is real (using actual runbooks, communication templates, and tools); debrief identifies gaps',
+      'Scenarios designed to be realistic and progressively more complex: Q1 simple service failure; Q2 database incident; Q3 multi-service cascade; Q4 undetected data corruption',
+      'Distinct from chaos engineering: game days test people and processes; chaos engineering tests systems'],
+    why:[
+      'Incident response skills atrophy between incidents — teams that practise regularly are significantly more effective when real incidents occur',
+      'Game days reveal gaps in runbooks, tooling, and team capability that would otherwise be discovered during real incidents — at the worst possible moment',
+      'They also build the psychological muscle for high-pressure decision-making: engineers who have practised being calm under a simulated P1 are calmer under a real one',
+      'Game days are the most effective investment in reducing MTTR — they improve the human side of incident response that monitoring and tooling cannot address'],
+    how:[
+      'Quarterly, 4 hours: 30-min preparation, 2.5-hour simulated incident response, 1-hour debrief',
+      'Facilitator (Agile Coach or SRE Lead): orchestrates the scenario; injects complications; does not help the team',
+      'Observers: 2–3 engineers watch for process gaps; note timing and communication breakdowns',
+      'Debrief: what went well? What was slow? What runbook gaps did we find? What will we change? — outputs added to improvement backlog'],
+    who:[
+      'Designed and facilitated by: SRE Lead + Agile Coach',
+      'Participants: all on-call engineers + Engineering Lead',
+      'Observers: senior engineers not in the primary response team',
+      'Debrief outputs: owned by Engineering Lead; implemented within 2 weeks'],
+    scenario:"A game day exercise simulates a P1 payment service failure. During the exercise, the team discovers: (1) the incident runbook references a monitoring dashboard that no longer exists; (2) the secondary on-call engineer does not know how to access the database console; (3) the customer communication template has a broken link. All three gaps are discovered in the safety of the game day. Fixed before the next real incident: the team's next actual P1 resolves in 28 minutes vs the 94-minute average before game days were introduced." },
+};
+const PM_LEVEL_LABEL = { F:'F · FOUNDATIONAL', D:'D · DEVELOPING', A:'A · ADVANCED' };
+const PM_LEVEL_COLOR = { F:'#4a90d9', D:'#2bb3a3', A:'#e0a92e' };
 let _capDrawerId = null;   // capability whose practice drawer is open
 let _capPracDetailId = null; // practice whose detail card is open (within drawer)
 function domainColor(d) {
@@ -3897,10 +4074,62 @@ function capCircleHtml(p, capId, color) {
   const lvl = String(p.level || '').slice(0,2).toUpperCase() || '•';
   const sel = _capPracDetailId === p.id;
   return `
-    <div class="cl-prac-hex ${sel ? 'sel' : ''}" style="--dc:${color}" onclick="showPracDetail('${p.id}','${capId}')" title="${escHtml(p.name)} — click for the practice card">
+    <div class="cl-prac-hex ${sel ? 'sel' : ''}" style="--dc:${color}" onclick="openPracticeCard('${p.id}','${capId}')" title="${escHtml(p.name)} — click to open its card">
       <div class="cl-prac-hex-inner"><div class="cl-prac-hex-lvl">${escHtml(lvl)}</div><div class="cl-prac-hex-name">${escHtml(p.name)}</div></div>
     </div>`;
 }
+
+// ── Two-faced practice card modal (Codex style; falls back to inline detail) ──
+function pmBullets(arr, cls) { return (arr||[]).map(t => `<li class="pcard-li ${cls}">${escHtml(t)}</li>`).join(''); }
+function openPracticeCard(pracId, capId) {
+  const cap = capabilitiesLibrary.find(c => c.id === capId);
+  const p = cap && cap.practices.find(x => x.id === pracId);
+  if (!p) return;
+  const card = PRACTICE_CARDS[p.name];
+  if (!card) { showPracDetail(pracId, capId); return; }   // no rich card → simple detail
+  closePracticeCard();
+  const lc = PM_LEVEL_COLOR[card.level] || '#4a90d9';
+  const div = document.createElement('div');
+  div.id = 'pcardModal'; div.className = 'pcard-modal';
+  div.innerHTML = `
+    <div class="pcard-scene">
+      <button class="pcard-close" onclick="closePracticeCard()" title="Close">✕</button>
+      <div class="pcard" id="pcardFlipper" style="--lvl-c:${lc}">
+        <div class="pcard-face pcard-front">
+          <div class="pcard-hdr">
+            <div><div class="pcard-cat">${escHtml(card.cat)}</div>
+              <div class="pcard-title">${escHtml(p.name)}</div></div>
+            <div class="pcard-code">${escHtml(card.code)}</div>
+          </div>
+          <div class="pcard-level">${PM_LEVEL_LABEL[card.level] || escHtml(card.level)}</div>
+          <div class="pcard-scroll">
+            <div class="pcard-sec what">WHAT</div><ul class="pcard-list">${pmBullets(card.what,'what')}</ul>
+            <div class="pcard-sec why">WHY</div><ul class="pcard-list">${pmBullets(card.why,'why')}</ul>
+          </div>
+          <div class="pcard-foot"><span>NEXUS CODEX · ${escHtml(card.deck||'')}</span>
+            <button class="pcard-flip" onclick="flipPracticeCard()">HOW / WHO / SCENARIO ⟳</button></div>
+        </div>
+        <div class="pcard-face pcard-back">
+          <div class="pcard-hdr">
+            <div><div class="pcard-cat">${escHtml(card.code)} · ${escHtml(card.cat)}</div>
+              <div class="pcard-title">${escHtml(p.name)}</div></div>
+          </div>
+          <div class="pcard-scroll">
+            <div class="pcard-sec how">HOW</div><ul class="pcard-list">${pmBullets(card.how,'how')}</ul>
+            <div class="pcard-sec who">WHO</div><ul class="pcard-list">${pmBullets(card.who,'who')}</ul>
+            <div class="pcard-sec scenario">SCENARIO</div>
+            <div class="pcard-scenario">${escHtml(card.scenario||'')}</div>
+          </div>
+          <div class="pcard-foot"><span>NEXUS CODEX · ${escHtml(card.deck||'')}</span>
+            <button class="pcard-flip" onclick="flipPracticeCard()">⟲ WHAT / WHY</button></div>
+        </div>
+      </div>
+    </div>`;
+  div.addEventListener('click', e => { if (e.target === div) closePracticeCard(); });
+  document.body.appendChild(div);
+}
+function flipPracticeCard() { const f = document.getElementById('pcardFlipper'); if (f) f.classList.toggle('flipped'); }
+function closePracticeCard() { const m = document.getElementById('pcardModal'); if (m) m.remove(); }
 
 function pracDetailHtml(pracId, capId) {
   const cap = capabilitiesLibrary.find(c => c.id === capId);

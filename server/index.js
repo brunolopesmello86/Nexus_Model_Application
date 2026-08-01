@@ -1157,11 +1157,28 @@ const AI_CAPABILITIES = [
   },
 ];
 
-async function ensureAICapabilities() {
+// ── Operations Codex — test capability (Incident Management, IM1–IM6) ──────
+// Practice card content (WHAT/WHY/HOW/WHO/SCENARIO) lives client-side in
+// index.html (PRACTICE_CARDS); the DB only needs name/level/description.
+const OPS_TEST_CAPABILITIES = [
+  { name: 'Incident Management', domain: 'Operations', source: 'Nexus Codex · Operations',
+    description: 'How the organization detects, responds to, coordinates and learns from production incidents.',
+    practices: [
+      { name: 'Incident Severity Classification', level: 'F', description: 'A shared P1–P4 taxonomy with explicit criteria so the first responder classifies consistently.' },
+      { name: 'On-Call Rotation Design', level: 'F', description: 'A structured, equitable on-call rotation that distributes the operational burden across the team.' },
+      { name: 'Incident Commander Role', level: 'D', description: 'A single owner of coordination, decisions and communication for P1/P2 incidents.' },
+      { name: 'Incident Communication Templates', level: 'D', description: 'Pre-written, pre-approved templates for every incident communication type.' },
+      { name: 'Mean Time to Detect Optimisation', level: 'A', description: 'A focused programme to shrink the time between a problem starting and the team knowing.' },
+      { name: 'Game Day Exercises', level: 'A', description: 'Quarterly simulated incidents that build and stress-test response capability safely.' },
+    ]
+  },
+];
+
+async function ensureCapabilities(list, label) {
   try {
     const { rows: existing } = await db.query('SELECT name FROM capabilities');
     const have = new Set(existing.map(r => r.name));
-    const toAdd = AI_CAPABILITIES.filter(c => !have.has(c.name));
+    const toAdd = list.filter(c => !have.has(c.name));
     if (!toAdd.length) return;
     const { rows: mx } = await db.query('SELECT COALESCE(MAX(sort_order),0) AS m FROM capabilities');
     let order = parseInt(mx[0].m) || 0;
@@ -1183,12 +1200,14 @@ async function ensureAICapabilities() {
       );
     }
     await db.query('COMMIT');
-    console.log(`AI capabilities ensured: +${toAdd.length} added`);
+    console.log(`${label} ensured: +${toAdd.length} added`);
   } catch (err) {
     await db.query('ROLLBACK').catch(() => {});
-    console.error('AI capabilities seed error:', err.message);
+    console.error(`${label} seed error:`, err.message);
   }
 }
+async function ensureAICapabilities() { return ensureCapabilities(AI_CAPABILITIES, 'AI capabilities'); }
+async function ensureOpsCapabilities() { return ensureCapabilities(OPS_TEST_CAPABILITIES, 'Ops capabilities'); }
 
 // Manually trigger the AI capabilities insert (idempotent, non-destructive)
 app.post('/api/admin/seed-ai', async (req, res) => {
@@ -1197,6 +1216,18 @@ app.post('/api/admin/seed-ai', async (req, res) => {
     const { rows } = await db.query(
       `SELECT COUNT(*)::int AS n FROM capabilities WHERE domain = 'Artificial Intelligence'`);
     res.json({ ok: true, aiCapabilities: rows[0].n });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Manually trigger the Ops test capabilities insert (idempotent, non-destructive)
+app.post('/api/admin/seed-ops', async (req, res) => {
+  try {
+    await ensureOpsCapabilities();
+    const { rows } = await db.query(
+      `SELECT c.name, COUNT(p.*)::int AS practices FROM capabilities c
+         LEFT JOIN practices p ON p.capability_id = c.id
+        WHERE c.name = 'Incident Management' GROUP BY c.name`);
+    res.json({ ok: true, capability: rows[0] || null });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -1307,7 +1338,7 @@ app.delete('/api/practices/:id', async (req, res) => {
 
 // ── Start (local dev) or export for Vercel ──
 if (process.env.VERCEL) {
-  seedCapabilitiesIfEmpty().then(remapCapabilityDomains).then(ensureAICapabilities);
+  seedCapabilitiesIfEmpty().then(remapCapabilityDomains).then(ensureAICapabilities).then(ensureOpsCapabilities);
   module.exports = app;
 } else {
   const PORT = process.env.PORT || 3000;
@@ -1316,5 +1347,6 @@ if (process.env.VERCEL) {
     await seedCapabilitiesIfEmpty();
     await remapCapabilityDomains();
     await ensureAICapabilities();
+    await ensureOpsCapabilities();
   });
 }
