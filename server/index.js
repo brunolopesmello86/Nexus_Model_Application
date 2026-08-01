@@ -1966,6 +1966,542 @@ const TA_CAPABILITIES = [
   }
 ];
 
+// ── Product & Delivery Codex — full deck (14 capabilities, 84 cards) ──
+const PD_CAPABILITIES = [
+  {
+    "name": "Flow Optimization",
+    "domain": "Product & Delivery",
+    "source": "Nexus Codex · Product & Delivery",
+    "description": "Flow Optimization — product & delivery practices.",
+    "practices": [
+      {
+        "name": "Flow Visualisation Board",
+        "level": "F",
+        "description": "A visual board (physical or digital) showing all work items in the team's system and their current state"
+      },
+      {
+        "name": "WIP Limits per Stage",
+        "level": "F",
+        "description": "Explicit limits on how many work items can be in each workflow stage simultaneously"
+      },
+      {
+        "name": "Bottleneck Identification",
+        "level": "D",
+        "description": "A systematic practice of identifying the slowest or most constrained stage in the team's workflow — the stage that limits the throughput of the…"
+      },
+      {
+        "name": "Flow Metrics Dashboard",
+        "level": "D",
+        "description": "A real-time digital dashboard displaying the team's key flow metrics: lead time, cycle time, throughput, WIP levels, and flow efficiency"
+      },
+      {
+        "name": "Waste Elimination Sprints",
+        "level": "A",
+        "description": "Dedicated sprint cycles (or partial sprints) where the team focuses entirely on identifying and eliminating waste in their delivery process — not on…"
+      },
+      {
+        "name": "Automated Flow Analytics",
+        "level": "A",
+        "description": "A fully automated flow analytics system that continuously monitors the delivery process — identifying bottlenecks, predicting delivery dates, and…"
+      }
+    ]
+  },
+  {
+    "name": "Feedback Loops",
+    "domain": "Product & Delivery",
+    "source": "Nexus Codex · Product & Delivery",
+    "description": "Feedback Loops — product & delivery practices.",
+    "practices": [
+      {
+        "name": "Production Monitoring Alerts",
+        "level": "F",
+        "description": "A set of automated alerts that notify the team immediately when production systems behave outside defined parameters — before customers report the…"
+      },
+      {
+        "name": "Weekly Usability Testing",
+        "level": "F",
+        "description": "A structured practice of conducting at least one usability test per week with a real user — not a quarterly research project, a continuous rhythm"
+      },
+      {
+        "name": "Feature Flag Rollouts",
+        "level": "D",
+        "description": "A deployment practice where new features are deployed to production behind a feature flag — initially invisible to users, then progressively exposed…"
+      },
+      {
+        "name": "Build–Measure–Learn Cycle",
+        "level": "D",
+        "description": "A structured iteration loop where every feature or experiment follows the same 3-phase cycle: Build (the minimum version), Measure (against…"
+      },
+      {
+        "name": "Internal Alpha Programme",
+        "level": "A",
+        "description": "A structured programme where new features are first deployed to internal employees — not external customers — to identify critical issues before…"
+      },
+      {
+        "name": "Automated Anomaly Detection",
+        "level": "A",
+        "description": "Machine learning or statistical models embedded in the monitoring stack that automatically identify unusual patterns in system behaviour — without…"
+      }
+    ]
+  },
+  {
+    "name": "Cycle Time Management",
+    "domain": "Product & Delivery",
+    "source": "Nexus Codex · Product & Delivery",
+    "description": "Cycle Time Management — product & delivery practices.",
+    "practices": [
+      {
+        "name": "Cycle Time Baseline",
+        "level": "F",
+        "description": "An initial measurement of how long work items take from 'started' to 'done' — establishing the baseline before any improvement effort begins"
+      },
+      {
+        "name": "Cycle Time Targets",
+        "level": "F",
+        "description": "Explicit, team-agreed targets for cycle time by work item type — specific enough to be actionable, ambitious enough to require improvement"
+      },
+      {
+        "name": "Cumulative Flow Diagrams",
+        "level": "D",
+        "description": "A chart displaying the count of work items in each workflow stage over time — showing flow, WIP levels, and lead time visually in a single view"
+      },
+      {
+        "name": "Handoff Reduction",
+        "level": "D",
+        "description": "A systematic effort to identify and eliminate unnecessary handoffs in the delivery process — stages where work moves from one person, team, or system…"
+      },
+      {
+        "name": "Cycle Time Retrospectives",
+        "level": "A",
+        "description": "A structured retrospective format focused specifically on cycle time performance — analysing the previous sprint's cycle time distribution and…"
+      },
+      {
+        "name": "Per-Story Cycle Time SLAs",
+        "level": "A",
+        "description": "Explicit service level agreements attached to specific story types or categories — customers or stakeholders know the maximum time a specific type of…"
+      }
+    ]
+  },
+  {
+    "name": "Team Topology",
+    "domain": "Product & Delivery",
+    "source": "Nexus Codex · Product & Delivery",
+    "description": "Team Topology — product & delivery practices.",
+    "practices": [
+      {
+        "name": "Team Type Classification",
+        "level": "F",
+        "description": "Explicitly classifying each team against the four Team Topologies types: Stream-Aligned, Platform, Enabling, or Complicated-Subsystem"
+      },
+      {
+        "name": "Cognitive Load Assessment",
+        "level": "F",
+        "description": "A structured assessment of the cognitive load each team carries — the total complexity of the systems, domains, and interactions they are responsible…"
+      },
+      {
+        "name": "Interaction Mode Definition",
+        "level": "D",
+        "description": "For each pair of teams that interact, an explicit definition of the interaction mode: Collaboration (working closely together for a defined period),…"
+      },
+      {
+        "name": "Conway's Law Audit",
+        "level": "D",
+        "description": "A structured audit examining whether the organisation's team structure mirrors (and therefore constrains) its software architecture — Conway's Law:…"
+      },
+      {
+        "name": "Team Topology Roadmap",
+        "level": "A",
+        "description": "A planned, phased evolution of the organisation's team topology over 12–18 months — specifying the target topology, the transition states, and the…"
+      },
+      {
+        "name": "Thinnest Viable Platform",
+        "level": "A",
+        "description": "A design principle for platform teams: build and maintain only the platform capabilities that stream-aligned teams actually need and cannot easily…"
+      }
+    ]
+  },
+  {
+    "name": "Experimentation",
+    "domain": "Product & Delivery",
+    "source": "Nexus Codex · Product & Delivery",
+    "description": "Experimentation — product & delivery practices.",
+    "practices": [
+      {
+        "name": "Experiment Hypothesis Template",
+        "level": "F",
+        "description": "A structured one-page template for defining any experiment before it is built — containing: hypothesis statement, key assumption, build specification…"
+      },
+      {
+        "name": "Safe-to-Fail Sandbox",
+        "level": "F",
+        "description": "A designated environment (technical, organisational, and cultural) where experiments can be tried without the risk of production impact, political…"
+      },
+      {
+        "name": "Experiment Velocity Tracking",
+        "level": "D",
+        "description": "A metric tracking how many experiments the team runs per sprint/month — measuring the organisation's rate of validated learning, not just its rate of…"
+      },
+      {
+        "name": "Experiment Retrospectives",
+        "level": "D",
+        "description": "A structured retrospective format dedicated to reviewing the quality and outcomes of experiments run in the previous quarter — distinct from sprint…"
+      },
+      {
+        "name": "A/B Testing Infrastructure",
+        "level": "A",
+        "description": "A fully automated, self-service system enabling any team member to create and run A/B tests in production without requiring engineering intervention…"
+      },
+      {
+        "name": "Celebrating Failed Experiments",
+        "level": "A",
+        "description": "A deliberate, recurring practice of publicly recognising and celebrating experiments that refuted their hypothesis — treating a 'no' answer as equal…"
+      }
+    ]
+  },
+  {
+    "name": "Continuous Delivery",
+    "domain": "Product & Delivery",
+    "source": "Nexus Codex · Product & Delivery",
+    "description": "Continuous Delivery — product & delivery practices.",
+    "practices": [
+      {
+        "name": "Deployment Pipeline Baseline",
+        "level": "F",
+        "description": "An initial measurement of the current deployment pipeline: how long it takes, how often it is run, what stages exist, its reliability (pass rate),…"
+      },
+      {
+        "name": "Sprint-Cadence Releases",
+        "level": "F",
+        "description": "The practice of releasing to production at the end of every sprint — creating a predictable release cadence aligned to the delivery rhythm"
+      },
+      {
+        "name": "Blue/Green Deployments",
+        "level": "D",
+        "description": "A deployment pattern maintaining two identical production environments (Blue and Green) — only one serves live traffic at any time"
+      },
+      {
+        "name": "Deployment Frequency Metric",
+        "level": "D",
+        "description": "A tracked metric measuring how often the team deploys to production — expressed as deploys per day, week, or month"
+      },
+      {
+        "name": "Change Failure Rate Reduction",
+        "level": "A",
+        "description": "A focused improvement programme targeting the percentage of deployments that cause a degradation in service requiring a hotfix, rollback, or forward…"
+      },
+      {
+        "name": "Chaos Engineering Practice",
+        "level": "A",
+        "description": "The disciplined practice of intentionally introducing controlled failures into the production system to identify weaknesses before they cause…"
+      }
+    ]
+  },
+  {
+    "name": "Quality Practices",
+    "domain": "Product & Delivery",
+    "source": "Nexus Codex · Product & Delivery",
+    "description": "Quality Practices — product & delivery practices.",
+    "practices": [
+      {
+        "name": "Test Pyramid Implementation",
+        "level": "F",
+        "description": "A testing strategy structuring tests in three layers: many fast unit tests at the base, fewer integration tests in the middle, and few slow…"
+      },
+      {
+        "name": "Definition of Done with Quality",
+        "level": "F",
+        "description": "An explicit team agreement specifying what 'done' means for a story — including specific quality criteria that must be met before the story can be…"
+      },
+      {
+        "name": "Code Review Standards",
+        "level": "D",
+        "description": "A published, team-agreed set of standards for what a code review should examine and how it should be conducted"
+      },
+      {
+        "name": "Defect Escape Rate Tracking",
+        "level": "D",
+        "description": "A metric measuring the percentage of defects discovered in production vs total defects discovered (production + testing)"
+      },
+      {
+        "name": "Pair and Mob Programming",
+        "level": "A",
+        "description": "Pair programming: two developers work on the same code at the same time — one 'driver' types, one 'navigator' reviews and guides; roles rotate…"
+      },
+      {
+        "name": "Quality Engineering Culture",
+        "level": "A",
+        "description": "A team-wide culture where quality is everyone's responsibility — not the sole domain of QA engineers or code reviewers"
+      }
+    ]
+  },
+  {
+    "name": "Roadmap Management",
+    "domain": "Product & Delivery",
+    "source": "Nexus Codex · Product & Delivery",
+    "description": "Roadmap Management — product & delivery practices.",
+    "practices": [
+      {
+        "name": "Now/Next/Later Format",
+        "level": "F",
+        "description": "A simple three-column roadmap format: Now (current sprint or quarter — committed), Next (following sprint or quarter — directional), Later (beyond…"
+      },
+      {
+        "name": "Monthly Roadmap Reviews",
+        "level": "F",
+        "description": "A structured monthly session where the Product Owner reviews the roadmap with all key stakeholders — not to report progress, but to update direction…"
+      },
+      {
+        "name": "Assumption Mapping",
+        "level": "D",
+        "description": "A facilitated workshop technique for surfacing and prioritising the assumptions underlying a product, feature, or initiative — distinguishing between…"
+      },
+      {
+        "name": "Dependency Visibility",
+        "level": "D",
+        "description": "A practice of making all cross-team and cross-system dependencies visible in the roadmap and sprint planning tools — not just internal work items"
+      },
+      {
+        "name": "Roadmap Retrospectives",
+        "level": "A",
+        "description": "A quarterly retrospective examining the quality of the team's roadmap — not sprint execution, but the quality of the roadmap itself as a planning and…"
+      },
+      {
+        "name": "Outcome-Based Roadmap",
+        "level": "A",
+        "description": "A roadmap structured around outcomes the product team is trying to achieve — not around features they plan to ship"
+      }
+    ]
+  },
+  {
+    "name": "Version Control",
+    "domain": "Product & Delivery",
+    "source": "Nexus Codex · Product & Delivery",
+    "description": "Version Control — product & delivery practices.",
+    "practices": [
+      {
+        "name": "Everything-in-VCS Policy",
+        "level": "F",
+        "description": "An explicit policy that ALL production-relevant artefacts must be version controlled: application code, infrastructure definitions, configuration…"
+      },
+      {
+        "name": "Branch Protection Rules",
+        "level": "F",
+        "description": "Automated rules enforced by the version control system that prevent direct commits to protected branches (main, production) without passing defined…"
+      },
+      {
+        "name": "Config Separation from Code",
+        "level": "D",
+        "description": "A design and deployment principle where all configuration that varies between environments (database connection strings, API endpoints, feature…"
+      },
+      {
+        "name": "Infrastructure as Code",
+        "level": "D",
+        "description": "The practice of managing and provisioning infrastructure through machine-readable definition files in version control — not through manual…"
+      },
+      {
+        "name": "Trunk-Based Development",
+        "level": "A",
+        "description": "A version control practice where all engineers commit directly to the main branch (trunk) — or use very short-lived branches (less than 1 day) that…"
+      },
+      {
+        "name": "Continuous Integration Cadence",
+        "level": "A",
+        "description": "A team norm where all engineers integrate their code into the main branch at least once per day — enabling the team to detect integration conflicts…"
+      }
+    ]
+  },
+  {
+    "name": "Continuous Integration",
+    "domain": "Product & Delivery",
+    "source": "Nexus Codex · Product & Delivery",
+    "description": "Continuous Integration — product & delivery practices.",
+    "practices": [
+      {
+        "name": "CI Pipeline Standards",
+        "level": "F",
+        "description": "Defined standards for how all CI pipelines are structured, what quality gates they include, and what 'passing' means for a pipeline run"
+      },
+      {
+        "name": "Build Failure Response Protocol",
+        "level": "F",
+        "description": "A defined team norm specifying how quickly and how a broken CI build must be addressed — making build health a shared team responsibility"
+      },
+      {
+        "name": "Test Parallelisation",
+        "level": "D",
+        "description": "A technique for running test suites faster by splitting them across multiple parallel execution workers — reducing total feedback time without…"
+      },
+      {
+        "name": "Pipeline as Code",
+        "level": "D",
+        "description": "CI/CD pipeline configuration stored in version control as code — not configured through web UIs that have no audit trail"
+      },
+      {
+        "name": "Flaky Test Management",
+        "level": "A",
+        "description": "A systematic programme to identify, track, quarantine, and eliminate tests that fail intermittently without code changes — 'flaky tests'"
+      },
+      {
+        "name": "Pipeline Performance OKRs",
+        "level": "A",
+        "description": "Explicit quarterly OKRs set for CI/CD pipeline performance — elevating pipeline health to the same strategic importance as product feature delivery"
+      }
+    ]
+  },
+  {
+    "name": "Test Automation",
+    "domain": "Product & Delivery",
+    "source": "Nexus Codex · Product & Delivery",
+    "description": "Test Automation — product & delivery practices.",
+    "practices": [
+      {
+        "name": "Automated Test Coverage Baseline",
+        "level": "F",
+        "description": "An initial measurement of the current state of automated test coverage across the codebase — establishing the baseline before any investment in…"
+      },
+      {
+        "name": "Test-First Development Norm",
+        "level": "F",
+        "description": "A team norm where automated tests are written before or alongside production code — not as a retrospective afterthought"
+      },
+      {
+        "name": "Contract Testing",
+        "level": "D",
+        "description": "Automated tests that verify service interface contracts are honoured by both the providing and consuming sides — without requiring both services to…"
+      },
+      {
+        "name": "End-to-End Test Strategy",
+        "level": "D",
+        "description": "A defined strategy for how end-to-end tests are scoped, written, maintained, and managed — preventing the E2E test sprawl that slows pipelines and…"
+      },
+      {
+        "name": "Test Impact Analysis",
+        "level": "A",
+        "description": "A technique that identifies which tests are affected by a specific code change — and runs only those tests, rather than the full suite, for fast…"
+      },
+      {
+        "name": "Testing Knowledge Sharing",
+        "level": "A",
+        "description": "A structured programme for spreading testing skills and knowledge across the engineering team — treating testing as a professional discipline that…"
+      }
+    ]
+  },
+  {
+    "name": "Deployment Patterns",
+    "domain": "Product & Delivery",
+    "source": "Nexus Codex · Product & Delivery",
+    "description": "Techniques for releasing change safely and frequently — blue-green, canary, feature flags.",
+    "practices": [
+      {
+        "name": "Deployment Runbook",
+        "level": "F",
+        "description": "A documented, step-by-step procedure for every production deployment type — covering: pre-deployment checklist, deployment steps, post-deployment…"
+      },
+      {
+        "name": "Canary Deployment Pattern",
+        "level": "F",
+        "description": "A deployment practice that routes a small percentage of production traffic (1–5%) to the new version before rolling it out to all users"
+      },
+      {
+        "name": "Deployment Frequency Optimisation",
+        "level": "D",
+        "description": "A structured programme to remove blockers to increasing deployment frequency — identifying and eliminating the processes, gates, and cultural factors…"
+      },
+      {
+        "name": "Environment Parity",
+        "level": "D",
+        "description": "The engineering discipline of maintaining staging and development environments that are as close to production as possible — same infrastructure,…"
+      },
+      {
+        "name": "Progressive Delivery Framework",
+        "level": "A",
+        "description": "A comprehensive framework combining multiple deployment risk-reduction techniques: feature flags, canary deployments, A/B testing, and dark launches…"
+      },
+      {
+        "name": "Deployment Analytics",
+        "level": "A",
+        "description": "A comprehensive analytics system that collects, aggregates, and surfaces insights from every deployment — enabling data-driven decisions about…"
+      }
+    ]
+  },
+  {
+    "name": "Loosely Coupled Architecture",
+    "domain": "Product & Delivery",
+    "source": "Nexus Codex · Product & Delivery",
+    "description": "Designing components that change independently to enable autonomous, fast delivery.",
+    "practices": [
+      {
+        "name": "Service Interface Contracts",
+        "level": "F",
+        "description": "Explicit, versioned API contracts defining the interface between services — specifying inputs, outputs, error formats, and versioning semantics"
+      },
+      {
+        "name": "Dependency Analysis Baseline",
+        "level": "F",
+        "description": "An initial analysis of the current inter-service and inter-module dependency structure — establishing what is tightly coupled before designing any…"
+      },
+      {
+        "name": "Event-Driven Decoupling",
+        "level": "D",
+        "description": "An architectural pattern where services communicate through events (messages) on a shared event bus rather than through synchronous direct API calls"
+      },
+      {
+        "name": "Architecture Fitness Functions",
+        "level": "D",
+        "description": "Automated tests that continuously verify the system's compliance with architectural principles and non-functional requirements"
+      },
+      {
+        "name": "Domain-Driven Design Application",
+        "level": "A",
+        "description": "The practice of modelling software systems around the business domain — using a shared language (Ubiquitous Language) between technical and…"
+      },
+      {
+        "name": "Evolutionary Architecture Practice",
+        "level": "A",
+        "description": "A disciplined approach to making architectural changes incrementally and continuously — rather than in periodic big-bang redesign efforts"
+      }
+    ]
+  },
+  {
+    "name": "Monitoring & Observability",
+    "domain": "Product & Delivery",
+    "source": "Nexus Codex · Product & Delivery",
+    "description": "Seeing system and delivery health in production to act before customers feel it.",
+    "practices": [
+      {
+        "name": "Structured Logging Standard",
+        "level": "F",
+        "description": "A team-wide standard for how all application logs are formatted — using structured (JSON) format with mandatory fields: timestamp, service name, log…"
+      },
+      {
+        "name": "Metric Instrumentation Standards",
+        "level": "F",
+        "description": "A standard for how all services instrument and expose metrics — using a consistent format (Prometheus metrics), naming convention, and mandatory…"
+      },
+      {
+        "name": "Distributed Tracing Implementation",
+        "level": "D",
+        "description": "End-to-end tracing of requests as they flow through multiple services — using a distributed tracing system (Jaeger, Zipkin, AWS X-Ray, Datadog APM)"
+      },
+      {
+        "name": "SLO Dashboard",
+        "level": "D",
+        "description": "A real-time dashboard displaying Service Level Objectives (SLOs) and Error Budgets for all production services — the primary operational health view…"
+      },
+      {
+        "name": "Observability-Driven Development",
+        "level": "A",
+        "description": "A development practice where instrumentation is added before or alongside feature code — not as an afterthought after deployment"
+      },
+      {
+        "name": "Runbook Automation",
+        "level": "A",
+        "description": "The progressive automation of operational runbooks — converting manual, step-by-step response procedures into automated scripts or workflows that…"
+      }
+    ]
+  }
+];
+
 async function ensureCapabilities(list, label) {
   try {
     const { rows: existing } = await db.query('SELECT name FROM capabilities');
@@ -2001,6 +2537,40 @@ async function ensureCapabilities(list, label) {
 async function ensureAICapabilities() { return ensureCapabilities(AI_CAPABILITIES, 'AI capabilities'); }
 async function ensureOpsCapabilities() { return ensureCapabilities(OPS_CAPABILITIES, 'Ops capabilities'); }
 async function ensureTACapabilities() { return ensureCapabilities(TA_CAPABILITIES, 'TA capabilities'); }
+// Product & Delivery: the deck mostly matches existing seeded capabilities
+// (spelling aside). Match capabilities by normalized name so we don't
+// duplicate them, create only genuinely-new ones, and add only practices that
+// don't already exist anywhere in the domain. Non-destructive (no deletes).
+function normCapName(x){ return String(x||'').toLowerCase().replace(/optimization/g,'optimisation').replace(/management/g,'mgmt').replace(/[^a-z0-9]/g,''); }
+async function ensurePDCapabilities(){
+  try{
+    const ex = await db.query("SELECT id,name FROM capabilities WHERE domain='Product & Delivery'");
+    const byNorm={}; ex.rows.forEach(r=>{ byNorm[normCapName(r.name)]=r.id; });
+    const dp = await db.query("SELECT name FROM practices p JOIN capabilities c ON c.id=p.capability_id WHERE c.domain='Product & Delivery'");
+    const domainHave=new Set(dp.rows.map(r=>r.name));
+    let added=0, newcaps=0;
+    for(const cap of PD_CAPABILITIES){
+      let capId = byNorm[normCapName(cap.name)];
+      if(!capId){
+        const mx = await db.query('SELECT COALESCE(MAX(sort_order),0) AS m FROM capabilities');
+        const cr = await db.query('INSERT INTO capabilities (name,description,domain,source,sort_order) VALUES ($1,$2,$3,$4,$5) RETURNING id',
+          [cap.name, cap.description, 'Product & Delivery', cap.source, (parseInt(mx.rows[0].m)||0)+1]);
+        capId = cr.rows[0].id; byNorm[normCapName(cap.name)]=capId; newcaps++;
+      }
+      const toAdd = cap.practices.filter(p=>!domainHave.has(p.name));
+      if(toAdd.length){
+        const om = await db.query('SELECT COALESCE(MAX(sort_order),0) AS m FROM practices WHERE capability_id=$1',[capId]);
+        let po = parseInt(om.rows[0].m)||0;
+        const N=[],D=[],L=[],O=[];
+        toAdd.forEach(p=>{ po++; N.push(p.name); D.push(p.description); L.push(p.level||null); O.push(po); domainHave.add(p.name); });
+        await db.query(`INSERT INTO practices (capability_id,name,description,level,sort_order)
+          SELECT $1::uuid,n,d,l,o FROM unnest($2::text[],$3::text[],$4::text[],$5::int[]) AS t(n,d,l,o)`,[capId,N,D,L,O]);
+        added += toAdd.length;
+      }
+    }
+    if(added||newcaps) console.log(`PD reconcile: +${newcaps} capabilities, +${added} practices`);
+  }catch(err){ console.error('PD reconcile error:', err.message); }
+}
 
 // Merge the older short-named Operations capabilities into the new card
 // capabilities: move each old capability's distinct practices onto the new one,
@@ -2067,6 +2637,16 @@ app.post('/api/admin/seed-ai', async (req, res) => {
 });
 
 // Manually trigger the TA capabilities insert + retire superseded (idempotent)
+app.post('/api/admin/seed-pd', async (req, res) => {
+  try {
+    await ensurePDCapabilities();
+    const { rows } = await db.query(
+      `SELECT c.name, COUNT(p.*)::int AS practices FROM capabilities c
+         LEFT JOIN practices p ON p.capability_id=c.id
+        WHERE c.domain='Product & Delivery' GROUP BY c.name ORDER BY c.name`);
+    res.json({ ok:true, pdCapabilities: rows.length, capabilities: rows });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
 app.post('/api/admin/seed-ta', async (req, res) => {
   try {
     await ensureTACapabilities();
@@ -2198,7 +2778,7 @@ app.delete('/api/practices/:id', async (req, res) => {
 
 // ── Start (local dev) or export for Vercel ──
 if (process.env.VERCEL) {
-  seedCapabilitiesIfEmpty().then(remapCapabilityDomains).then(ensureAICapabilities).then(ensureOpsCapabilities).then(reconcileOpsCapabilities).then(ensureTACapabilities).then(retireSupersededTACapabilities);
+  seedCapabilitiesIfEmpty().then(remapCapabilityDomains).then(ensureAICapabilities).then(ensureOpsCapabilities).then(reconcileOpsCapabilities).then(ensureTACapabilities).then(retireSupersededTACapabilities).then(ensurePDCapabilities);
   module.exports = app;
 } else {
   const PORT = process.env.PORT || 3000;
@@ -2211,5 +2791,6 @@ if (process.env.VERCEL) {
     await reconcileOpsCapabilities();
     await ensureTACapabilities();
     await retireSupersededTACapabilities();
+    await ensurePDCapabilities();
   });
 }

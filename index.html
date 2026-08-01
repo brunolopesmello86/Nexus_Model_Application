@@ -14833,6 +14833,2084 @@ const PRACTICE_CARDS = {
   ],
   "scenario": "A model update starts emitting biased recommendations to real users. The AI incident playbook kicks in: rollback to the prior model within minutes, notify stakeholders, and open a blameless review. The review adds a fairness gate to the deployment pipeline. What could have been a prolonged, damaging exposure is contained in under an hour and made impossible to repeat.",
   "deck": "ARTIFICIAL INTELLIGENCE"
+ },
+ "Flow Visualisation Board": {
+  "code": "FO1",
+  "cat": "Flow Optimization",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A visual board (physical or digital) showing all work items in the team's system and their current state",
+   "Columns represent workflow stages: Backlog → Ready → In Progress → Review → Done",
+   "Cards show item title, owner, age in current stage, and priority signal",
+   "Updated daily — the board is the real-time view of the team's work, not a planning artifact"
+  ],
+  "why": [
+   "Work that is invisible accumulates silently — the board makes every item's status and age transparent",
+   "When work ages visibly in a column, it triggers a conversation that wouldn't happen otherwise: 'why has this been In Review for 5 days?'",
+   "A shared board creates a shared reality: the whole team sees the same picture of what is happening right now",
+   "Flow visualisation is the first step to flow improvement — you cannot optimise what you cannot see"
+  ],
+  "how": [
+   "Set up in Jira, Miro, or a physical board: one column per workflow stage, one card per work item",
+   "Columns must reflect actual workflow stages — not aspirational ones; include all real stages including 'waiting for review'",
+   "Update rule: whoever moves the work moves the card — the board is owned by the team, not updated by a PM",
+   "Daily stand-up done at the board: walk cards right to left, flag blocked or aging items"
+  ],
+  "who": [
+   "Set up by: Agile Coach with team",
+   "Maintained by: all team members (self-service updates)",
+   "Reviewed daily in: stand-up",
+   "Used by: Scrum Master/coach to identify flow issues"
+  ],
+  "scenario": "A team adds age indicators to their flow board: items older than 3 days in any stage get a yellow dot; 5+ days get red. In the first week, 4 red dots appear in the 'Review' column. The stand-up conversation surfaces that code review is being deprioritised when development is busy. The team agrees a norm: review requests responded to within 4 hours. Red dots disappear within 2 weeks."
+ },
+ "WIP Limits per Stage": {
+  "code": "FO2",
+  "cat": "Flow Optimization",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "Explicit limits on how many work items can be in each workflow stage simultaneously",
+   "Limits are defined per stage and displayed on the board — when a limit is reached, no new work enters that stage until something exits",
+   "WIP limits are the team's self-imposed policy for managing flow — not rules imposed from outside",
+   "Review WIP limits quarterly: too many items consistently hit the limit? Investigate and address the root cause"
+  ],
+  "why": [
+   "Without WIP limits, teams start new work rather than finishing in-progress work — creating piles of half-done items",
+   "WIP limits force the team to face and resolve blockers rather than routing around them by starting something easier",
+   "The economic argument: finishing 3 items in 3 days delivers more value than starting 6 items and finishing none",
+   "The DORA research correlates WIP discipline with flow efficiency and deployment frequency"
+  ],
+  "how": [
+   "Set initial WIP limits conservatively: (team size / 2) per active stage is a reasonable starting point",
+   "Display limits visibly on the board: 'In Progress: max 3'",
+   "When a limit is reached: the team pulls a blocked conversation, not a new item — 'how do we unblock this?'",
+   "Retrospective review: are WIP limit violations frequent? Why? Adjust limits or address root cause"
+  ],
+  "who": [
+   "WIP limits set by: team + Agile Coach collaboratively",
+   "Enforced by: team self-management",
+   "Reviewed quarterly in: retrospectives",
+   "Violations tracked by: Agile Coach as a flow health metric"
+  ],
+  "scenario": "A team of 5 sets a WIP limit of 3 for 'In Progress'. In the first sprint, the limit is hit by day 2. Two developers want to start new work. Following the WIP limit norm, they instead help unblock a stuck item in review. The stuck item is cleared in 45 minutes — work they would never have done without the WIP limit creating the pressure. Sprint completion rate improves from 62% to 79% in the following sprint."
+ },
+ "Bottleneck Identification": {
+  "code": "FO3",
+  "cat": "Flow Optimization",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A systematic practice of identifying the slowest or most constrained stage in the team's workflow — the stage that limits the throughput of the entire system",
+   "Identified using: cycle time data per stage, WIP accumulation patterns, and flow efficiency metrics",
+   "Addressed through focused improvement on the constraint (not on stages before it, which will just create larger queues)",
+   "Identified bottleneck changes over time as improvements are made — reidentified monthly"
+  ],
+  "why": [
+   "Improving stages that are not the bottleneck does not improve overall throughput — it can make things worse by feeding the bottleneck faster",
+   "The Theory of Constraints is clear: the system's throughput is determined by its weakest link",
+   "Most teams focus improvement effort on what is visible and painful — not necessarily on what is limiting the system",
+   "Bottleneck identification ensures improvement energy is applied where it will produce the most system-level benefit"
+  ],
+  "how": [
+   "Monthly: pull cycle time data per workflow stage; identify the stage with longest average wait and largest queue",
+   "Confirm with team: 'does this feel like the constraint?'",
+   "For the identified bottleneck: investigate root causes (capacity, skill, tooling, process, dependencies)",
+   "Apply the improvement: add capacity, redesign the process, automate, or restructure the stage"
+  ],
+  "who": [
+   "Analysis led by: Agile Coach",
+   "Confirmed with: team (they have contextual knowledge the data doesn't)",
+   "Root cause investigation: the team + coach together",
+   "Improvement design and implementation: the team (with support from OT Lead for systemic issues)"
+  ],
+  "scenario": "A flow analysis identifies 'Code Review' as the consistent bottleneck: items wait an average of 4.2 days here while all other stages average under 1 day. Root cause investigation reveals only 2 of 6 engineers are comfortable reviewing complex backend code. The team designs an improvement: 30-min weekly 'review clinic' where the 2 expert reviewers teach the patterns. After 6 weeks, 5 of 6 engineers are doing complex reviews. Average code review wait time drops to 1.1 days."
+ },
+ "Flow Metrics Dashboard": {
+  "code": "FO4",
+  "cat": "Flow Optimization",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A real-time digital dashboard displaying the team's key flow metrics: lead time, cycle time, throughput, WIP levels, and flow efficiency",
+   "Metrics shown with trend lines (improving/stable/declining) and threshold alerts",
+   "Updated automatically from Jira or equivalent work tracking system",
+   "Reviewed in sprint retrospectives, stand-ups, and monthly performance conversations"
+  ],
+  "why": [
+   "Teams without flow metrics manage by intuition — 'it feels like we're moving faster' is not actionable",
+   "Flow metrics make performance visible and objective: conversations shift from 'I think' to 'the data shows'",
+   "Trend lines are more important than absolute values: a declining throughput over 4 weeks is a signal regardless of absolute numbers",
+   "When the dashboard is visible to all, the team holds itself accountable for flow — no external pressure needed"
+  ],
+  "how": [
+   "Configure in Jira Software, LinearB, Sleuth, or build in Power BI: lead time trend, cycle time histogram, WIP over time, throughput per week",
+   "Set alert thresholds: lead time > X days, WIP > Y items, throughput drops below Z per week",
+   "Display in team space and open as the first view in retrospectives",
+   "Review in monthly stand-ups with leadership: what do the trends tell us about our system's health?"
+  ],
+  "who": [
+   "Built by: Agile Coach + tooling support",
+   "Maintained by: automated feeds (zero manual effort is the target)",
+   "Reviewed by: team weekly + leadership monthly",
+   "Used for: retrospective improvement prioritisation and quarterly OKR setting"
+  ],
+  "scenario": "A Flow Metrics Dashboard shows a team's throughput declining for 6 consecutive weeks — from 12 items per week to 7. The trend is not visible in sprint reviews (teams present completed items, not throughput trends). The coach surfaces the dashboard data in the next retrospective. Investigation reveals: a new integration testing requirement was added 7 weeks ago without capacity adjustment. The team renegotiates integration testing frequency. Throughput recovers to 11 items/week within 3 sprints."
+ },
+ "Waste Elimination Sprints": {
+  "code": "FO5",
+  "cat": "Flow Optimization",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "Dedicated sprint cycles (or partial sprints) where the team focuses entirely on identifying and eliminating waste in their delivery process — not on feature delivery",
+   "Waste types targeted: unnecessary handoffs, redundant approvals, manual steps that could be automated, unused artefacts, duplicate communication channels",
+   "Output: a prioritised waste backlog and at least 2–3 waste items eliminated per sprint",
+   "Run quarterly or whenever flow metrics show a significant efficiency decline"
+  ],
+  "why": [
+   "Flow improvement work consistently loses out to feature delivery in standard sprints — it is always deprioritised",
+   "Dedicated waste elimination sprints ring-fence time for systemic improvement: the team works on how they work, not just what they deliver",
+   "The compound return on waste elimination is significant: one eliminated handoff saves hours every sprint for years",
+   "Teams that run waste elimination sprints create ownership of their delivery system — they stop seeing process as something that happens to them"
+  ],
+  "how": [
+   "Quarter planning: schedule one 2-week waste elimination sprint per quarter (or 20% of one sprint per month)",
+   "Sprint start: identify top 5 waste candidates using flow data + team input (value stream mapping lite)",
+   "Sprint work: eliminate or reduce the top 2–3 waste items; instrument the improvement to measure impact",
+   "Sprint review: demonstrate improvements to stakeholders; show flow metric improvement post-elimination"
+  ],
+  "who": [
+   "Sponsored by: senior leadership (explicit capacity protection required)",
+   "Led by: Agile Coach with full team participation",
+   "Stakeholders briefed: why this sprint has different deliverables than a feature sprint",
+   "Results reported: in portfolio forum and next sprint review"
+  ],
+  "scenario": "A Waste Elimination Sprint focuses on a team's release process, which takes 3 days of manual steps. The team maps the release workflow and finds: 7 of 11 steps can be automated, 2 are redundant, and 1 requires a sign-off for a risk that no longer exists. By end of sprint: release time drops from 3 days to 4 hours. The time saved compounds — every subsequent release saves 2.5 days of team effort."
+ },
+ "Automated Flow Analytics": {
+  "code": "FO6",
+  "cat": "Flow Optimization",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A fully automated flow analytics system that continuously monitors the delivery process — identifying bottlenecks, predicting delivery dates, and surfacing anomalies without manual analysis",
+   "Feeds from: Jira, Git, CI/CD pipeline, and deployment logs",
+   "Capabilities: predictive lead time, anomaly detection (this item is behaving unlike similar items), and systemic pattern alerts (code review wait time is trending up for the 3rd week)",
+   "Accessible to all team members; reviewed in retrospectives and leadership forums"
+  ],
+  "why": [
+   "Manual flow analysis by coaches and team leads is valuable but limited in frequency and coverage",
+   "Automated analytics catch patterns that human review misses: subtle trends, cross-team correlations, and early anomalies",
+   "Predictive delivery dates grounded in actual flow data are more accurate and honest than estimate-based commitments",
+   "Teams with automated flow analytics outperform those without in DORA metrics — they make faster, better-informed process decisions"
+  ],
+  "how": [
+   "Select or build a flow analytics tool (LinearB, Jellyfish, Faros, or custom Power BI pipeline)",
+   "Connect data sources: Jira, GitHub/GitLab, Jenkins/GitHub Actions, deployment logs",
+   "Configure predictions and anomaly alerts for the team's specific workflow and history",
+   "Review in sprint retrospectives: 'here is what the analytics surfaced this sprint — what do we address?'"
+  ],
+  "who": [
+   "Built by: platform/tooling engineering team + Agile Coach",
+   "Maintained by: platform team (automated)",
+   "Reviewed by: team in retrospectives; leadership in monthly forums",
+   "Alert recipients: Agile Coach (immediate); team lead (daily digest)"
+  ],
+  "scenario": "Automated flow analytics identifies a pattern: every 4th sprint, the team's WIP spikes and throughput drops. Manual analysis had never noticed this pattern because it appeared too infrequently. Investigation reveals: the same senior engineer goes on travel every 4th week, removing the most common code reviewer. The team designs a cross-training plan so review capability doesn't have a single point of dependency. The 4-sprint pattern disappears."
+ },
+ "Production Monitoring Alerts": {
+  "code": "FL1",
+  "cat": "Feedback Loops",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A set of automated alerts that notify the team immediately when production systems behave outside defined parameters — before customers report the issue",
+   "Alert categories: error rate spikes, latency thresholds, availability drops, unusual traffic patterns, and business metric anomalies",
+   "Alerts routed to the whole team (not just operations) via Slack, PagerDuty, or equivalent",
+   "Each alert has a defined response runbook: who is notified, what is the first action, what is the escalation path"
+  ],
+  "why": [
+   "Teams that learn about production issues from customer reports are always behind — the customer has already had a bad experience",
+   "Production monitoring converts reactive firefighting into proactive response: the team acts before customers are affected at scale",
+   "Routing alerts to the whole team builds shared responsibility for production health — not an 'operations team problem'",
+   "Mean time to detect (MTTD) is a key DORA metric: teams with automated monitoring consistently outperform those without"
+  ],
+  "how": [
+   "Define alert thresholds for: error rate, latency (p50, p95, p99), availability, and 2–3 business metrics",
+   "Configure in monitoring tool (Datadog, Grafana, New Relic, or equivalent)",
+   "Route to Slack team channel AND PagerDuty for on-call engineer",
+   "Runbook per alert type: reviewed quarterly; updated after each triggered incident"
+  ],
+  "who": [
+   "Alert design: Engineering Lead + SRE/DevOps",
+   "Maintained by: engineering team (shared responsibility)",
+   "On-call rota: all engineers rotate",
+   "Runbooks owned by: the team; updated by whoever responds to the alert"
+  ],
+  "scenario": "A production alert fires at 2pm on a Tuesday: error rate on the checkout API has risen from 0.1% to 2.8% over 10 minutes. The on-call engineer sees the alert in Slack, acknowledges within 4 minutes, and identifies a database connection pool exhaustion. A fix is deployed within 35 minutes. Total customer impact: 180 failed transactions in 45 minutes. Without the alert, the issue would likely have been discovered from customer support tickets 2–4 hours later."
+ },
+ "Weekly Usability Testing": {
+  "code": "FL2",
+  "cat": "Feedback Loops",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A structured practice of conducting at least one usability test per week with a real user — not a quarterly research project, a continuous rhythm",
+   "Each test: 30–45 minutes, one participant, one researcher/observer, focused on 2–3 specific questions the team has about the current product",
+   "Tests are recorded and clips shared with the whole team within 24 hours — not summarised, observed directly",
+   "Findings feed into the next sprint's backlog refinement — not a quarterly research report"
+  ],
+  "why": [
+   "Teams separated from real users by design systems and ticket abstraction make assumptions about usability that compound over time",
+   "One 30-minute usability test per week costs less than half a developer-day and can prevent weeks of building the wrong thing",
+   "Continuous testing catches usability issues when they are cheapest to fix — in design or early development, not post-launch",
+   "When the whole team watches usability test clips, empathy for users becomes a team capability, not a UX researcher's job"
+  ],
+  "how": [
+   "Recruit: maintain a pool of 5–10 willing participants; rotate; recruit new participants monthly",
+   "Each Monday: team identifies top 2–3 usability questions for the week",
+   "Thursday (or chosen day): 30-min moderated test; recorded with consent",
+   "Friday: researcher clips the most interesting 5–10 minutes and shares in team Slack; 30-min team review of clips"
+  ],
+  "who": [
+   "Tests run by: UX Researcher or trained Product Owner",
+   "Participants: real users from the target segment (not internal employees)",
+   "Team involvement: all team members watch clips; attend at least one live test per month",
+   "Findings integrated by: Product Owner in backlog refinement"
+  ],
+  "scenario": "Weekly usability testing on a new onboarding flow reveals in week 2 that 4 of 5 participants cannot find the 'invite team member' button. The design is 3 days into development. The fix (moving the button to a more prominent location) takes 2 hours. Without weekly testing, this issue would have been discovered after launch — in support tickets, NPS verbatims, and a full redesign sprint."
+ },
+ "Feature Flag Rollouts": {
+  "code": "FL3",
+  "cat": "Feedback Loops",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A deployment practice where new features are deployed to production behind a feature flag — initially invisible to users, then progressively exposed to 1%, 5%, 25%, 100% of users",
+   "Enables: canary releases, A/B testing, emergency rollbacks without a code deployment, and segment-specific feature delivery",
+   "Each flag has a defined rollout plan and a rollback trigger (e.g., if error rate for flagged users exceeds 2%, auto-rollback)",
+   "Flags are short-lived: removed from the codebase within 2 sprints of reaching 100% rollout"
+  ],
+  "why": [
+   "Full production deployments without feature flags are binary: the feature is on for everyone or off for everyone",
+   "Feature flags enable progressive validation: real user behaviour in production, with the ability to stop instantly if something goes wrong",
+   "They decouple deployment from release: code can be in production weeks before users see it, enabling continuous deployment without continuous release",
+   "DORA research identifies feature flags as a key contributor to low change fail rate and fast recovery time"
+  ],
+  "how": [
+   "Implement a feature flag system (LaunchDarkly, Unleash, or homegrown with environment variables)",
+   "For every significant new feature: create a flag before development starts; define rollout stages and rollback triggers",
+   "Monitor the rollout: error rates, latency, and business metrics for flagged vs non-flagged users",
+   "Remove the flag (and the conditional code) within 2 sprints of 100% rollout — flag debt is real technical debt"
+  ],
+  "who": [
+   "Flag design: Engineering Lead + Product Owner",
+   "Rollout plan: Product Owner defines stages; Engineering Lead defines rollback triggers",
+   "Monitoring during rollout: on-call engineer + automated alerts",
+   "Flag removal: tracked in the technical debt backlog; owned by the implementing engineer"
+  ],
+  "scenario": "A team deploys a new payment processing flow behind a feature flag. After 1% rollout, the automated monitor detects a 0.3% increase in payment failures for flagged users. The flag is rolled back in 2 minutes — 30 seconds of manual action. The error affects 400 users for an average of 8 minutes. Without feature flags, the same deployment would have affected all users and required a full rollback deployment taking 45 minutes."
+ },
+ "Build–Measure–Learn Cycle": {
+  "code": "FL4",
+  "cat": "Feedback Loops",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A structured iteration loop where every feature or experiment follows the same 3-phase cycle: Build (the minimum version), Measure (against predefined success metrics), Learn (analyse, decide, and feed insight into the next build)",
+   "The cycle is explicitly time-boxed: learning must occur within the same sprint or the next one — not weeks later",
+   "Success metrics defined before building — not after, when the temptation is to select metrics that confirm the desired outcome",
+   "Learning is documented and shared — 'what we built, what we measured, what we concluded'"
+  ],
+  "why": [
+   "The most common product failure mode: teams build features, measure loosely if at all, and never formally conclude anything — the wheel keeps spinning without learning",
+   "The BML cycle creates accountability for learning, not just delivery: the sprint review includes 'what did we learn?' as an equal metric to 'what did we deliver?'",
+   "Explicit pre-defined metrics prevent post-hoc rationalisation: teams cannot move the goalposts after seeing the data",
+   "Over time, organisations with disciplined BML cycles make significantly better product investment decisions"
+  ],
+  "how": [
+   "Before building: write a 3-sentence experiment card — what are we building, what is the success metric, what is the decision rule?",
+   "Build: the minimum version that tests the hypothesis (see MVP/MVE practice)",
+   "Measure: collect the predefined metric for 2–4 weeks post-deployment — no exceptions",
+   "Learn: team review session — did the metric confirm or refute the hypothesis? Decision: continue, iterate, or pivot"
+  ],
+  "who": [
+   "Experiment card: authored by Product Owner before sprint planning",
+   "Measurement: data engineer or Product Owner (automated where possible)",
+   "Learning session: full team + stakeholders (30 min per experiment)",
+   "Insights documented by: Product Owner in the team's experiment log"
+  ],
+  "scenario": "A team adds a 'recently viewed' feature, hypothesising it will increase session length by 10%. Pre-defined metric: average session duration, measured 3 weeks post-launch. Measured result: +2% (not significant). The Build–Measure–Learn session concludes: the hypothesis was not confirmed. The team does not invest further in this direction. Without the BML structure, the same team would likely have shipped the feature and immediately moved on — never learning whether it worked."
+ },
+ "Internal Alpha Programme": {
+  "code": "FL5",
+  "cat": "Feedback Loops",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A structured programme where new features are first deployed to internal employees — not external customers — to identify critical issues before wider release",
+   "Alpha participants: a defined group of internal users who use the product in realistic conditions and report issues through a structured channel",
+   "Alpha period: 1–2 weeks per major feature; participants provide structured feedback using a lightweight template",
+   "Issues discovered in alpha: triaged and fixed before external rollout; not all feedback triggers changes — product owner makes the call"
+  ],
+  "why": [
+   "The gap between synthetic testing and real usage is often where the most critical issues hide",
+   "Internal employees are more forgiving of early rough edges AND more willing to provide specific, structured feedback than external customers",
+   "Alpha programmes create a culture of quality ownership: employees who use the product are invested in its success",
+   "The cost of fixing an issue found by an internal alpha user is 10–100x lower than fixing it post-external launch"
+  ],
+  "how": [
+   "Recruit 10–20 internal alpha participants representing diverse usage patterns and skill levels",
+   "Before external release: deploy new features to alpha users only (via feature flag or separate environment)",
+   "Alpha period: 1–2 weeks; participants use a structured feedback template (what worked, what didn't, critical vs minor)",
+   "Alpha debrief: product owner and tech lead review all feedback; prioritise fixes; decision to proceed with external rollout"
+  ],
+  "who": [
+   "Programme owned by: Product Owner",
+   "Alpha participants: recruited from internal teams representing real use patterns",
+   "Feedback reviewed by: Product Owner + Engineering Lead",
+   "Decision to proceed with external rollout: Product Owner"
+  ],
+  "scenario": "An Internal Alpha for a new reporting feature surfaces a data accuracy issue: calculated totals don't match source data in edge cases involving timezone offsets. The issue affects approximately 8% of reporting scenarios. Fixed before external release: 2 engineering days. If discovered post-launch: estimated 3 weeks of investigation, customer remediation, and trust repair. The Alpha programme ROI on this single issue: 10:1."
+ },
+ "Automated Anomaly Detection": {
+  "code": "FL6",
+  "cat": "Feedback Loops",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "Machine learning or statistical models embedded in the monitoring stack that automatically identify unusual patterns in system behaviour — without requiring a human to define specific thresholds",
+   "Detects: unusual traffic patterns, unexpected feature usage distributions, anomalous error correlations, and business metric deviations from historical patterns",
+   "Alerts include: 'this is unusual for this time of day/week/deployment cycle' — contextual, not just threshold-based",
+   "Supplements (does not replace) rule-based alerts: catches the unexpected, not just the expected"
+  ],
+  "why": [
+   "Rule-based alerts can only fire on patterns you anticipated — the most dangerous production issues are often ones you didn't think to monitor",
+   "Anomaly detection catches the unknown unknowns: it alerts when behaviour is statistically unusual, not just when it crosses a predefined line",
+   "The combination of rule-based and anomaly-based monitoring provides dramatically better production coverage than either alone",
+   "As systems grow in complexity, manual threshold definition becomes impossible — anomaly detection scales where manual monitoring cannot"
+  ],
+  "how": [
+   "Implement: Datadog Watchdog, AWS DevOps Guru, Dynatrace Davis, or equivalent ML monitoring layer on top of existing metrics",
+   "Training period: 2–4 weeks for the model to learn baseline behaviour patterns",
+   "Alert tuning: first 4 weeks will produce some false positives — review and tune sensitivity per metric class",
+   "Review anomaly alerts in the same workflow as rule-based alerts — same runbook process, same on-call response"
+  ],
+  "who": [
+   "Implemented by: SRE/DevOps team + Engineering Lead",
+   "Tuned by: on-call engineers over the first 4 weeks",
+   "Alerts reviewed: same rotation as rule-based alerts",
+   "Model reviewed quarterly: is it catching real issues? What is the false positive rate?"
+  ],
+  "scenario": "Automated anomaly detection fires on a Tuesday morning: the distribution of API response times has shifted — not crossed a threshold, but changed shape in a statistically significant way. Investigation reveals: a database index was accidentally dropped during a maintenance operation 6 hours ago. The system is technically within all SLO thresholds but degrading gradually. The index is restored within 2 hours — before any customer-visible SLO breach. Without anomaly detection, the gradual degradation would have been invisible until the SLO breach 8–12 hours later."
+ },
+ "Cycle Time Baseline": {
+  "code": "CT1",
+  "cat": "Cycle Time Management",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "An initial measurement of how long work items take from 'started' to 'done' — establishing the baseline before any improvement effort begins",
+   "Measured per work item type (feature, bug, improvement, chore) and per workflow stage",
+   "Expressed as: average, median, and 85th percentile — the distribution matters as much as the average",
+   "Published to the team: 'here is where we are today' — the starting point for all cycle time improvement work"
+  ],
+  "why": [
+   "You cannot manage what you do not measure — a cycle time baseline makes the current state objective and undeniable",
+   "Teams often believe they are faster or slower than they actually are — the baseline corrects both biases",
+   "The baseline creates a benchmark against which all subsequent improvements can be measured",
+   "Establishing the baseline is also a team-building exercise: the data often surprises everyone, creating shared motivation to improve"
+  ],
+  "how": [
+   "Pull 8–12 weeks of historical data from Jira: start date (moved to 'In Progress') and end date (moved to 'Done') per item",
+   "Calculate: average, median, 85th percentile for each work item type",
+   "Display as a histogram: shows the distribution, not just the average — the long tail is where the most interesting problems live",
+   "Share with the team: 'this is our baseline — here is what the data tells us about our current cycle time patterns'"
+  ],
+  "who": [
+   "Analysis conducted by: Agile Coach",
+   "Data pulled from: Jira or work tracking system",
+   "Shared with: full team in a dedicated session",
+   "Used as: the baseline reference in all subsequent cycle time discussions"
+  ],
+  "scenario": "A team's cycle time baseline reveals: average cycle time is 4.1 days, but the 85th percentile is 12.3 days — meaning 15% of items take 3x longer than average. The team had assumed cycle time was predictably around 4 days. The baseline reveals two populations: 85% complete in 1–4 days; 15% take 8–18 days. Investigation shows all long-tail items require a database schema change. This single insight drives the first improvement: a dedicated database change workflow with its own cycle time tracking."
+ },
+ "Cycle Time Targets": {
+  "code": "CT2",
+  "cat": "Cycle Time Management",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "Explicit, team-agreed targets for cycle time by work item type — specific enough to be actionable, ambitious enough to require improvement",
+   "Example: features < 5 days, bugs < 2 days, improvements < 3 days, chores < 1 day",
+   "Targets set based on baseline data and customer expectations — not arbitrary round numbers",
+   "Reviewed quarterly: targets tighten as the team improves; new targets set based on current performance data"
+  ],
+  "why": [
+   "Without targets, improvement is directionless — the team improves randomly rather than toward a goal",
+   "Targets create shared commitment: everyone knows what 'good' looks like for this team in this context",
+   "Targets based on baseline data are credible — they are challenging but achievable, not aspirational fiction",
+   "Customer expectations should anchor cycle time targets: what cycle time does our customer need to feel well-served?"
+  ],
+  "how": [
+   "After establishing the baseline: team workshop (60 min) to set targets per work item type",
+   "Starting point: set targets at the 50th percentile of current performance — this means 50% of items already achieve the target; the goal is to move the whole distribution",
+   "Review quarterly using flow metrics dashboard: are we hitting targets? What is preventing items from meeting the target?",
+   "Tighten targets as performance improves — targets should always be slightly aspirational"
+  ],
+  "who": [
+   "Targets set by: team in a workshop facilitated by Agile Coach",
+   "Agreed with: product owner (customer-facing implications) and engineering lead (technical feasibility)",
+   "Reviewed quarterly in: retrospectives",
+   "Visible on: flow metrics dashboard alongside actuals"
+  ],
+  "scenario": "A team sets a cycle time target of 4 days for features. In the first quarter, 58% of features hit the target — up from 45% before targets were set. Analysis of the 42% that miss shows a common pattern: items requiring design input average 7 days. The team introduces a 'design input before sprint start' process. In the next quarter, 74% of features hit the 4-day target."
+ },
+ "Handoff Reduction": {
+  "code": "CT4",
+  "cat": "Cycle Time Management",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A systematic effort to identify and eliminate unnecessary handoffs in the delivery process — stages where work moves from one person, team, or system to another with associated delays and information loss",
+   "Handoffs identified through value stream mapping; each handoff assessed: is it necessary? Can it be automated? Can the receiving party be involved earlier?",
+   "Target: reduce total handoff count by 30–50% within one quarter",
+   "Progress measured through: handoff wait time in the CFD, flow efficiency, and team report of coordination overhead"
+  ],
+  "why": [
+   "Each handoff adds: wait time (work sits in queue), information loss (context degrades at each transfer), and coordination overhead",
+   "Most delivery processes have 40–70% of lead time sitting in handoff queues — reducing handoffs is the fastest way to reduce lead time",
+   "Handoff reduction also improves quality: the fewer times work is handed off, the more context the implementer has from the originator",
+   "Teams that work across traditional handoff boundaries build shared mental models — improving both speed and quality over time"
+  ],
+  "how": [
+   "Value stream mapping: map every handoff in the current process; assign wait time and information loss score to each",
+   "Categorise: essential (regulatory, cross-functional expertise), necessary (current structure requires), or unnecessary (legacy process)",
+   "Eliminate unnecessary handoffs immediately; redesign necessary handoffs to reduce wait time (better tooling, earlier involvement, automated triggers)",
+   "Measure: handoff wait time in CFD before and after; flow efficiency delta"
+  ],
+  "who": [
+   "Led by: Agile Coach with team",
+   "Cross-boundary handoffs: negotiated with adjacent teams and managers",
+   "Automation of handoffs: implemented by engineering team",
+   "Results reviewed: in monthly flow review and quarterly portfolio forum"
+  ],
+  "scenario": "A delivery process has 11 handoffs from feature idea to production. A handoff reduction analysis identifies: 4 are unnecessary (legacy sign-offs from a previous era), 3 can be automated (triggering the next stage automatically when the previous one completes), and 4 are essential. After reduction: 7 handoffs (4 essential + 3 automated). Average lead time drops from 23 days to 11 days — without changing the team's development speed."
+ },
+ "Cycle Time Retrospectives": {
+  "code": "CT5",
+  "cat": "Cycle Time Management",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A structured retrospective format focused specifically on cycle time performance — analysing the previous sprint's cycle time distribution and identifying systemic patterns",
+   "Separate from (or added to) the standard retrospective: 30 additional minutes focused on flow data",
+   "Examines: which items had the longest cycle times and why? What do the outliers have in common? What systemic factor is most responsible for long cycle times?",
+   "Each session produces 1 improvement experiment to run in the next sprint"
+  ],
+  "why": [
+   "Standard retrospectives focus on team dynamics and process — they rarely address the flow metrics that reveal systemic delivery problems",
+   "Cycle time retrospectives create a data-driven improvement loop: the data tells you what to fix, the retrospective designs how to fix it",
+   "Focusing specifically on outliers is high-leverage: the items that took 3x longer than average are where the most actionable improvement potential lives",
+   "Teams that run cycle time retrospectives improve their cycle time significantly faster than those that rely on general retrospectives alone"
+  ],
+  "how": [
+   "Open the retrospective with the cycle time dashboard: 'here is our cycle time distribution this sprint'",
+   "Focus on the top 20% longest items: what did they have in common? (work type, team member involved, stage where they stuck)",
+   "Identify the 1 systemic factor most responsible for long cycle times this sprint",
+   "Design a specific improvement experiment: 'next sprint we will try X to address Y; we will know it worked if cycle time for Z decreases'"
+  ],
+  "who": [
+   "Facilitated by: Agile Coach",
+   "Participants: full team",
+   "Data prepared by: Agile Coach (cycle time dashboard screenshot + outlier analysis)",
+   "Improvement experiment owned by: the team member most involved in the pattern identified"
+  ],
+  "scenario": "In a cycle time retrospective, the team analyses 6 outlier items (all >8 days). Pattern found: all 6 involved a dependency on a third-party API that required a specific test environment available only during business hours. The improvement experiment: request a shared test account for after-hours testing. Cost: 1 email. Result: cycle time for API-dependent items drops from average 9.2 days to 3.4 days over the following sprint."
+ },
+ "Per-Story Cycle Time SLAs": {
+  "code": "CT6",
+  "cat": "Cycle Time Management",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "Explicit service level agreements attached to specific story types or categories — customers or stakeholders know the maximum time a specific type of request will take",
+   "Examples: P1 bug fixed and deployed within 24 hours; feature request acknowledged within 48 hours, prioritised within 2 weeks, shipped within 1 quarter",
+   "SLAs made visible to stakeholders in the team's working agreement or service description",
+   "Adherence tracked monthly; systemic SLA violations trigger process investigation, not blame"
+  ],
+  "why": [
+   "Stakeholders without SLAs make unlimited requests and have unlimited expectations — creating friction and managing-up behaviour",
+   "SLAs create mutual clarity: stakeholders know what to expect; teams know what they're committed to",
+   "Tracking SLA adherence surfaces systemic process failures: if the P1 SLA is consistently missed, the process has a problem",
+   "SLAs also protect teams: when a stakeholder escalates a delayed request, the team can reference the SLA and the adherence data"
+  ],
+  "how": [
+   "Define SLAs for the 3–5 most common request types: P1/P2 bugs, feature requests, improvement requests, security vulnerabilities",
+   "Make SLAs visible: publish in the team's wiki page, mention in stakeholder kickoffs",
+   "Track adherence monthly: what % of each request type met its SLA?",
+   "When adherence drops below 80%: investigate the systemic cause; escalate if capacity is the root cause"
+  ],
+  "who": [
+   "SLAs defined by: Product Owner + Engineering Lead with stakeholder input",
+   "Communicated by: Product Owner to all stakeholders",
+   "Adherence tracked by: Agile Coach monthly",
+   "Reported in: monthly portfolio forum and quarterly stakeholder reviews"
+  ],
+  "scenario": "A team defines an SLA: P1 bugs deployed to production within 24 hours of discovery. In the first month, adherence is 60% — 40% of P1 bugs take longer. Investigation reveals the bottleneck: the deployment approval process requires a senior engineer sign-off that is unavailable on weekends. The team redesigns the approval process: P1 fixes can be deployed without sign-off if 2 senior engineers have reviewed the code. P1 SLA adherence rises to 94% the following month."
+ },
+ "Team Type Classification": {
+  "code": "TT1",
+  "cat": "Team Topology",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "Explicitly classifying each team against the four Team Topologies types: Stream-Aligned, Platform, Enabling, or Complicated-Subsystem",
+   "Each team type has a distinct purpose, interaction model, and success metric",
+   "Classification performed collaboratively — not assigned by leadership — as part of org design work",
+   "Results in a team topology map: a visual showing all teams, their types, and their interaction patterns"
+  ],
+  "why": [
+   "Teams formed without intentional topology design accumulate unclear responsibilities, excessive dependencies, and coordination overhead",
+   "The Team Topologies framework (Skelton & Pais) gives organisations a shared vocabulary and design pattern for high-performing team structures",
+   "Classification surfaces mismatches: a team operating as a Stream-Aligned team while structured as a shared-service team is a common, expensive anti-pattern",
+   "Org design decisions grounded in topology principles produce more stable, higher-performing team structures"
+  ],
+  "how": [
+   "Workshop (half day): introduce the 4 team types to all team leads and senior leaders",
+   "Each team self-classifies against the 4 types; discuss cases where classification is unclear",
+   "Identify mismatches: which teams are classified differently by different stakeholders? These mismatches are org design problems to solve",
+   "Produce a team topology map; use it as the foundation for team design, interaction design, and dependency management discussions"
+  ],
+  "who": [
+   "Workshop facilitated by: Org Transformation Lead",
+   "Participants: all team leads + senior leadership",
+   "Topology map maintained by: portfolio manager or Org Design Lead",
+   "Reviewed: at every significant org change and quarterly for drift"
+  ],
+  "scenario": "A topology classification workshop reveals that what is described as a 'Platform Team' is actually functioning as a Stream-Aligned team: they own a specific customer-facing product, not a shared platform. This misclassification has caused 3 other teams to treat them as a shared service — making support requests and expecting priority treatment. Reclassifying them as Stream-Aligned and creating a genuine platform team for shared infrastructure reduces cross-team friction significantly within one quarter."
+ },
+ "Cognitive Load Assessment": {
+  "code": "TT2",
+  "cat": "Team Topology",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A structured assessment of the cognitive load each team carries — the total complexity of the systems, domains, and interactions they are responsible for understanding and managing",
+   "Assessment tool: a survey covering domain complexity, technology complexity, interaction complexity, and change rate",
+   "Output: a cognitive load score per team; teams above the threshold are at risk of quality, engagement, and delivery problems",
+   "Used to inform team size, responsibility scope, and interaction design decisions"
+  ],
+  "why": [
+   "Cognitive overload is one of the most common causes of delivery degradation — teams carrying too much complexity cannot maintain quality or speed",
+   "Most org design decisions are made on headcount and skill — not on cognitive load; this creates teams that are technically adequate but cognitively overloaded",
+   "When teams are cognitively overloaded, they simplify: they skip tests, cut documentation corners, avoid complex refactoring — the technical debt that results is invisible but expensive",
+   "Cognitive Load Assessment makes the invisible load visible, enabling org design decisions to address the root cause"
+  ],
+  "how": [
+   "Each team completes a structured cognitive load survey (20 items; 30 min)",
+   "Calculate a composite cognitive load score per team (domain + tech + interaction complexity × change rate)",
+   "Identify teams above threshold (typically top 25% of scores)",
+   "For each high-load team: investigate the primary drivers and design relief (split scope, platform investment, enable team support, reduce interaction surface)"
+  ],
+  "who": [
+   "Assessment designed by: Org Transformation Lead",
+   "Completed by: each team collectively (team lead facilitates the 30-min discussion)",
+   "Results analysed by: Org Transformation Lead",
+   "Action design: Org Design Lead + senior leadership for structural interventions"
+  ],
+  "scenario": "A cognitive load assessment shows the 'Core Platform' team has a score in the 95th percentile — responsible for 7 distinct subsystems, interacting with 12 other teams, and undergoing a major technical migration simultaneously. The assessment makes visible what the team has been experiencing invisibly. Decision: split the team into two; create an Enabling Team to support migration; reduce direct interaction surface to 6 teams. Within one quarter, the team's engagement score and delivery predictability both improve significantly."
+ },
+ "Interaction Mode Definition": {
+  "code": "TT3",
+  "cat": "Team Topology",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "For each pair of teams that interact, an explicit definition of the interaction mode: Collaboration (working closely together for a defined period), X-as-a-Service (one team provides a service with a clear interface), or Facilitating (an Enabling Team helps a Stream-Aligned team develop capability)",
+   "Interaction modes are explicitly agreed — not assumed — and reviewed quarterly for fit",
+   "When interaction mode changes (e.g., from Collaboration to X-as-a-Service as a platform matures), the change is designed deliberately",
+   "Visual: interaction mode map updated and shared with all affected teams"
+  ],
+  "why": [
+   "Teams that interact without defined modes default to whichever mode is most comfortable — often the most expensive one (Collaboration)",
+   "Undefined interaction modes create the most common org design pathology: constant interrupt requests masquerading as collaboration",
+   "Explicit interaction modes set mutual expectations: a team offering X-as-a-Service can decline ad hoc collaboration requests without appearing unhelpful",
+   "The mode change from Collaboration to X-as-a-Service is the most important transition in platform team maturation"
+  ],
+  "how": [
+   "For each significant team-to-team interaction: run a 30-min session with both team leads",
+   "Agree the current mode and the target mode (mode evolves as the relationship matures)",
+   "Define the mode contract: for X-as-a-Service, what is the service interface, response SLA, and escalation path?",
+   "Review quarterly: is the agreed mode working? Is it time to evolve to the next mode?"
+  ],
+  "who": [
+   "Defined by: both team leads collaboratively",
+   "Facilitated by: Agile Coach or Org Design Lead",
+   "Mode map maintained by: portfolio manager",
+   "Reviewed quarterly by: both team leads + their manager"
+  ],
+  "scenario": "A platform team has been in 'Collaboration' mode with 4 stream-aligned teams for 6 months — constantly being pulled into bespoke work. An Interaction Mode Definition session reveals: the platform team's APIs are mature enough for X-as-a-Service mode. Both teams agree to transition. The platform team publishes documentation and a request queue. The 4 stream-aligned teams adjust — initially frustrated, then independently productive. The platform team's capacity for platform improvement increases 60%."
+ },
+ "Conway's Law Audit": {
+  "code": "TT4",
+  "cat": "Team Topology",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A structured audit examining whether the organisation's team structure mirrors (and therefore constrains) its software architecture — Conway's Law: 'organisations design systems that mirror their own communication structure'",
+   "The audit compares: the team communication map vs the software architecture dependency map",
+   "Identifies: architectural coupling that mirrors organisational coupling (and vice versa)",
+   "Outputs: recommendations for either restructuring teams to produce better architecture, or restructuring architecture to reduce team coupling"
+  ],
+  "why": [
+   "Conway's Law is not optional: organisations that ignore it pay the price in coupling — their software architecture inevitably reflects their team structure",
+   "Inverse Conway Manoeuvre: deliberately design the team structure to produce the architecture you want, not the other way around",
+   "Most technical debt has an organisational root cause — a Conway's Law audit often surfaces team structure changes that are more effective than any code refactoring",
+   "Software architects who don't consider team structure are solving half the problem"
+  ],
+  "how": [
+   "Map 1: draw the software component dependency map (what depends on what)",
+   "Map 2: draw the team communication map (who talks to whom, frequently)",
+   "Compare: where do the maps match? Where do they conflict?",
+   "Identify opportunities: which team or architecture restructuring would reduce coupling and improve flow?"
+  ],
+  "who": [
+   "Led by: Engineering Lead + Org Transformation Lead jointly",
+   "Participants: all team leads + system architect",
+   "Maps produced by: engineering team (software) + Agile Coach (team communication)",
+   "Recommendations reviewed by: senior leadership for any structural changes required"
+  ],
+  "scenario": "A Conway's Law audit reveals that a monolithic 'checkout service' is maintained by 3 separate teams because it evolved alongside 3 separate business domains. Every change requires coordination between all 3 teams. The audit recommends splitting the checkout service into 3 microservices aligned to the 3 team boundaries. After the split, checkout change lead time drops from 3 weeks (cross-team coordination) to 3 days (single team ownership)."
+ },
+ "Team Topology Roadmap": {
+  "code": "TT5",
+  "cat": "Team Topology",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A planned, phased evolution of the organisation's team topology over 12–18 months — specifying the target topology, the transition states, and the sequencing of changes",
+   "Each phase includes: which teams change, how they change, what interaction modes evolve, and what platform capabilities are required",
+   "Designed to achieve the architecture and flow outcomes defined in the organisation's technology strategy",
+   "Reviewed and updated quarterly: transitions happen, learnings emerge, the roadmap adapts"
+  ],
+  "why": [
+   "Most org design changes are reactive: a crisis prompts a restructure that is implemented in weeks without architectural thought",
+   "A topology roadmap makes org design proactive, planned, and sequenced — reducing the disruption of each individual change",
+   "The roadmap also creates accountability: promised transitions that don't happen are visible; org design drift from the plan is tracked",
+   "Teams benefit from visibility into the planned evolution: they can prepare, upskill, and make architecture decisions aligned to the future topology"
+  ],
+  "how": [
+   "Current state: map the existing topology (team types, interaction modes, cognitive loads)",
+   "Future state: define the target topology in 18 months — driven by architecture strategy and delivery ambitions",
+   "Design the transition: what changes must happen first to enable subsequent changes?",
+   "Publish the roadmap and review quarterly with all team leads"
+  ],
+  "who": [
+   "Designed by: Org Transformation Lead + Engineering Lead + senior leadership",
+   "Input from: all team leads (their cognitive load and capability data informs the design)",
+   "Published to: all employees (team topology changes should not be surprises)",
+   "Reviewed quarterly by: Org Transformation Lead + senior leadership"
+  ],
+  "scenario": "A Team Topology Roadmap reveals that the Q1 target — splitting the monolithic backend team into 3 stream-aligned teams — requires a shared Platform Team to be operational first (otherwise all 3 teams will need to manage their own infrastructure). The roadmap sequences: Q1 = Platform Team formation + capability build; Q2 = backend split enabled by platform. Without the roadmap, the backend split would have been attempted first, creating 3 teams with unsupported infrastructure and high cognitive load."
+ },
+ "Thinnest Viable Platform": {
+  "code": "TT6",
+  "cat": "Team Topology",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A design principle for platform teams: build and maintain only the platform capabilities that stream-aligned teams actually need and cannot easily build themselves — no more",
+   "TVP is curated by the stream-aligned teams: they pull capabilities, the platform team doesn't push them",
+   "Platform capabilities are retired when stream-aligned teams stop using them — the platform stays lean and relevant",
+   "The TVP is reviewed quarterly: what capabilities are being used? What is being requested? What can be deprecated?"
+  ],
+  "why": [
+   "Platform teams tend to grow by adding capabilities no one asked for — producing a platform that is complex, hard to maintain, and poorly adopted",
+   "Unused platform capabilities create maintenance burden and cognitive load without producing value",
+   "The TVP principle keeps platform investment tightly connected to actual stream-aligned team needs — maximising adoption and minimising waste",
+   "When platform teams operate TVP discipline, stream-aligned teams trust the platform more: it does fewer things, but does them extremely well"
+  ],
+  "how": [
+   "Quarterly TVP review: which capabilities were used in the last quarter? Which were not?",
+   "Capability adoption tracked in the platform metrics dashboard (usage by capability by consumer team)",
+   "Unused capabilities (fewer than 2 consumer teams in the last quarter): candidates for deprecation",
+   "New capability requests: assessed against TVP principle — is this needed by multiple teams? Can teams easily build it themselves?"
+  ],
+  "who": [
+   "TVP review led by: Platform Team Lead with stream-aligned team representatives",
+   "Usage data maintained by: platform team (instrumented)",
+   "Deprecation decisions: platform team lead with stream-aligned team agreement",
+   "New capability requests submitted by: stream-aligned teams; reviewed by platform lead quarterly"
+  ],
+  "scenario": "A platform team's TVP review reveals that a 'feature flag management' capability they built 6 months ago is used by only 1 of 7 stream-aligned teams. The other 6 teams are using LaunchDarkly directly. The platform team deprecates the bespoke capability and officially endorses LaunchDarkly as the standard. Maintenance burden decreases; the single team migrates to LaunchDarkly and gains 4 features they previously lacked. TVP discipline saves 20% of platform team capacity."
+ },
+ "Experiment Hypothesis Template": {
+  "code": "E1",
+  "cat": "Experimentation",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A structured one-page template for defining any experiment before it is built — containing: hypothesis statement, key assumption, build specification (minimum version), success metric, failure metric, and decision rule",
+   "Hypothesis format: 'We believe [building X] will result in [outcome Y] for [customer Z], measurable by [metric M], because [assumption A]'",
+   "Decision rule: pre-committed — 'if metric M reaches threshold T within N days, we continue; otherwise, we pivot/stop'",
+   "Template is the entry ticket for any experiment entering the sprint backlog"
+  ],
+  "why": [
+   "Experiments without hypotheses are features in disguise — they get built, shipped, and never formally assessed",
+   "The template forces clarity about what you are testing and how you will know if it worked — before spending any build time",
+   "Pre-committed decision rules prevent post-hoc rationalisation: teams cannot move the goalposts after seeing the results",
+   "Over time, teams with disciplined hypothesis templates make significantly better product investment decisions"
+  ],
+  "how": [
+   "Template takes 20–30 min to complete — if a team cannot complete it in 30 min, the thinking is not ready",
+   "Review template in backlog refinement: is the hypothesis testable? Is the minimum build truly minimum? Is the metric clearly measurable?",
+   "Template stored in Confluence or Notion alongside the work item — findable when the measurement phase arrives",
+   "After each experiment: rate the quality of the template in retrospective — did the decision rule work? Was the metric the right one?"
+  ],
+  "who": [
+   "Template authored by: Product Owner before refinement",
+   "Reviewed by: engineering lead (feasibility) + Agile Coach (hypothesis quality) + data analyst (metric feasibility)",
+   "Approved by: Product Owner as entry condition for sprint planning",
+   "Archived by: Product Owner in the experiment log after the experiment concludes"
+  ],
+  "scenario": "A team starts using the Experiment Hypothesis Template for all new feature work. In the first sprint, 3 experiment hypotheses are reviewed in refinement. One is rejected before development starts: the metric the team planned to use ('user engagement') cannot be attributed to the specific feature being built — it will be confounded by a simultaneous A/B test. The team redesigns the experiment with an attributable metric. One sprint of misdirected measurement effort is avoided."
+ },
+ "Safe-to-Fail Sandbox": {
+  "code": "E2",
+  "cat": "Experimentation",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A designated environment (technical, organisational, and cultural) where experiments can be tried without the risk of production impact, political consequence, or performance evaluation",
+   "Technical sandbox: a separate environment with production-like data that is reset regularly",
+   "Organisational sandbox: a defined budget envelope and time allocation (e.g., 10% of sprint capacity) explicitly reserved for exploratory experiments",
+   "Cultural sandbox: explicit leadership permission — 'experiments in the sandbox cannot be used as evidence of poor judgment'"
+  ],
+  "why": [
+   "Without explicit safe-to-fail space, experiments are conducted at the same risk level as production decisions — creating the risk-aversion that kills innovation",
+   "A defined sandbox enables genuinely bold experiments: people try things they would never risk in a production context",
+   "The cultural dimension is the most important: the sandbox must have explicit leadership permission, or the technical and organisational infrastructure is wasted",
+   "Teams that have a safe-to-fail sandbox generate 3–5x more useful experiment ideas than those without one"
+  ],
+  "how": [
+   "Technical: set up a production-mirror sandbox environment (refreshed monthly with anonymised production data)",
+   "Organisational: ring-fence 10% of sprint capacity as 'sandbox experiments' — protected in planning, not available to stakeholders",
+   "Cultural: leadership communicates explicitly: 'sandbox experiments that fail are learning, not failure; they will not be referenced in performance conversations'",
+   "Review sandbox experiments monthly in a team showcase — celebrate the learning, not just the outcomes"
+  ],
+  "who": [
+   "Technical sandbox: built and maintained by engineering/DevOps team",
+   "Capacity protection: Agile Coach enforces in sprint planning",
+   "Cultural permission: senior leadership communicates and models (runs their own sandbox experiments publicly)",
+   "Monthly showcase: open to all interested employees"
+  ],
+  "scenario": "A team's safe-to-fail sandbox enables an experiment that no one would have proposed in a production planning session: replacing the entire recommendation algorithm with a simple rule-based system to test whether the ML complexity was necessary. Result: the simple rule-based system performs 94% as well as the ML model at 10% of the infrastructure cost. The experiment would never have happened in production. The finding saves an estimated £180K per year in infrastructure costs."
+ },
+ "Experiment Velocity Tracking": {
+  "code": "E3",
+  "cat": "Experimentation",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A metric tracking how many experiments the team runs per sprint/month — measuring the organisation's rate of validated learning, not just its rate of feature delivery",
+   "Tracked alongside delivery metrics: throughput, cycle time, and quality",
+   "Target: at least 2 validated experiments per sprint (one confirms a hypothesis; one refutes)",
+   "Displayed on the team dashboard; reviewed in retrospectives when experiment velocity drops below target"
+  ],
+  "why": [
+   "Delivery velocity without experiment velocity is efficiency without learning — teams that build fast but test rarely make fast, repeated mistakes",
+   "Experiment velocity is a leading indicator of product-market fit: organisations that learn faster beat organisations that build faster",
+   "When experiment velocity is tracked, it signals that leadership values learning as much as delivery — changing team behaviour",
+   "Low experiment velocity often reveals a cultural problem: teams are afraid to propose experiments because they might 'fail'"
+  ],
+  "how": [
+   "Instrument the experiment tracking tool: count experiments started, completed, and with confirmed/refuted outcomes per sprint",
+   "Define 'experiment': any piece of work with a hypothesis template and a defined measurement phase — not all features qualify",
+   "Display experiment velocity trend on the team dashboard alongside delivery velocity",
+   "When velocity drops below target (2/sprint): retrospective agenda item — what prevented experimentation this sprint?"
+  ],
+  "who": [
+   "Metric designed by: Agile Coach",
+   "Tracked by: Product Owner (experiment log)",
+   "Reviewed in: sprint retrospectives when below target",
+   "Reported to: leadership in monthly product forum as a learning culture indicator"
+  ],
+  "scenario": "Experiment velocity tracking shows a team averaging 0.4 experiments per sprint over 3 months — they are barely experimenting. The retrospective surfaces the root cause: the team has been under intense delivery pressure for a major release and all discretionary capacity has been consumed. After the release, the team renegotiates their capacity allocation: 15% protected for experimentation. Experiment velocity rises to 1.8 per sprint. Product improvement quality (measured by post-release usage metrics) improves visibly in the following quarter."
+ },
+ "Experiment Retrospectives": {
+  "code": "E4",
+  "cat": "Experimentation",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A structured retrospective format dedicated to reviewing the quality and outcomes of experiments run in the previous quarter — distinct from sprint retrospectives",
+   "Questions: which experiments produced the most valuable learning? Which experiments were poorly designed? What patterns do we see in our experiments?",
+   "Output: improvements to the experiment design process + 2–3 insights to carry into the next quarter's experiments",
+   "Run quarterly; takes 90 minutes"
+  ],
+  "why": [
+   "Individual experiment reviews are tactical; quarterly experiment retrospectives are strategic — they examine the team's experimentation capability, not just the outcomes",
+   "Teams that reflect on experiment quality improve their experiment design faster than those that only reflect on experiment outcomes",
+   "The retrospective surfaces systemic patterns: if 70% of experiments have unclear hypotheses, the problem is the template or the process",
+   "Learning about how to learn is the highest-leverage meta-capability a product team can develop"
+  ],
+  "how": [
+   "Quarterly: gather all completed experiment records from the quarter",
+   "Group experiments by outcome: confirmed hypothesis, refuted hypothesis, inconclusive (measurement failed)",
+   "Analyse the inconclusive experiments: why did measurement fail? What would have made the experiment designable?",
+   "Identify the top 3 improvements to the experiment design process for next quarter"
+  ],
+  "who": [
+   "Facilitated by: Agile Coach",
+   "Participants: full team + product owner",
+   "Data prepared by: Product Owner (experiment log summary)",
+   "Outputs: experiment process improvements + insights for next quarter; owned by Product Owner"
+  ],
+  "scenario": "An experiment retrospective analyses 14 experiments from the quarter. 8 confirmed or refuted their hypothesis (good). 6 were inconclusive. Pattern analysis of the 6 inconclusive: 5 of them shared a metric that is confounded by seasonal variation (the experiments were run during a holiday period). The team adds a 'confounding factors' field to the experiment template and a pre-experiment check for seasonality. This prevents an entire class of inconclusive experiments going forward."
+ },
+ "A/B Testing Infrastructure": {
+  "code": "E5",
+  "cat": "Experimentation",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A fully automated, self-service system enabling any team member to create and run A/B tests in production without requiring engineering intervention for each test",
+   "Capabilities: experiment creation (define variant, audience, metric, duration), automated traffic split, real-time statistical significance monitoring, and one-click winner deployment",
+   "Tests managed through a self-service interface — not through a backlog ticket to a data team",
+   "Results visible in real time; automated stopping rules prevent both false positives (stopping too early) and waste (running too long after significance is reached)"
+  ],
+  "why": [
+   "Manual A/B testing (engineering-implemented per test) is slow and expensive — it creates a bottleneck that limits experiment velocity",
+   "Self-service A/B testing democratises experimentation: product managers, designers, and marketers can run tests without engineering time",
+   "The ROI on A/B testing infrastructure is among the highest in product engineering: a 2% improvement from a well-designed test on high-traffic flows can generate millions in annual value",
+   "Organisations with self-service A/B testing run 10–50x more experiments than those without"
+  ],
+  "how": [
+   "Implement: Optimizely, LaunchDarkly Experimentation, GrowthBook (open source), or build on feature flag infrastructure",
+   "Feature set: variant creation, audience targeting, metric selection (from analytics platform), significance threshold setting",
+   "Integrate statistical significance alerts: notify experiment owner when significance is reached; automated stopping rules when significance > 95%",
+   "Enable: any team member can create a test in under 30 min without engineering help"
+  ],
+  "who": [
+   "Built by: platform/data engineering team",
+   "Maintained by: data engineering team (ongoing)",
+   "Used by: any team member (product, design, marketing, engineering)",
+   "Statistical review: data analyst validates experiment design for significance before launch"
+  ],
+  "scenario": "A UX designer hypothesises that changing the checkout CTA from 'Complete Purchase' to 'Place My Order' will increase conversion. With the A/B testing infrastructure, she creates and launches the test herself in 25 minutes — no engineering ticket, no sprint dependency. The test reaches statistical significance after 8 days: the variant improves conversion by 3.2%. She deploys the winner with one click. Total value: estimated £140K additional annual revenue. Total cost: 25 minutes of designer time + 8 days of automated testing."
+ },
+ "Celebrating Failed Experiments": {
+  "code": "E6",
+  "cat": "Experimentation",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A deliberate, recurring practice of publicly recognising and celebrating experiments that refuted their hypothesis — treating a 'no' answer as equal in value to a 'yes'",
+   "Formats: monthly 'failed experiment spotlight' at all-hands, a 'wall of learning' showing refuted experiments with the learning extracted, or an 'experiment of the month' award given to the best-designed experiment regardless of outcome",
+   "Celebrates: the quality of the experiment design and the value of the learning — not the outcome",
+   "Senior leaders share their own failed experiments publicly and visibly"
+  ],
+  "why": [
+   "If only successful experiments are celebrated, teams bias toward safe hypotheses and avoid bold experiments",
+   "Celebrating failed experiments signals that the organisation genuinely values learning over certainty — not just in its values statement but in its visible behaviour",
+   "Teams that have seen failed experiments celebrated are significantly more willing to propose high-risk experiments",
+   "This practice is the operational implementation of psychological safety at the product-team level"
+  ],
+  "how": [
+   "Monthly all-hands: feature one 'learning experiment' — a refuted hypothesis with the most valuable learning extracted",
+   "Learning must be specific: not 'we learned customers don't want X' but 'we learned that 68% of customers in segment A prefer Y to X when they have used the product for more than 30 days'",
+   "Senior leaders participate visibly: they share their own refuted hypotheses in the format, with the same level of specificity",
+   "Recognition: the team whose experiment produced the most useful learning receives visible acknowledgement"
+  ],
+  "who": [
+   "Programme owned by: Product Owner culture (every product team runs it)",
+   "Coordinated by: Org Transformation Lead (org-wide visibility)",
+   "Senior leader participation: required — their visibility is the cultural signal",
+   "Recognition: informal but consistent — the learning spotlight is on the agenda every month, not optional"
+  ],
+  "scenario": "A product team runs a celebrated failed experiment spotlight for the first time. A junior designer shares an experiment she designed — a hypothesis that a new onboarding animation would reduce drop-off — which was refuted: drop-off increased 8%. But the learning was specific: the animation increased perceived load time, causing impatient users to abandon. The CTO publicly thanks her for the insight — which prevents the same mistake in 3 subsequent animation features. The designer's next experiment hypothesis is the most sophisticated the team has ever written."
+ },
+ "Deployment Pipeline Baseline": {
+  "code": "CD1",
+  "cat": "Continuous Delivery",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "An initial measurement of the current deployment pipeline: how long it takes, how often it is run, what stages exist, its reliability (pass rate), and what human intervention it requires",
+   "Baseline metrics: build duration, test duration, deployment duration, pipeline pass rate, frequency of deployment, and MTTR when deployment fails",
+   "The baseline is the starting point for all pipeline improvement work — without it, 'we improved the pipeline' is unmeasurable",
+   "Published to the team; reviewed in the first pipeline improvement workshop"
+  ],
+  "why": [
+   "You cannot improve what you have not measured — the baseline converts pipeline improvement from opinion to evidence",
+   "Most teams believe their pipeline is faster/more reliable than it is; the baseline corrects this bias with data",
+   "The baseline creates a benchmark against which all subsequent automation and reliability investments can be measured",
+   "DORA research uses deployment frequency and lead time for changes as key performance metrics — the baseline is where your DORA measurement begins"
+  ],
+  "how": [
+   "Pull data from: CI/CD tool (Jenkins, GitHub Actions, CircleCI) — build duration, test duration, deploy duration, pass rate for last 90 days",
+   "If data is unavailable (manual processes): estimate via team survey + direct observation",
+   "Calculate: average build time, test time, deploy time, pass rate, and deployment frequency (deploys per week/day)",
+   "Present in a team session: 'this is our pipeline today — here is our baseline'"
+  ],
+  "who": [
+   "Baseline conducted by: Agile Coach + Engineering Lead",
+   "Data pulled from: CI/CD tooling by DevOps engineer or senior engineer",
+   "Presented to: full team in a dedicated session",
+   "Used as: the reference point for all pipeline improvement OKRs"
+  ],
+  "scenario": "A team's deployment pipeline baseline reveals: build + test + deploy takes 47 minutes average; pass rate is 61% (39% of pipeline runs fail); deployment frequency is 2x per week. Comparing against DORA Elite benchmarks (< 1 hour, > 95% pass rate, multiple daily), the team can see clearly where they are vs where high-performing teams operate. The baseline becomes the basis for a 2-quarter pipeline improvement roadmap. By the end: 12-minute pipeline, 94% pass rate, daily deployments."
+ },
+ "Sprint-Cadence Releases": {
+  "code": "CD2",
+  "cat": "Continuous Delivery",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "The practice of releasing to production at the end of every sprint — creating a predictable release cadence aligned to the delivery rhythm",
+   "Sprint-cadence releases enforce discipline: all work in a sprint must be releasable by sprint end",
+   "Release includes: all completed and tested stories, regression testing, deployment to staging then production, and release notes",
+   "This is the stepping stone to continuous deployment — it establishes release confidence before increasing frequency"
+  ],
+  "why": [
+   "Teams that release infrequently accumulate risk: each release contains many changes, making rollback complex and failure investigation difficult",
+   "Sprint-cadence releases reduce batch size at the release level: smaller releases are less risky, faster to roll back, and easier to diagnose",
+   "The discipline of making every sprint's work releasable changes how the team thinks about Definition of Done",
+   "DORA research shows release frequency strongly correlates with release stability — frequent releasers have lower change fail rates, not higher"
+  ],
+  "how": [
+   "Sprint planning: only commit to work that can be releasable by sprint end — if it can't be finished, it doesn't enter the sprint",
+   "Sprint week: deployment pipeline runs on every merge; staging deployment automated",
+   "Sprint end: release checklist completed (automated where possible); production deployment; release notes published",
+   "Retrospective: was everything releasable? If not, why? Improve the Definition of Done or sprint commitment process"
+  ],
+  "who": [
+   "Owned by: Engineering Lead with Product Owner",
+   "Release checklist maintained by: Engineering Lead",
+   "Deployment executed by: any engineer (rotation)",
+   "Release notes authored by: Product Owner"
+  ],
+  "scenario": "A team transitioning from quarterly releases to sprint-cadence releases discovers in sprint 2 that their regression test suite takes 6 hours — preventing sprint-end releases. Rather than extending the sprint, the team adds 'test automation for top 10 manual regression tests' to their backlog. Within 3 sprints, the regression suite is reduced to 45 minutes and fully automated. Sprint-cadence releases become sustainable — and the testing improvement compounds for every subsequent release."
+ },
+ "Blue/Green Deployments": {
+  "code": "CD3",
+  "cat": "Continuous Delivery",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A deployment pattern maintaining two identical production environments (Blue and Green) — only one serves live traffic at any time",
+   "To deploy: prepare the new version on the inactive environment; run tests; switch traffic from the current environment to the new one in seconds",
+   "Rollback: switch traffic back to the previous environment — takes 30 seconds, not 30 minutes",
+   "Both environments are maintained simultaneously; after successful deployment, the previous environment becomes the new 'inactive' ready for the next deployment"
+  ],
+  "why": [
+   "Traditional deployments require taking the application offline or accepting risk during the deployment window",
+   "Blue/green deployments make deployment near-zero downtime: traffic switches in under a second",
+   "Rollback is trivial: switch the load balancer back — no code change, no redeploy, no incident",
+   "The pattern also enables safe production testing: the green environment can serve a canary audience before full traffic switch"
+  ],
+  "how": [
+   "Provision: two identical production environments (Kubernetes namespaces, separate VMs, or ECS services)",
+   "Deployment pipeline: build and test new version on inactive environment → run smoke tests → switch load balancer → monitor for 15 minutes → decommission or keep old environment for rollback",
+   "Rollback runbook: single load balancer switch — documented and practised in quarterly game days",
+   "Cost: approximately 2x infrastructure cost during deployment window (typically less than 1 hour)"
+  ],
+  "who": [
+   "Implemented by: DevOps/platform engineering team",
+   "Deployment executed by: any engineer with deployment access",
+   "Rollback decision: on-call engineer (self-service — no approval required for rollback)",
+   "Pattern reviewed: in quarterly platform architecture review"
+  ],
+  "scenario": "During a Tuesday morning deployment, the new version has a critical memory leak that wasn't caught in testing. Within 8 minutes of the traffic switch, production monitoring alerts fire: memory usage climbing rapidly. The on-call engineer executes the blue/green rollback: one Terraform command, 25-second traffic switch. Total customer impact: 8 minutes of degraded performance for 12% of users (canary segment). Without blue/green: full rollback deployment would have taken 45 minutes, affecting 100% of users for the duration."
+ },
+ "Deployment Frequency Metric": {
+  "code": "CD4",
+  "cat": "Continuous Delivery",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A tracked metric measuring how often the team deploys to production — expressed as deploys per day, week, or month",
+   "Tracked and displayed on the team's engineering dashboard alongside other DORA metrics",
+   "Reviewed in sprint retrospectives and monthly performance forums",
+   "Used to set deployment frequency improvement targets — tracked quarterly against DORA performance level benchmarks (Low: weekly-monthly, Medium: weekly, High: daily, Elite: multiple times/day)"
+  ],
+  "why": [
+   "DORA research consistently shows deployment frequency as one of the top predictors of both delivery performance and operational stability",
+   "Higher deployment frequency correlates with lower change fail rate — counterintuitively, deploying more frequently reduces risk per deployment",
+   "Tracking the metric creates accountability: teams can see whether they are improving, plateauing, or regressing",
+   "Deployment frequency also reveals pipeline health: a team that wants to deploy daily but can't is being constrained by pipeline reliability or test suite speed"
+  ],
+  "how": [
+   "Instrument: count production deployments per day from CI/CD tool; display on team dashboard with trend line",
+   "Review in sprint retrospective: what is our current deployment frequency? Is it improving?",
+   "Set a quarterly target: which DORA level are we targeting? What would need to change to reach it?",
+   "Track blockers to increased frequency: pipeline reliability, test suite duration, manual approval steps, release process overhead"
+  ],
+  "who": [
+   "Metric instrumented by: DevOps engineer",
+   "Reviewed by: team in retrospectives + Engineering Lead monthly",
+   "DORA benchmark comparison: Agile Coach presents quarterly",
+   "Improvement targets set by: Engineering Lead + Product Owner"
+  ],
+  "scenario": "A team tracks deployment frequency and discovers they are at 1.2 deploys per week (Low DORA category). Their target is High (1+ per day). The gap analysis reveals 3 blockers: 45-minute test suite, a manual security review requirement for every deployment, and a manual database migration approval. The team addresses them sequentially over 2 quarters. By quarter 3: 1.8 deploys per day (Elite category). Change fail rate drops from 18% to 4% in the same period."
+ },
+ "Change Failure Rate Reduction": {
+  "code": "CD5",
+  "cat": "Continuous Delivery",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A focused improvement programme targeting the percentage of deployments that cause a degradation in service requiring a hotfix, rollback, or forward fix (DORA: Change Failure Rate)",
+   "Measured as: (deployments that required remediation) / (total deployments) × 100%",
+   "Programme includes: root cause analysis of every failure, systematic improvement of test coverage and deployment practices, and weekly trend monitoring",
+   "Target: move from current DORA level toward the Elite benchmark (0–15% change failure rate)"
+  ],
+  "why": [
+   "DORA research shows change failure rate as one of the most important predictors of delivery performance — high-performing teams have dramatically lower failure rates than low performers",
+   "Each failed deployment creates: customer impact, incident response overhead, trust damage, and developer flow interruption — all expensive",
+   "Most change failures have preventable causes: insufficient test coverage, manual processes with human error, or deployment to environments that don't match production",
+   "Teams that invest in change failure rate reduction see compounding returns: each failure prevented is a disruption avoided for all future deployments"
+  ],
+  "how": [
+   "Baseline: calculate change failure rate from the last 90 days of deployment data",
+   "Root cause analysis of every failed deployment in the last quarter: what was the root cause? What type of test or check would have caught it?",
+   "Priority improvement areas: invest where the highest concentration of failure root causes exists (often test coverage, environment parity, or deployment automation)",
+   "Track weekly: is the failure rate trend improving? Adjust investment based on the data"
+  ],
+  "who": [
+   "Programme led by: Engineering Lead + Agile Coach",
+   "Root cause analysis: conducted by the team that deployed the failing change",
+   "Improvement actions: owned by engineering team",
+   "Reported monthly to: leadership in engineering health forum"
+  ],
+  "scenario": "A team's change failure rate is 28% (Low DORA category). Root cause analysis of 15 failed deployments reveals: 8 were caused by untested configuration changes; 4 by database migration errors not caught in staging; 3 by integration failures with a specific third-party service. The team invests in: configuration change test suite, production-mirror database in staging, and expanded integration test coverage. Change failure rate drops to 9% within 2 quarters (Elite DORA category)."
+ },
+ "Test Pyramid Implementation": {
+  "code": "QP1",
+  "cat": "Quality Practices",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A testing strategy structuring tests in three layers: many fast unit tests at the base, fewer integration tests in the middle, and few slow end-to-end tests at the top",
+   "Current-state baseline: how many tests exist at each layer? What is the ratio?",
+   "Target ratio: 70% unit, 20% integration, 10% end-to-end (or calibrated to context)",
+   "Test pyramid is implemented incrementally: teams add tests at the correct layer when writing new code and when fixing bugs"
+  ],
+  "why": [
+   "Inverted test pyramids (many E2E, few unit tests) are slow, brittle, and expensive to maintain — they create the deployment bottleneck that prevents continuous delivery",
+   "A well-structured test pyramid provides fast feedback (unit tests in seconds) and reliable coverage (integration tests in minutes)",
+   "Every bug fixed without a new test will recur — the pyramid grows naturally when teams follow this discipline",
+   "DORA research shows test automation quality as a strong predictor of delivery performance"
+  ],
+  "how": [
+   "Baseline: count current tests per layer; calculate the ratio; compare to target",
+   "For all new code: write unit tests as part of development (test-first or test-alongside)",
+   "For all bug fixes: add a unit test that would have caught the bug before fixing it",
+   "Quarterly: review pyramid ratio; invest in restructuring if E2E ratio is growing"
+  ],
+  "who": [
+   "Strategy set by: Engineering Lead + Agile Coach",
+   "Implemented by: all engineers (every PR)",
+   "Reviewed quarterly by: Engineering Lead (pyramid health report)",
+   "Reported to: leadership as part of technical health metrics"
+  ],
+  "scenario": "A team's test pyramid is inverted: 400 E2E tests, 120 integration tests, 80 unit tests. Pipeline run time: 55 minutes. E2E tests fail randomly 30% of the time (flakiness), consuming developer time investigating false failures. A 2-quarter pyramid rebalancing adds 600 unit tests covering the same scenarios as 200 of the E2E tests, which are removed. Pipeline time drops from 55 to 22 minutes. Flakiness drops from 30% to 4%. Developer satisfaction with the test suite increases measurably."
+ },
+ "Definition of Done with Quality": {
+  "code": "QP2",
+  "cat": "Quality Practices",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "An explicit team agreement specifying what 'done' means for a story — including specific quality criteria that must be met before the story can be marked complete",
+   "Quality criteria include: unit tests written and passing, integration tests passing, code reviewed by 2 engineers, no new high-severity linting violations, deployed to staging, and product owner acceptance",
+   "The DoD is displayed on the team's wiki and referenced in sprint planning and review",
+   "Reviewed and updated quarterly — quality standards should increase as the team matures"
+  ],
+  "why": [
+   "Without a shared DoD, 'done' means different things to different team members — leading to half-done work being marked complete",
+   "A DoD with explicit quality criteria prevents the most common quality failure modes: missing tests, skipped reviews, undeployed code",
+   "When quality is a DoD criterion rather than a post-delivery retrofit, the cost of quality is dramatically lower",
+   "Teams with rigorous DoDs experience far fewer production incidents than those with informal quality standards"
+  ],
+  "how": [
+   "Workshop (60 min): 'what must be true before we can call this story done?' — generate criteria from the whole team",
+   "Group into categories: code quality, test coverage, documentation, deployment, acceptance",
+   "Select 6–10 criteria that are meaningful and consistently achievable — the DoD should be challenging but not aspirational fiction",
+   "Display on the team wiki and reference in sprint planning: 'is everything here ready to meet all DoD criteria?'"
+  ],
+  "who": [
+   "Defined by: team collaboratively in a workshop",
+   "Facilitated by: Agile Coach",
+   "Maintained on: team wiki (primary owner: Scrum Master)",
+   "Reviewed quarterly in: retrospectives — is the DoD still appropriate? Can we raise the bar?"
+  ],
+  "scenario": "Before defining a DoD with quality criteria, a team regularly marks stories 'done' without integration tests and with unreviewed code. After the DoD is established, a story in the next sprint is blocked from being marked done because integration tests are missing. The developer writes the tests — discovering an edge case bug in the process. The bug is fixed before it reached staging. Without the DoD, the same bug would have been discovered by the product owner in sprint review or by a customer in production."
+ },
+ "Code Review Standards": {
+  "code": "QP3",
+  "cat": "Quality Practices",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A published, team-agreed set of standards for what a code review should examine and how it should be conducted",
+   "Standards include: correctness, testability, readability, security patterns, performance considerations, and adherence to architectural decisions",
+   "Feedback standards: distinguish between blocking issues (must be resolved before merge) and non-blocking suggestions (improvement opportunities)",
+   "Updated quarterly — as the codebase and team evolve, so should the standards"
+  ],
+  "why": [
+   "Code reviews without standards are inconsistent: some reviews are thorough, some are rubber-stamps, and the difference depends on who is reviewing",
+   "Inconsistency creates two problems: false confidence (rubber-stamp approvals miss defects) and friction (overly thorough reviews slow delivery without adding value)",
+   "Review standards also make feedback culture explicit: unclear feedback or purely negative reviews damage psychological safety — standards create a professional, constructive review culture",
+   "Teams with review standards improve review quality and review speed"
+  ],
+  "how": [
+   "Workshop (90 min): what does a good code review examine? What makes feedback constructive vs destructive?",
+   "Draft standards covering: technical checklist (security, performance, tests, readability) + feedback guidelines (constructive language, blocking vs non-blocking)",
+   "Publish on the team wiki; reference in onboarding; review in PR template",
+   "Quarterly review: are reviews consistent with the standards? Run a code review retrospective every 6 months"
+  ],
+  "who": [
+   "Standards defined by: engineering team collaboratively",
+   "Maintained on: team wiki + PR review template",
+   "Reviewed quarterly by: Engineering Lead + team",
+   "New engineer onboarding: standards reviewed in week 1"
+  ],
+  "scenario": "After defining code review standards, the team adds a PR template with a review checklist. In the first 2 weeks, reviewers start flagging security patterns they had previously overlooked — because 'check for injection vulnerabilities' is now explicitly on the checklist. Three potential security issues are caught in review that would previously have passed. Review time increases slightly (5 minutes per PR) but defect escape rate drops 40% in the following quarter."
+ },
+ "Defect Escape Rate Tracking": {
+  "code": "QP4",
+  "cat": "Quality Practices",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A metric measuring the percentage of defects discovered in production vs total defects discovered (production + testing)",
+   "Expressed as: (production defects in period) / (total defects in period) × 100%",
+   "Tracked monthly and trended — direction is more important than absolute level",
+   "Used to evaluate the effectiveness of testing strategy: a rising escape rate signals testing is not keeping pace with code complexity or change rate"
+  ],
+  "why": [
+   "Defects discovered in production are 10–100x more expensive to fix than defects caught in testing — tracking escape rate measures this cost directly",
+   "Without escape rate tracking, teams cannot know whether their test investments are working",
+   "Escape rate trending reveals systemic quality problems early: a steadily rising escape rate predicts a production incident surge 4–6 weeks ahead",
+   "Teams that track and improve their defect escape rate build the empirical foundation for quality investment decisions"
+  ],
+  "how": [
+   "Instrument: tag all defects with discovery stage (unit test, integration test, staging, production) in Jira",
+   "Monthly: calculate (production-discovered defects) / (total defects) — expressed as a percentage",
+   "Display on engineering health dashboard with trend line",
+   "When escape rate rises above threshold (team defines their own — typically >15%): root cause analysis — what is the test gap?"
+  ],
+  "who": [
+   "Metric designed by: Engineering Lead + Agile Coach",
+   "Data tagged by: whoever discovers/creates the defect (process discipline)",
+   "Reported monthly by: Engineering Lead",
+   "Used for: test strategy investment decisions and quality OKR setting"
+  ],
+  "scenario": "A team's defect escape rate rises from 12% to 31% over 2 months. Root cause analysis reveals the increase correlates with a new feature area that was built under time pressure with minimal test coverage. The team backlogs 3 sprints of test coverage catch-up for the new area. Escape rate returns to 9% within 6 weeks. The data makes the case for the catch-up work in a way that 'we should have better tests' could not."
+ },
+ "Pair and Mob Programming": {
+  "code": "QP5",
+  "cat": "Quality Practices",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "Pair programming: two developers work on the same code at the same time — one 'driver' types, one 'navigator' reviews and guides; roles rotate regularly",
+   "Mob programming: 3–5 developers work together on the same code at the same computer/screen simultaneously",
+   "Both practices: entirely voluntary per session, not mandated for all work",
+   "Applied selectively: most valuable for complex problems, knowledge transfer, and high-stakes code — not for all work"
+  ],
+  "why": [
+   "Pair programming reduces defect rate by 15–20% compared to solo development — the navigator catches issues the driver misses in real time",
+   "Knowledge transfer through pairing is the most effective mechanism for spreading both technical skills and codebase context",
+   "Mob programming on hard problems converges to a solution faster than individuals working in parallel on the same problem",
+   "Both practices reduce code review overhead: when 2–5 engineers built the code together, formal review is a formality not a quality gate"
+  ],
+  "how": [
+   "Introduce as an experiment: 2 sprints of voluntary pairing on the most complex stories; retrospective on the experience",
+   "Remote pairing tools: VS Code Live Share, JetBrains Code With Me, or tuple.app",
+   "Mob programming: weekly 2-hour mob session on the team's hardest problem; driver rotation every 15 minutes",
+   "Measure: defect rate, code review turnaround, and team knowledge distribution score before and after"
+  ],
+  "who": [
+   "Introduced by: Agile Coach",
+   "Practice decisions: made by the team (when to pair, when to mob — self-organised)",
+   "Facilitated mob sessions: Agile Coach runs the first 3 to establish the format",
+   "Results shared: in retrospectives and quarterly engineering forum"
+  ],
+  "scenario": "A team introduces mob programming for their weekly 'hardest problem' sessions. In the first month, they mob on a complex data migration design that had been stuck for 2 sprints with 3 engineers working independently. The mob converges to a solution in 3 hours — less time than any individual had spent on the problem alone. The solution also passes code review immediately because 5 engineers co-authored it. The team makes mob sessions a permanent fixture."
+ },
+ "Quality Engineering Culture": {
+  "code": "QP6",
+  "cat": "Quality Practices",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A team-wide culture where quality is everyone's responsibility — not the sole domain of QA engineers or code reviewers",
+   "Manifests in: every engineer writing tests before or alongside code, every PR being reviewed with quality rigour, and every team member feeling empowered to stop work when quality standards cannot be met",
+   "Measured through: defect escape rate, DoD adherence, test pyramid health, and team self-assessment on quality ownership",
+   "Built over 6–12 months through training, tooling, recognition, and leadership modelling"
+  ],
+  "why": [
+   "Quality enforced by gatekeepers produces minimum viable quality; quality owned by the team produces continuously improving quality",
+   "When quality is everyone's job, problems are caught at the source — not at the gate downstream",
+   "A quality engineering culture is self-reinforcing: teams that are proud of their quality record work harder to maintain it than teams that see quality as a compliance exercise",
+   "The business case is straightforward: teams with quality engineering culture spend 20–30% less time on rework and incident response than those without"
+  ],
+  "how": [
+   "Define quality ownership explicitly in the team's operating model: 'everyone on this team is responsible for quality'",
+   "Training: quality engineering fundamentals workshop (half day) covering test strategy, TDD basics, and quality metrics interpretation",
+   "Recognition: celebrate quality wins — zero-defect sprints, improved escape rates, successful chaos engineering — in the same way as feature delivery wins",
+   "Leadership modelling: engineering lead and senior engineers demonstrate quality behaviour visibly in their own code and reviews"
+  ],
+  "who": [
+   "Culture built by: Engineering Lead + Agile Coach collaboratively",
+   "Training delivered by: Engineering Lead or external quality engineering expert",
+   "Recognition programme owned by: Engineering Lead",
+   "Progress measured by: Engineering Lead quarterly (test pyramid, escape rate, DoD adherence)"
+  ],
+  "scenario": "An engineering team transitions from 'QA team catches defects' to 'we own quality'. Over 6 months: test pyramid ratio improves from 20/40/40 to 65/25/10; defect escape rate drops from 28% to 7%; time spent on incident response drops from 22% to 8% of engineering capacity. The freed capacity is reinvested in feature delivery. The team's delivery velocity (measured by customer outcomes) increases 35% — without any headcount change. The quality investment paid for itself and then some."
+ },
+ "Now/Next/Later Format": {
+  "code": "RM1",
+  "cat": "Roadmap Management",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A simple three-column roadmap format: Now (current sprint or quarter — committed), Next (following sprint or quarter — directional), Later (beyond that — aspirational)",
+   "Each column has decreasing specificity and increasing flexibility — only 'Now' contains commitments",
+   "Designed for communication, not project management: it tells stakeholders what to expect, not when exactly every feature ships",
+   "Updated monthly; reviewed with stakeholders in each sprint review"
+  ],
+  "why": [
+   "Traditional roadmaps with dates create false precision — and then break trust when dates slip",
+   "Now/Next/Later is honest about uncertainty: it sets expectations that increase in flexibility as the time horizon extends",
+   "Stakeholders who see a Now/Next/Later roadmap can make informed decisions without being misled by date commitments the team cannot keep",
+   "The format also simplifies roadmap maintenance: 'Later' doesn't need weekly updates because it's explicitly directional, not committed"
+  ],
+  "how": [
+   "Migrate existing roadmap to Now/Next/Later format in a 60-min session with Product Owner and stakeholders",
+   "'Now' column: only items in the current sprint or confirmed for the next sprint — genuine commitments",
+   "'Next' column: items expected in the following 1–2 sprints — directional, subject to learning",
+   "'Later' column: strategic direction for the coming quarter — themes and intentions, not features"
+  ],
+  "who": [
+   "Maintained by: Product Owner",
+   "Reviewed with: stakeholders monthly",
+   "Updated after: each sprint planning + any significant portfolio decision",
+   "Communicated to: all stakeholders and team members — the roadmap is never confidential"
+  ],
+  "scenario": "A team switches from a quarterly roadmap with dates to Now/Next/Later. At the first stakeholder review, a key stakeholder objects: 'I need dates for budgeting purposes.' The Product Owner responds: 'Now items will be done this quarter. Next items are planned for next quarter. This is the most honest forecast I can give you — dates would imply a certainty I don't have.' The stakeholder accepts this after one quarter of the team consistently delivering 'Now' items. Trust in the roadmap increases, not decreases."
+ },
+ "Monthly Roadmap Reviews": {
+  "code": "RM2",
+  "cat": "Roadmap Management",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A structured monthly session where the Product Owner reviews the roadmap with all key stakeholders — not to report progress, but to update direction based on learning",
+   "Agenda: what completed last month, what was learned, what is changing in the roadmap as a result",
+   "Duration: 60 minutes; structured format — no more than 15 minutes on 'what shipped', 45 minutes on 'what are we learning and how does the roadmap evolve?'",
+   "Output: updated roadmap published within 24 hours of the review"
+  ],
+  "why": [
+   "Roadmaps reviewed annually become strategies for a past world — monthly reviews keep the roadmap current with the market, customer learning, and strategic shifts",
+   "The learning focus — 'what changed and why' — positions the roadmap as a living strategy rather than a delivery calendar",
+   "Monthly cadence creates stakeholder trust: they know they will hear from the team regularly, reducing between-review anxiety and ad hoc requests",
+   "Product Owners who present learning in monthly reviews are treated as strategic partners; those who only present delivery status are treated as project managers"
+  ],
+  "how": [
+   "Monthly fixed meeting: 60 min, same day each month, all key stakeholders invited",
+   "Agenda: completed items (10 min) → what we learned this month (20 min) → roadmap changes based on learning (20 min) → next month's Now items (10 min)",
+   "Product Owner prepares: 3–5 learning highlights from the month (customer interview insights, experiment results, competitive signals)",
+   "Roadmap updated live in the session or within 24 hours post-session"
+  ],
+  "who": [
+   "Led by: Product Owner",
+   "Participants: key stakeholders, team lead, and engineering lead as needed",
+   "Facilitated by: Product Owner (with Agile Coach support for the first 3 sessions)",
+   "Output distributed by: Product Owner within 24 hours"
+  ],
+  "scenario": "Monthly Roadmap Reviews reveal at month 4 that the 'Next' column has had the same 3 features for 3 consecutive months — they keep getting deprioritised. The stakeholder review surfaces the pattern: these 3 features consistently lose to urgent customer issues in 'Now'. Rather than continuing to show them as 'Next', the Product Owner facilitates a conversation: should these be in the roadmap at all? Two are formally deprioritised; one is escalated for protected capacity. The roadmap becomes honest rather than aspirational."
+ },
+ "Assumption Mapping": {
+  "code": "RM3",
+  "cat": "Roadmap Management",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A facilitated workshop technique for surfacing and prioritising the assumptions underlying a product, feature, or initiative — distinguishing between assumptions about desirability, viability, feasibility, and usability",
+   "Each assumption mapped on a 2x2 grid: importance (how critical to success) vs evidence (how much do we know?)",
+   "High-importance, low-evidence assumptions become the highest-priority experiments to run",
+   "Output: a ranked list of assumptions with a testing plan for each"
+  ],
+  "why": [
+   "Most product failures are not execution failures — they are assumption failures: the core hypothesis about why users would want the product was wrong",
+   "Assumption mapping makes implicit assumptions explicit and visible — creating the shared recognition that they need to be tested, not assumed",
+   "Teams that map assumptions before building focus their experiment budget on the risks that matter most",
+   "The 2x2 grid creates prioritisation: limited time and budget are directed to the assumptions that are both critically important and poorly evidenced"
+  ],
+  "how": [
+   "Workshop (2 hours, 4–6 participants): for the initiative in question, generate all assumptions across 4 categories: desirability, viability, feasibility, usability",
+   "Map each assumption on the 2x2 (importance vs evidence) using dot voting or consensus",
+   "For high-importance/low-evidence quadrant: design a minimum experiment to test each assumption",
+   "Sequence experiments: most important, least evidenced assumptions first"
+  ],
+  "who": [
+   "Facilitated by: Agile Coach or Product Owner",
+   "Participants: full cross-functional team + 1–2 stakeholders",
+   "Output owned by: Product Owner (assumption list + experiment backlog)",
+   "Reviewed at: quarterly planning when initiative direction is reassessed"
+  ],
+  "scenario": "An Assumption Mapping session for a new B2B analytics product surfaces the highest-risk assumption: that finance managers (the target user) will change their existing Excel-based workflow to use the new product. This assumption has zero evidence — the team has only spoken to IT buyers, not finance managers. Before building anything, the team runs 8 structured interviews with finance managers. 6 of 8 say they prefer their current Excel workflow and would not switch. The product direction pivots before a line of code is written."
+ },
+ "Dependency Visibility": {
+  "code": "RM4",
+  "cat": "Roadmap Management",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A practice of making all cross-team and cross-system dependencies visible in the roadmap and sprint planning tools — not just internal work items",
+   "Dependency types tracked: API dependencies, shared infrastructure, cross-team feature dependencies, and third-party service dependencies",
+   "Each dependency has: owner team, dependency description, needed-by date, and current status (on track / at risk / blocked)",
+   "Reviewed weekly in dependency stand-up; escalated when at risk"
+  ],
+  "why": [
+   "Hidden dependencies are the most common cause of sprint spillover and roadmap slip — they arrive as surprises",
+   "When dependencies are visible, teams can negotiate sequence, build redundancy, or adjust roadmap timing before the dependency becomes a blocker",
+   "Dependency visibility also creates accountability in the providing team: when their dependency is visible to 3 other teams, they are more likely to prioritise it",
+   "Most organisations underestimate their dependency complexity by 50–70% — the visibility exercise itself is a diagnostic"
+  ],
+  "how": [
+   "In sprint planning: each team identifies their external dependencies for the sprint and logs them in the shared dependency tracker",
+   "Shared tracker: Jira dependency links, Miro swimlane board, or Confluence table — one entry per dependency",
+   "Weekly dependency stand-up (15 min): status review of all dependencies; flag at-risk items",
+   "Escalation: at-risk dependencies escalated to leadership in the portfolio forum; resolved within 48 hours (SLA)"
+  ],
+  "who": [
+   "Dependency tracking owned by: Agile Coach or Release Train Engineer",
+   "Updated by: team leads and product owners (sprint planning input)",
+   "Reviewed weekly by: all team representatives in the dependency stand-up",
+   "Escalated to: senior leadership when at risk and unresolvable at team level"
+  ],
+  "scenario": "Dependency visibility surfaces that 3 teams are all depending on a fourth team's API change in the same 2-week window — a collision no one had seen. In the dependency stand-up, the providing team confirms they can deliver one API change per week but not three simultaneously. The teams negotiate: Team A takes week 1, Team C takes week 2, Team B adjusts their roadmap by 1 sprint. The collision is resolved 3 weeks before it would have become a blocker. No delivery miss."
+ },
+ "Roadmap Retrospectives": {
+  "code": "RM5",
+  "cat": "Roadmap Management",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A quarterly retrospective examining the quality of the team's roadmap — not sprint execution, but the quality of the roadmap itself as a planning and communication tool",
+   "Questions: was our Now/Next/Later categorisation accurate? Did our assumptions hold? What was in 'Later' that we should have put in 'Now' sooner? What was in 'Now' that should have stayed in 'Later'?",
+   "Output: 2–3 improvements to the roadmap process and calibration adjustments for the next quarter",
+   "Distinct from sprint retrospective: evaluates strategic planning quality, not operational execution quality"
+  ],
+  "why": [
+   "Roadmaps that are never retrospectively evaluated become progressively worse calibrated — teams don't learn from their roadmap misses",
+   "A roadmap retrospective builds the team's forecasting and prioritisation capability — the same way a sprint retrospective builds the team's execution capability",
+   "Patterns in roadmap misses often reveal systemic planning biases: consistently over-estimating delivery speed, underestimating dependency complexity, or missing external signals",
+   "Teams with roadmap retrospectives improve their roadmap accuracy measurably quarter-over-quarter"
+  ],
+  "how": [
+   "Quarterly (last week of the quarter): 90-min session with Product Owner, Engineering Lead, and Agile Coach",
+   "Review: what was planned at the start of the quarter (saved snapshot)? What actually shipped? Why did each divergence occur?",
+   "Pattern analysis: were the misses due to scope changes, estimation errors, dependencies, or external signals?",
+   "Calibration: adjust Now/Next/Later sizing rules, dependency buffer assumptions, or stakeholder input processes based on patterns"
+  ],
+  "who": [
+   "Led by: Agile Coach with Product Owner",
+   "Participants: Product Owner, Engineering Lead, selected team members",
+   "Output owned by: Product Owner (calibration adjustments for next quarter's roadmap)",
+   "Shared with: stakeholders in the next monthly roadmap review"
+  ],
+  "scenario": "A roadmap retrospective reveals a consistent pattern: 'Next' items take 40% longer than estimated to reach 'Now', primarily due to dependency delays. The team adjusts: all 'Next' items must have dependency status confirmed before being categorised. The following quarter, 80% of 'Next' items move to 'Now' on schedule (vs 55% previously). Stakeholder trust in the roadmap improves measurably."
+ },
+ "Outcome-Based Roadmap": {
+  "code": "RM6",
+  "cat": "Roadmap Management",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A roadmap structured around outcomes the product team is trying to achieve — not around features they plan to ship",
+   "Each roadmap item is an outcome: 'reduce checkout abandonment from 35% to 20%' — not 'build a one-click checkout feature'",
+   "Features are one possible path to the outcome — teams are empowered to find the best path through experimentation",
+   "Outcome metrics are tracked on the roadmap dashboard: is the outcome moving in the right direction?"
+  ],
+  "why": [
+   "Feature roadmaps create output accountability: teams are measured on shipping features, whether or not those features achieve their intended outcome",
+   "Outcome roadmaps create impact accountability: teams are measured on whether users' problems are solved and business goals are achieved",
+   "The shift from feature to outcome roadmaps is one of the highest-leverage changes in product organisation design",
+   "When teams own outcomes, they have the authority to decide how to achieve them — this authority drives better decisions and higher engagement"
+  ],
+  "how": [
+   "Transition: for each feature on the current roadmap, ask 'what outcome is this feature trying to achieve?'",
+   "Rewrite the roadmap entry as the outcome, not the feature: 'improve new user activation from 40% to 65%' instead of 'redesign onboarding flow'",
+   "Define the outcome metric — how will we measure it? Who owns measurement?",
+   "In sprint planning: teams propose experiments and features to move the outcome metric — they are not pre-committed to a specific feature approach"
+  ],
+  "who": [
+   "Designed by: Product Owner with strategy function input",
+   "Approved by: senior leadership (outcomes must connect to strategic OKRs)",
+   "Execution decisions: owned by the team (how to achieve the outcome)",
+   "Outcome measurement: Product Owner + data analyst"
+  ],
+  "scenario": "A team switches from a feature roadmap to an outcome roadmap. Quarter 1 outcome: 'reduce support tickets from new users by 30%'. The team plans 3 possible features to achieve this. After experiment 1, the data shows the support tickets are caused by a single confusing UI element — not the 3 features they had planned. They fix the UI element in 2 days. Support tickets drop 38%. They use the remaining quarter capacity on the next outcome. Under the feature roadmap, they would have built 3 features regardless of whether they solved the problem."
+ },
+ "Branch Protection Rules": {
+  "code": "VC2",
+  "cat": "Version Control",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "Automated rules enforced by the version control system that prevent direct commits to protected branches (main, production) without passing defined quality gates",
+   "Rules include: minimum 2 approving reviewers, all status checks passing (CI, security scan, test coverage threshold), no force pushes, and linear commit history required",
+   "Branch protection is configured in the VCS platform — not a social agreement, an enforced policy",
+   "Exceptions (emergency hotfixes): documented, require post-hoc review within 24 hours"
+  ],
+  "why": [
+   "Social agreements about code review and testing compliance are inconsistently followed — branch protection rules make compliance automatic",
+   "Branch protection prevents the most common quality failures: direct production pushes, bypassed code review, and untested code in main",
+   "When branch protection rules block a deployment, it is never personal — the rules are the safeguard, not a colleague's judgment",
+   "Teams with branch protection rules have significantly lower change fail rates than those relying on social compliance"
+  ],
+  "how": [
+   "Configure in GitHub/GitLab settings: branch protection rules for main/production/release branches",
+   "Rules: require status checks, require PR review (2 reviewers minimum), dismiss stale reviews on new commits, require signed commits",
+   "Document exceptions: emergency hotfix process must be defined in runbook (not as a bypass — as a documented exception with post-hoc review)",
+   "Review quarterly: are the rules appropriate? Are there status checks that should be added?"
+  ],
+  "who": [
+   "Configured by: Engineering Lead + DevOps engineer",
+   "Rules reviewed quarterly by: Engineering Lead",
+   "Exception process documented by: Engineering Lead",
+   "Status checks added by: any engineer with a case for inclusion"
+  ],
+  "scenario": "Branch protection rules prevent a direct commit to main during a Friday afternoon deployment rush. The engineer, frustrated, creates a PR instead — which is reviewed by a colleague in 10 minutes. The reviewer catches a subtle SQL injection vulnerability in the last-minute code change. Without branch protection, the vulnerability would have gone to production. With it: caught before it ever left a developer's branch."
+ },
+ "Config Separation from Code": {
+  "code": "VC3",
+  "cat": "Version Control",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A design and deployment principle where all configuration that varies between environments (database connection strings, API endpoints, feature flags, scaling parameters) is stored and managed separately from application code",
+   "Configuration managed via: environment variables, AWS Parameter Store, HashiCorp Vault, Kubernetes ConfigMaps, or equivalent",
+   "The same application binary is deployed to all environments — only configuration changes between dev, staging, and production",
+   "Enforced through: automated checks that fail if hardcoded environment-specific values are found in code"
+  ],
+  "why": [
+   "Configuration embedded in code forces separate builds per environment — making identical staging and production builds impossible",
+   "Configuration drift between environments causes the classic 'it works on staging but not in production' failure mode",
+   "When config is separate, a production incident caused by a misconfiguration is reproduced instantly in a local or staging environment",
+   "DORA research identifies infrastructure management through code (including config) as a key predictor of delivery performance"
+  ],
+  "how": [
+   "Audit: identify all hardcoded configuration values in the codebase",
+   "Migrate: extract to environment variables or a configuration management service — one item at a time",
+   "Enforce: add a linting rule that fails the build if environment-specific values appear in code",
+   "Infrastructure as Code: manage configuration store infrastructure through Terraform or equivalent"
+  ],
+  "who": [
+   "Migration led by: senior engineer with Engineering Lead oversight",
+   "Enforced by: automated linting in CI pipeline",
+   "Configuration store managed by: DevOps/platform team",
+   "New feature development: engineers trained to use config-from-environment as the default pattern"
+  ],
+  "scenario": "Config Separation from Code migration discovers 47 hardcoded environment-specific values scattered across the codebase — database URLs, API keys, and feature toggle values, some duplicated and some inconsistent between files. After migration to a centralised configuration store, a production misconfiguration is identified and corrected in 3 minutes (previously it would have required a code change, PR, review, merge, and deployment — 2+ hours). The configuration store also reveals 3 API keys being shared between staging and production — a security vulnerability immediately remediated."
+ },
+ "Infrastructure as Code": {
+  "code": "VC4",
+  "cat": "Version Control",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "The practice of managing and provisioning infrastructure through machine-readable definition files in version control — not through manual configuration interfaces",
+   "Tools: Terraform, AWS CloudFormation, Pulumi, Ansible — or a combination",
+   "All infrastructure changes flow through the same code review and CI/CD process as application changes",
+   "Infrastructure state is tracked: drift from defined state is detected and corrected automatically"
+  ],
+  "why": [
+   "Manually configured infrastructure is impossible to reproduce consistently — 'it works in production but not in the new environment' is the IaC problem statement",
+   "IaC enables disaster recovery: in a major incident, the entire infrastructure can be rebuilt from code in minutes rather than days of manual reconstruction",
+   "Infrastructure as Code means infrastructure changes are reviewed, tested, and reversible — the same discipline as application code",
+   "DORA research identifies IaC as a key predictor of delivery performance and operational stability"
+  ],
+  "how": [
+   "Start with the most critical, most volatile infrastructure component (typically compute or networking)",
+   "Define it in Terraform (or equivalent); migrate the existing state using import commands; test destroy/recreate in staging",
+   "Expand coverage incrementally: add components as the team builds confidence in the IaC workflow",
+   "All future infrastructure changes: through code and PR — no manual console changes allowed in production"
+  ],
+  "who": [
+   "IaC practice led by: Engineering Lead + DevOps",
+   "Implemented by: DevOps and platform engineering team",
+   "Code review: Engineering Lead + senior engineers (IaC changes can have broad impact)",
+   "State management: DevOps (remote state backend with locking — e.g., S3 + DynamoDB for Terraform)"
+  ],
+  "scenario": "A production environment needs to be duplicated for a major load test. Without IaC: estimated 3 days of manual infrastructure setup with significant risk of misconfiguration. With IaC: the same environment is reproduced in 45 minutes using Terraform. The load test environment is identical to production down to security group rules and autoscaling policies. After the load test, it is destroyed in 5 minutes — no lingering cost. The IaC investment pays for itself in the first major test."
+ },
+ "CI Pipeline Standards": {
+  "code": "CI1",
+  "cat": "Continuous Integration",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "Defined standards for how all CI pipelines are structured, what quality gates they include, and what 'passing' means for a pipeline run",
+   "Standards include: all PRs must run the full pipeline before merge; pipeline must complete within 10 minutes for fast feedback; no pipeline suppression allowed; failed pipelines block merges",
+   "Every repository has a CI pipeline — no exceptions — using the organisation's standard pipeline template",
+   "Pipeline standards reviewed quarterly: as tooling and quality practices evolve, so do the standards"
+  ],
+  "why": [
+   "CI pipelines without standards are inconsistent: some run in 2 minutes and test nothing meaningful; others run in 3 hours and are bypassed",
+   "Consistent standards ensure every codebase has the same baseline of automated quality assurance — regardless of which team built it",
+   "The 10-minute standard is critical: pipelines that take longer are routinely bypassed under delivery pressure — speed is a safety feature",
+   "When engineers know a pipeline pass means something consistent and trustworthy, they trust the green signal and deploy confidently"
+  ],
+  "how": [
+   "Define the standard pipeline stages: build → unit test → lint → security scan → integration test → artefact publish",
+   "Set the 10-minute target: if the full suite cannot run in 10 minutes, parallelise, split, or reduce E2E tests (see test pyramid)",
+   "Create a standard pipeline template: all new repositories use this template by default (Golden Path)",
+   "Enforce: pipeline bypass without Engineering Lead approval is a policy violation; tracked and audited monthly"
+  ],
+  "who": [
+   "Standards defined by: Engineering Lead + DevOps",
+   "Pipeline template maintained by: Platform/DevOps team",
+   "Compliance monitored by: automated CI/CD metrics dashboard + quarterly audit",
+   "Bypass approvals: Engineering Lead (rare, time-limited, post-hoc documented)"
+  ],
+  "scenario": "Before CI pipeline standards, pipelines across 12 repositories range from 4 minutes to 47 minutes in duration. 3 repositories have no automated tests in their pipeline. After standards: all 12 run in under 9 minutes; all have unit + integration tests + security scanning; bypass rate drops from 23% of PRs to 1%. Engineering Lead estimates: the standardisation prevents approximately 3 production incidents per month previously caused by pipelines being bypassed under deadline pressure."
+ },
+ "Build Failure Response Protocol": {
+  "code": "CI2",
+  "cat": "Continuous Integration",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A defined team norm specifying how quickly and how a broken CI build must be addressed — making build health a shared team responsibility",
+   "Protocol: build failure triggers an immediate Slack notification; the engineer whose commit broke it acknowledges within 15 minutes; the build is fixed or reverted within 1 hour",
+   "If the breaking engineer is unavailable: any team member can fix or revert — the main branch is a shared responsibility",
+   "Main branch build failure is a team emergency: no new merges until the build is green"
+  ],
+  "why": [
+   "Broken builds that persist block the entire team — every engineer is blocked from getting reliable feedback on their work",
+   "A broken build left overnight creates a compounding problem: multiple engineers have merged on top of the broken commit by morning",
+   "Without a protocol, build failures become background noise: engineers start ignoring the red signal and the CI system loses its value",
+   "The protocol converts build health from an engineering platitude into an enforced team agreement"
+  ],
+  "how": [
+   "Define the protocol in the team's working agreements: 15-minute acknowledgement, 1-hour fix-or-revert SLA",
+   "Configure automated notifications: broken build → Slack @channel with the breaking commit and author",
+   "No new merges to main during a broken build: branch protection can enforce this automatically",
+   "Monthly metric: average time to fix a broken build; target < 30 minutes; tracked and reviewed in retrospectives"
+  ],
+  "who": [
+   "Protocol set by: Engineering Lead as a team operating standard",
+   "Enforced by: team peer accountability + automated notifications",
+   "Average fix time tracked by: Agile Coach monthly",
+   "Reviewed in: retrospectives when the protocol is violated or the metric is declining"
+  ],
+  "scenario": "Before the Build Failure Response Protocol, a broken build sits unfixed for 6 hours on a Tuesday afternoon. 4 engineers merge commits on top of it. When the build is finally investigated, untangling which commit introduced the failure takes 2 additional hours. After the protocol: the same scenario — a broken build at 2pm — is acknowledged in 9 minutes and fixed (via revert) in 22 minutes. Total blocked time for the team: 22 minutes vs 8 hours."
+ },
+ "Test Parallelisation": {
+  "code": "CI3",
+  "cat": "Continuous Integration",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A technique for running test suites faster by splitting them across multiple parallel execution workers — reducing total feedback time without reducing test coverage",
+   "Implementation: split test suite by module, by file, or by test type; run splits simultaneously across parallel workers",
+   "Tools: GitHub Actions matrix, CircleCI parallelism, Jest --maxWorkers, pytest-xdist, or equivalent",
+   "Target: maintain test suite speed at < 10 minutes as coverage grows — parallelisation is the primary mechanism for keeping this target achievable"
+  ],
+  "why": [
+   "Test suites grow as codebases grow — without parallelisation, a team that starts at 3-minute builds eventually reaches 45-minute builds",
+   "Slow pipelines are bypassed under pressure: the same engineers who strictly follow a 5-minute pipeline will bypass a 45-minute one",
+   "Parallelisation keeps the feedback loop tight as the codebase scales — it is an investment in sustainable CI discipline",
+   "The alternative: choose between slow comprehensive tests and fast incomplete tests — parallelisation enables both fast AND comprehensive"
+  ],
+  "how": [
+   "Baseline: measure current suite duration; identify the slowest test categories",
+   "Split strategy: divide tests into N parallel shards (start with 4; tune based on duration distribution)",
+   "Configure in CI: set up matrix builds or parallelism workers; merge results into a single pass/fail signal",
+   "Target and monitor: pipeline duration should stay under 10 minutes as coverage is added; add more shards when duration approaches the limit"
+  ],
+  "who": [
+   "Implementation: DevOps + senior engineers (parallelisation requires understanding of test dependencies)",
+   "Maintained by: DevOps/platform team (parallel infrastructure) + engineering team (test organisation)",
+   "Pipeline duration monitored by: DevOps monthly; alert when approaching 10-minute threshold",
+   "Added shards when needed: DevOps + Engineering Lead joint decision"
+  ],
+  "scenario": "A growing team's test suite has reached 28 minutes in a single thread. Deployment frequency has dropped from daily to 3x per week — engineers are combining changes to amortise the pipeline wait. Implementing 4-way parallelisation reduces the same suite to 8 minutes. Deployment frequency recovers to daily within 2 sprints. As coverage continues to grow, 8-way parallelisation at month 6 maintains the 8-minute target while test coverage has increased 40%."
+ },
+ "Pipeline as Code": {
+  "code": "CI4",
+  "cat": "Continuous Integration",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "CI/CD pipeline configuration stored in version control as code — not configured through web UIs that have no audit trail",
+   "Pipeline defined in: GitHub Actions YAML, GitLab CI YAML, Jenkinsfile, or equivalent — stored in the repository it builds",
+   "Pipeline changes reviewed in code review: the same PR process as application code changes",
+   "Pipeline configuration is reproducible: any engineer can understand, modify, and reproduce the pipeline from the code alone"
+  ],
+  "why": [
+   "Pipeline configuration in web UIs is invisible: changes are made without review, without audit trail, and without rollback capability",
+   "Pipeline as Code makes CI configuration as trustworthy as application code — changes are reviewed, tested, and reversible",
+   "When pipeline configuration lives in the repository, it evolves alongside the code it builds — no sync problems, no undocumented configuration",
+   "Onboarding is dramatically faster: a new engineer reads the pipeline YAML and understands the full build process — no need to navigate a complex web UI"
+  ],
+  "how": [
+   "Migrate all pipeline configurations to code: export existing web UI configs; convert to YAML format; commit to the repository",
+   "Add pipeline lint step: validate pipeline YAML syntax before running (GitHub Actions validator, yamllint)",
+   "Code review requirement: pipeline changes require the same PR review as code changes",
+   "Document: add a PIPELINE.md explaining the pipeline structure; link from the main README"
+  ],
+  "who": [
+   "Migration: DevOps + Engineering Lead",
+   "Ongoing: any engineer can propose pipeline changes via PR",
+   "Reviews: Engineering Lead + DevOps (pipeline changes have broad impact)",
+   "Pipeline standards compliance: DevOps checks new repositories for pipeline-as-code compliance in quarterly audit"
+  ],
+  "scenario": "A pipeline change made through the GitHub Actions web UI accidentally removes the security scanning step. No one notices for 3 weeks because the change has no audit trail. After Pipeline as Code is implemented: the same change must be made via PR. The code reviewer immediately spots the missing security step and blocks the merge. The step stays in the pipeline. The 3-week security gap is prevented."
+ },
+ "Flaky Test Management": {
+  "code": "CI5",
+  "cat": "Continuous Integration",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A systematic programme to identify, track, quarantine, and eliminate tests that fail intermittently without code changes — 'flaky tests'",
+   "Flaky test identification: automated tracking of tests that pass and fail across multiple runs on the same code",
+   "Quarantine protocol: flaky tests are tagged and moved to a quarantine suite that runs separately — they do not block the main pipeline",
+   "Elimination programme: quarantined tests are investigated and fixed within 2 weeks; tests unresolved after 2 weeks are deleted",
+   "Zero tolerance policy: no new flaky tests are tolerated — any test flaking on its first run must be fixed before the PR is merged"
+  ],
+  "why": [
+   "Flaky tests are the primary cause of CI pipeline trust erosion: engineers who see random failures start ignoring the red signal",
+   "A pipeline with 10% flakiness provides unreliable feedback: engineers cannot distinguish between 'this is broken' and 'this is random'",
+   "The time cost of flaky tests is enormous: each investigation of a false failure costs 15–45 minutes of engineer time",
+   "When flaky tests are managed, the pipeline is trusted; when trusted, it is followed; when followed, it is effective"
+  ],
+  "how": [
+   "Instrument: CI system tracks test pass/fail history by test case across multiple runs; flakiness score = fail rate on passing code",
+   "Dashboard: flaky tests ranked by flakiness score; visible to all engineers",
+   "Quarantine: tests with flakiness score > 2% are tagged and moved to quarantine suite (runs in parallel, does not block merges)",
+   "Elimination: each quarantined test assigned an owner; 2-week fix deadline; deleted if not fixed"
+  ],
+  "who": [
+   "Programme owned by: Engineering Lead",
+   "Flaky test dashboard: built and maintained by DevOps/platform team",
+   "Test owners: the engineer who wrote or last modified the test",
+   "Quarantine and deletion authority: Engineering Lead (with team visibility — no silent deletions)"
+  ],
+  "scenario": "A team's CI pipeline has 340 tests. Investigation reveals 47 have a flakiness rate above 2% — causing the pipeline to fail randomly on 31% of runs. Engineers have started ignoring red builds. After the Flaky Test Management programme: 23 tests are fixed (mostly race conditions and test isolation issues); 24 are deleted (testing implementation details with no clear failure mode). Pipeline reliability improves from 69% to 97%. Engineers start trusting the red signal again. One real bug is caught that would previously have been ignored as 'probably flaky'."
+ },
+ "Pipeline Performance OKRs": {
+  "code": "CI6",
+  "cat": "Continuous Integration",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "Explicit quarterly OKRs set for CI/CD pipeline performance — elevating pipeline health to the same strategic importance as product feature delivery",
+   "Example OKRs: 'Reduce pipeline median duration from 18 minutes to under 8 minutes by Q3', 'Achieve pipeline pass rate > 95% (currently 78%)', 'Eliminate all flaky tests from the main pipeline suite'",
+   "Pipeline OKRs tracked in the same OKR tool as product OKRs — visible to leadership alongside feature delivery metrics",
+   "Improvement investment: pipeline OKRs receive explicit capacity allocation (typically 10–15% of sprint capacity for one or two engineers)"
+  ],
+  "why": [
+   "Pipeline performance that is not measured and targeted is not improved — it degrades gradually as the codebase grows",
+   "When pipeline OKRs sit alongside product OKRs, engineering leadership can show the business value of the investment: 'faster pipeline = faster delivery = faster value'",
+   "OKRs create accountability: 'we committed to reducing pipeline time from 18 to 8 minutes — we are at 12 minutes after 6 weeks — here is our plan'",
+   "Pipeline improvements compound: a 10-minute reduction in pipeline duration, multiplied by 20 engineers × 10 deployments/day × 250 working days = 10,000 engineer-hours of feedback loop time saved per year"
+  ],
+  "how": [
+   "Set quarterly OKRs: Engineering Lead proposes 2–3 pipeline performance OKRs; approved jointly with Product Owner",
+   "Allocate capacity: 10–15% of sprint capacity for 1–2 engineers on pipeline improvement per quarter",
+   "Track weekly: pipeline duration, pass rate, and flakiness score on engineering health dashboard",
+   "Report in: portfolio forum alongside product OKRs — pipeline health is product health"
+  ],
+  "who": [
+   "Proposed by: Engineering Lead",
+   "Approved by: Engineering Lead + Product Owner jointly",
+   "Tracked by: DevOps (metrics) + Agile Coach (weekly check-in)",
+   "Reported in: portfolio forum and quarterly leadership review alongside product OKRs"
+  ],
+  "scenario": "A Pipeline Performance OKR is set: reduce median pipeline duration from 22 minutes to under 10 minutes. The OKR is reviewed in bi-weekly check-ins. At week 4, the team is at 16 minutes — ahead of a linear target. At week 8, they hit 9.5 minutes. The OKR is achieved. Post-quarter analysis: engineers make 15% more deployments per day (less waiting), 12 fewer production incidents occur (more frequent feedback caught issues earlier), and 3 engineers mention pipeline speed as a reason they enjoy their work more. The OKR frames the ROI in terms leadership understands."
+ },
+ "Automated Test Coverage Baseline": {
+  "code": "TA1",
+  "cat": "Test Automation",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "An initial measurement of the current state of automated test coverage across the codebase — establishing the baseline before any investment in coverage improvement",
+   "Coverage measured by: line coverage %, branch coverage %, and mutation score (for the most critical modules)",
+   "Reported per service and per module: where are the coverage gaps? What are the highest-risk uncovered areas?",
+   "Published to the team: 'here is where we are today' — the starting point for all test coverage improvement work"
+  ],
+  "why": [
+   "Teams cannot prioritise test coverage investment without knowing where coverage is low and where coverage matters most",
+   "The baseline reveals surprises: teams often discover critical business logic modules with 0% test coverage",
+   "Coverage measurement also changes developer behaviour: when coverage is visible, developers add tests — simply because the number is tracked",
+   "Without a baseline, 'we need better test coverage' is a feeling; with one, it is a prioritised investment decision"
+  ],
+  "how": [
+   "Run coverage tooling on the full codebase: JaCoCo (Java), Istanbul/NYC (JavaScript), coverage.py (Python), or equivalent",
+   "Generate a coverage report showing: overall %, per-module %, and uncovered branches highlighted",
+   "Identify the 5 highest-risk low-coverage modules (highest business criticality + lowest coverage = highest priority)",
+   "Share with the team: 'here is our coverage landscape — here is where we need to invest first'"
+  ],
+  "who": [
+   "Baseline analysis: Engineering Lead + Agile Coach",
+   "Coverage tooling configuration: DevOps engineer",
+   "Shared with: full team in a dedicated session",
+   "Prioritisation of gaps: Engineering Lead + Product Owner (business criticality input)"
+  ],
+  "scenario": "A test coverage baseline reveals: overall line coverage is 54%, but the payment processing module — the most business-critical in the application — has 12% coverage. The team had assumed payment processing was well-covered (it's so important, surely someone tested it). The baseline corrects this assumption. 2 sprints of targeted test investment raise payment processing coverage to 89%. In the following quarter, a regression in payment processing is caught by an automated test that would previously have reached production."
+ },
+ "Test-First Development Norm": {
+  "code": "TA2",
+  "cat": "Test Automation",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A team norm where automated tests are written before or alongside production code — not as a retrospective afterthought",
+   "Applied as: Test-Driven Development (TDD: red-green-refactor cycle) for complex business logic, or test-alongside for simpler cases",
+   "The norm is enforced culturally in code review: PRs with no new tests for new functionality prompt a review comment asking why",
+   "Tracked: test-to-code commit ratio in each sprint (are we writing tests at the same cadence as code?)"
+  ],
+  "why": [
+   "Tests written after the code is working test what the code does — not what it should do. Tests written first specify the required behaviour before implementation",
+   "Test-first development produces code that is testable by design — eliminating the common problem of code written first that is difficult or impossible to test",
+   "The discipline creates better code: thinking about how to test a function forces clearer thinking about what the function's interface and contract should be",
+   "Teams that practise test-first have higher test coverage, fewer production incidents, and faster code review cycles than those that don't"
+  ],
+  "how": [
+   "Introduce via a team workshop: practice TDD on a real but non-production code example (kata format); 90 minutes",
+   "Team agreement: 'for all new business logic, we write the test first' — captured in working agreements",
+   "Code review norm: reviewers ask 'where are the tests?' for any PR touching business logic without associated test changes",
+   "Monthly check: Agile Coach reviews commit history for the test-to-code ratio; team discusses in retrospective if declining"
+  ],
+  "who": [
+   "Norm set by: Engineering Lead",
+   "Practiced by: all engineers",
+   "Reinforced in: code review (peer accountability)",
+   "Monitored by: Agile Coach (monthly commit analysis)"
+  ],
+  "scenario": "A team adopts the test-first norm. In the first sprint, 4 engineers report that writing the test first forced them to reconsider the API design of their function — they found the test was hard to write because the function had too many responsibilities. In each case, they split the function before writing the test. The refactored code is simpler, more testable, and reviewed faster. The test-first discipline improves both test coverage and code design simultaneously."
+ },
+ "End-to-End Test Strategy": {
+  "code": "TA4",
+  "cat": "Test Automation",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A defined strategy for how end-to-end tests are scoped, written, maintained, and managed — preventing the E2E test sprawl that slows pipelines and creates flakiness",
+   "Strategy decisions: which user journeys must have E2E coverage (critical paths only), what tooling to use (Playwright, Cypress, Selenium), how to manage test data, and when E2E tests run (pre-deploy, not every PR)",
+   "Maximum E2E test count: team agrees an upper bound (e.g., 50 tests covering 10 critical journeys) — any new E2E test must replace or justify an existing one",
+   "E2E tests run on a schedule (nightly) and pre-deployment — not on every PR, which would make the main feedback loop too slow"
+  ],
+  "why": [
+   "Without a strategy, teams add E2E tests for every feature until the suite runs for 3 hours and flakes randomly — making CI unusable",
+   "An E2E strategy forces the discipline of choosing: which journeys are so critical that we need full browser-level validation? All others use lower-level tests",
+   "E2E tests are the most expensive tests to write, maintain, and run — they should be used sparingly for the highest-value scenarios",
+   "A capped E2E suite that runs reliably in 20 minutes is more valuable than an uncapped suite that takes 3 hours and flakes 30% of the time"
+  ],
+  "how": [
+   "Define: which 10 critical user journeys require E2E coverage? Write them down before writing any code",
+   "Select tooling: Playwright or Cypress for web (modern, reliable); decide on headless vs headed, parallel workers, retry strategy",
+   "Test data strategy: define how test data is created and cleaned up — shared state between tests is the primary source of flakiness",
+   "Run schedule: E2E in CI pre-deployment; nightly full run; fast smoke subset on every PR (5 tests, < 3 minutes)"
+  ],
+  "who": [
+   "Strategy defined by: Engineering Lead + QA Lead",
+   "E2E tests written by: QA or engineers (depending on team model)",
+   "Upper bound enforced by: Engineering Lead in code review (new E2E tests require justification)",
+   "Nightly run results reviewed by: Engineering Lead each morning"
+  ],
+  "scenario": "A team has accumulated 890 E2E tests over 18 months. The suite takes 4.5 hours and fails randomly 40% of the time. Nobody trusts it. The E2E Test Strategy caps the suite at 80 tests covering 12 critical journeys. 810 tests are deleted or converted to integration/unit tests. The remaining 80 run in 18 minutes with less than 2% flakiness. Engineers now check E2E results and take failures seriously because the signal is trustworthy. The same overall quality coverage is maintained with less than 10% of the original E2E investment."
+ },
+ "Test Impact Analysis": {
+  "code": "TA5",
+  "cat": "Test Automation",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A technique that identifies which tests are affected by a specific code change — and runs only those tests, rather than the full suite, for fast feedback on each commit",
+   "Tools: Jest --testPathPattern, pytest-testmon, Bazel test caching, or equivalent intelligence in CI",
+   "Output: for each commit, a targeted test run that completes in 2–3 minutes vs the full suite taking 8–10 minutes",
+   "Full suite: still run pre-deployment and nightly — test impact analysis accelerates the developer feedback loop, not the deployment gate"
+  ],
+  "why": [
+   "Running the full test suite on every commit wastes compute and developer time when 90% of tests are unaffected by a small change",
+   "Developer feedback loop speed directly affects code quality and flow state: a 2-minute feedback cycle enables a different development rhythm than a 10-minute one",
+   "Test impact analysis is the advanced technique that enables teams to maintain comprehensive coverage without sacrificing feedback speed as the codebase grows",
+   "With caching and impact analysis, teams can have 10,000 tests and still get 2-minute feedback on most changes — the scalability breakthrough of mature testing practice"
+  ],
+  "how": [
+   "Select tooling: Jest's --testPathPattern for JavaScript; pytest-testmon for Python; Nx affected for monorepos; Bazel for polyglot",
+   "Integrate into the developer workflow: test impact analysis runs locally on save AND in CI on every PR commit",
+   "Caching: cache unchanged test results so only genuinely changed or newly affected tests re-run",
+   "Safeguard: full suite always runs pre-deployment — test impact analysis is not a substitute for comprehensive validation at deployment time"
+  ],
+  "who": [
+   "Tooling selected and configured by: DevOps + senior engineers",
+   "Developer workflow integration: senior engineers demonstrate and document",
+   "Impact analysis accuracy reviewed: Engineering Lead monthly (are we catching what we expect to catch?)",
+   "Full suite gate maintained by: DevOps (deployment pipeline — never subject to impact analysis scoping)"
+  ],
+  "scenario": "A team with 8,000 tests uses Test Impact Analysis to reduce their per-commit feedback from 9 minutes to 90 seconds for typical changes. The impact: engineers make smaller, more frequent commits (from 3/day average to 8/day average) because the feedback cost is so low. Smaller commits are easier to review, easier to debug when they cause failures, and easier to revert. The change in development rhythm — enabled by the speed improvement — reduces code review time by 30% and incident investigation time by 45%."
+ },
+ "Testing Knowledge Sharing": {
+  "code": "TA6",
+  "cat": "Test Automation",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A structured programme for spreading testing skills and knowledge across the engineering team — treating testing as a professional discipline that all engineers develop, not a specialist role",
+   "Formats: monthly testing clinic (1 hour; one engineer presents a testing challenge and the team works on it together), testing book club (quarterly; one testing book or resource per quarter with discussion), and testing retrospective (quarterly; what testing worked well? what didn't? what should we try next?)",
+   "Senior engineers actively teach testing skills in code review and pairing — not just flagging missing tests, but explaining how to write better ones",
+   "Testing excellence recognised: engineers who write particularly elegant or effective tests are recognised in the team's learning culture"
+  ],
+  "why": [
+   "Testing skill variance across a team is one of the most significant contributors to inconsistent test quality",
+   "When testing knowledge is concentrated in 1–2 engineers, those engineers become bottlenecks for PR reviews and their departure creates a significant quality risk",
+   "The monthly testing clinic format is particularly effective: it creates a safe space to surface testing challenges and develops collective intelligence about solutions",
+   "Testing skills are rarely taught formally — most engineers learn by copying bad examples; structured knowledge sharing builds from first principles"
+  ],
+  "how": [
+   "Monthly testing clinic: rotating presenter (any engineer, regardless of seniority) brings a real testing challenge from their current work; group works on it together (60 min)",
+   "Testing retrospective (quarterly 45 min): what testing patterns worked well this quarter? What was hard? What technique should we try next quarter?",
+   "Code review as teaching: reviewers who flag missing tests always propose how to write them — not just that they're missing",
+   "Recognition: 'test of the sprint' — Scrum Master nominates an example of particularly good test writing in each sprint review"
+  ],
+  "who": [
+   "Programme owned by: Engineering Lead",
+   "Monthly clinic facilitated by: rotating engineer (any level; facilitation skill is developed as a side benefit)",
+   "Code review teaching: all senior engineers (modelled by Engineering Lead)",
+   "Recognition: Scrum Master selects 'test of the sprint' weekly"
+  ],
+  "scenario": "A Testing Knowledge Sharing programme runs for 6 months. Before the programme: 3 of 8 engineers are comfortable writing integration tests; 2 are comfortable with mocking; test coverage variance between engineers' PRs is significant. After the programme: 7 of 8 engineers write integration tests confidently; all 8 understand when to use mocking vs real dependencies; test coverage variance across PRs is minimal. The 2 'testing experts' on the team report spending 60% less time in code review fixing testing issues — that time is reinvested in new feature development."
+ },
+ "Deployment Runbook": {
+  "code": "DP1",
+  "cat": "Deployment Patterns",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A documented, step-by-step procedure for every production deployment type — covering: pre-deployment checklist, deployment steps, post-deployment verification, and rollback procedure",
+   "Written by the engineers who perform deployments — not by a manager or technical writer",
+   "Tested: the runbook is executed in a staging environment before it is used in production; each step is verified to work",
+   "Reviewed after every deployment: does the runbook match what actually happened? If not, update it immediately"
+  ],
+  "why": [
+   "Deployments executed from memory are inconsistent and error-prone — every deployment should be reproducible",
+   "A runbook that has never been tested is theoretical — the first real deployment will find the gaps at the worst possible time",
+   "Post-deployment verification steps are the most commonly skipped and the most valuable: did the deployment actually work?",
+   "When deployments are runbook-driven, any engineer can execute them — reducing key person dependency and enabling on-call coverage"
+  ],
+  "how": [
+   "Template: pre-deployment checklist (tests passing, stakeholders notified, rollback verified) → deployment steps (specific commands, not 'run the deployment') → post-deployment verification (specific metrics to check, expected values) → rollback procedure (step-by-step, specific commands)",
+   "All engineers who deploy review and maintain the runbook — it is a living document, not an archive",
+   "After every deployment: 5-minute runbook review — did we follow it? Were there steps missing or incorrect? Update immediately",
+   "Practice: new on-call engineers execute the runbook in staging during their first week"
+  ],
+  "who": [
+   "Runbook owned by: Engineering Lead (ultimate accountability)",
+   "Written and maintained by: all engineers who perform deployments",
+   "Reviewed after: every deployment (5-minute update)",
+   "Tested by: every engineer before their first production deployment"
+  ],
+  "scenario": "A new engineer executes her first production deployment using the runbook. Step 12 of the runbook reads: 'verify that the checkout conversion metric has not declined in the 10 minutes post-deployment'. She checks the metric and finds a 15% decline. Following the runbook, she initiates the rollback procedure (step 14) immediately — before the issue escalates. The rollback completes in 4 minutes. Customer impact: 12 minutes of degraded conversion for 5% of users (canary deployment). Without the runbook, the same engineer would not have known to check checkout conversion — the issue would have been discovered from customer support tickets 2–3 hours later."
+ },
+ "Canary Deployment Pattern": {
+  "code": "DP2",
+  "cat": "Deployment Patterns",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A deployment practice that routes a small percentage of production traffic (1–5%) to the new version before rolling it out to all users",
+   "The canary group is monitored intensively for 15–30 minutes: error rates, latency, and business metrics compared to the non-canary group",
+   "If the canary metrics are healthy: proceed to full rollout",
+   "If the canary metrics degrade: immediate rollback of the small canary group — before the vast majority of users are affected"
+  ],
+  "why": [
+   "Full deployments are binary: the new version is either on for everyone or off for everyone — any issue immediately affects all users",
+   "Canary deployments reduce the blast radius of deployment problems to 1–5% of users — by the time 95% of users see the new version, it has been validated",
+   "The monitoring window between canary and full rollout is the most valuable 15–30 minutes in the deployment process: real production behaviour at low risk",
+   "DORA research consistently shows that canary and progressive delivery patterns are associated with lower change failure rates — the pattern is a DORA best practice"
+  ],
+  "how": [
+   "Implement: load balancer routing (Nginx, ALB, Istio, or equivalent) with a canary traffic split",
+   "Define canary success criteria before deploying: which metrics must be healthy? What thresholds indicate a problem?",
+   "Monitor the canary for 15–30 minutes: Datadog/Grafana dashboard with canary vs non-canary comparison",
+   "Automated promotion or rollback: if metrics are healthy after the monitoring window, automate full rollout; if not, automate rollback"
+  ],
+  "who": [
+   "Infrastructure: Platform/DevOps team",
+   "Canary success criteria: Engineering Lead + Product Owner (business metrics matter, not just error rates)",
+   "Monitoring during canary window: on-call engineer (or automated with alerting)",
+   "Promotion/rollback decision: automated (preferred) or on-call engineer (manual fallback)"
+  ],
+  "scenario": "A new checkout flow is deployed as a canary to 2% of users. Within 8 minutes of canary activation, the automated monitor detects: checkout abandonment rate is 12% higher for canary users. No error rate spike — the issue is behavioural, not a crash. The canary is rolled back immediately. Investigation reveals a UX change that confused users at the payment step. The design is revised; the fix is redeployed as a canary; the checkout abandonment metric returns to baseline. Without canary: the same UX issue would have affected 100% of users, generating thousands of support tickets before it was identified and fixed."
+ },
+ "Deployment Frequency Optimisation": {
+  "code": "DP3",
+  "cat": "Deployment Patterns",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A structured programme to remove blockers to increasing deployment frequency — identifying and eliminating the processes, gates, and cultural factors that prevent the team from deploying more often",
+   "Blocker categories: slow pipelines, manual approval gates, insufficient test confidence, fear-based culture, environment dependencies, and coordination overhead",
+   "Each blocker: root caused, costed (how many deployments per week is this blocker preventing?), and addressed in priority order",
+   "Target: move from current DORA level toward the next level (Low → Medium → High → Elite) within 2 quarters"
+  ],
+  "why": [
+   "DORA research shows deployment frequency is causally linked to delivery performance and stability — it is not a vanity metric",
+   "Most organisations can deploy far more frequently than they currently do: the blockers are process and culture, not technical capability",
+   "Each blocker removed multiplies the value of all other delivery improvements: faster pipelines are useless if manual gates prevent deploying",
+   "High deployment frequency reduces risk per deployment: smaller changes are individually simpler, easier to diagnose, and cheaper to roll back"
+  ],
+  "how": [
+   "Baseline: current deployments per week per service (from CI/CD tooling)",
+   "Blocker identification: structured team session — 'what stops us from deploying every day?' — list all blockers with estimated frequency/time cost",
+   "Prioritise: top 3 blockers by cost × feasibility to remove",
+   "Remove blockers iteratively: one per sprint; measure deployment frequency after each removal"
+  ],
+  "who": [
+   "Programme owned by: Engineering Lead + Agile Coach",
+   "Blocker identification: full engineering team + DevOps",
+   "Removal of blockers: Engineering Lead (for cultural/process blockers) + DevOps (for technical blockers)",
+   "Frequency tracked: DevOps (DORA metrics dashboard) + reviewed by Engineering Lead monthly"
+  ],
+  "scenario": "A team's deployment frequency is 2x per week (Low DORA). A blocker analysis identifies 4 blockers: 45-minute test suite, a manual security review on every deployment, a manual database migration approval, and no feature flag system (requiring perfect code before deploying). Over 2 quarters: test suite parallelised (8 minutes), security review automated for standard changes (manual only for high-risk), database migration approval automated with a dry-run, and LaunchDarkly implemented. Deployment frequency: 2x per day (Elite DORA). Change fail rate drops from 22% to 6%."
+ },
+ "Environment Parity": {
+  "code": "DP4",
+  "cat": "Deployment Patterns",
+  "level": "D",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "The engineering discipline of maintaining staging and development environments that are as close to production as possible — same infrastructure, same data volumes, same service configuration",
+   "Parity dimensions: infrastructure (same cloud provider, same instance types), data (production-representative volume and shape), configuration (same config management approach, same security posture), and dependencies (same third-party services or test doubles with equivalent behaviour)",
+   "Parity gaps tracked: any known difference between staging and production is documented — 'known unknowns' are safer than invisible differences",
+   "Parity reviewed monthly: any new production change must be reflected in staging within 48 hours"
+  ],
+  "why": [
+   "The most common cause of 'works on staging, fails in production' is environment parity gaps — invisible differences between the two environments",
+   "When staging mirrors production, developers and QA gain genuine confidence in their testing: a passing staging run is meaningful",
+   "Load testing, chaos engineering, and performance testing are only valid when run against a production-representative environment",
+   "Environment parity is a prerequisite for meaningful continuous delivery: if staging and production are different, continuous delivery is continuous hope"
+  ],
+  "how": [
+   "Parity audit: compare staging and production configurations item by item; document all differences",
+   "Prioritise closing high-risk parity gaps (data volume, network topology, security configuration) first",
+   "IaC: use the same Terraform/Helm configurations for staging and production (with environment-specific variable overrides only)",
+   "Monthly parity review: Engineering Lead + DevOps verify no new parity gaps have been introduced in the past month"
+  ],
+  "who": [
+   "Parity audit: DevOps + Engineering Lead",
+   "Closing parity gaps: DevOps (infrastructure) + engineering team (application configuration)",
+   "Monthly parity review: DevOps + Engineering Lead",
+   "Parity gap documentation: maintained by DevOps in the infrastructure wiki"
+  ],
+  "scenario": "A parity audit reveals that production uses a PostgreSQL connection pool of 100 connections; staging uses the default of 5. A performance regression in connection handling under load is completely invisible in staging testing but causes timeouts in production. After closing the parity gap, a subsequent performance regression is caught in staging load testing before it reaches production — saving a production incident and the associated customer impact, incident response cost, and trust damage."
+ },
+ "Progressive Delivery Framework": {
+  "code": "DP5",
+  "cat": "Deployment Patterns",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A comprehensive framework combining multiple deployment risk-reduction techniques: feature flags, canary deployments, A/B testing, and dark launches — into a coherent deployment strategy",
+   "Each new capability is assessed: what is the right progressive delivery technique for this change? (Small UI change: A/B test; backend API change: canary; major new feature: feature flag dark launch → internal alpha → canary → full rollout)",
+   "Framework documented and shared: engineers know which technique to use for which type of change",
+   "Metrics instrumentation is mandatory: no progressive delivery without measurement of the right outcomes"
+  ],
+  "why": [
+   "Individual progressive delivery techniques are valuable; a coherent framework is transformative — it creates a shared vocabulary and consistent approach across all teams",
+   "Without a framework, engineers make ad hoc deployment risk decisions: some use feature flags, others deploy straight to production, depending on individual preference",
+   "A framework also creates accountability: 'this change should have been a canary — why wasn't it?' is a structured post-incident question that improves future behaviour",
+   "Progressive delivery is the mechanism that enables Elite DORA performance: high frequency, low failure rate — the framework is how teams achieve this systematically"
+  ],
+  "how": [
+   "Define the framework: decision tree for choosing the right progressive delivery technique based on change type, risk level, and audience segment",
+   "Document in: the engineering handbook; referenced in the release runbook and the PR template",
+   "Training: 2-hour workshop with all engineers; practice scenarios for each technique type",
+   "Measure: track which technique was used for each deployment; correlate with change failure rate to validate framework effectiveness"
+  ],
+  "who": [
+   "Framework designed by: Engineering Lead + DevOps + Agile Coach",
+   "Adopted by: all engineers (it becomes part of the standard deployment process)",
+   "Compliance: Engineering Lead reviews deployment records monthly — are engineers using the framework?",
+   "Refinement: Engineering Lead updates the framework based on post-incident learnings and DORA data quarterly"
+  ],
+  "scenario": "A Progressive Delivery Framework analysis of the previous quarter's incidents reveals that 6 of 8 incidents could have been caught by canary deployments. The framework is updated: any backend change affecting a payment flow must use a 5% canary with an automated 15-minute monitoring window before full rollout. In the following quarter: 4 canaries detect issues and roll back automatically before reaching full production. Zero payment flow incidents. The framework converts systematic retrospective learning into prospective risk management."
+ },
+ "Deployment Analytics": {
+  "code": "DP6",
+  "cat": "Deployment Patterns",
+  "level": "A",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "A comprehensive analytics system that collects, aggregates, and surfaces insights from every deployment — enabling data-driven decisions about deployment strategy and risk",
+   "Metrics tracked per deployment: deployment duration, change size (number of files, services affected), post-deployment incident rate, rollback frequency, and time-to-detect-any-issue",
+   "Aggregated insights: which type of changes have the highest failure rates? Which services are the riskiest to deploy? Which engineers have the highest quality deployment records (for knowledge sharing, not performance management)?",
+   "Reviewed monthly by Engineering Lead; trends surfaced in quarterly engineering health review"
+  ],
+  "why": [
+   "Most organisations have CI/CD tooling but no analytics on what the data from deployments tells them about their deployment health",
+   "Deployment analytics converts data into decisions: 'changes to service X have a 40% post-deployment incident rate — this service needs architecture or testing investment'",
+   "Correlation between change size and failure rate is one of the most powerful insights: it empirically validates the DORA finding that smaller, more frequent deployments are safer",
+   "When engineers can see their own deployment quality data, they improve it — not because of pressure, but because the feedback loop creates professional motivation"
+  ],
+  "how": [
+   "Instrument: connect CI/CD, incident management, and monitoring data to a deployment analytics pipeline (custom build or tools like LinearB, Sleuth, or Faros)",
+   "Define key metrics: deployment duration, change size (DORA lead time), post-deployment incident rate (DORA change failure rate), and rollback frequency",
+   "Dashboard: monthly trends per service; high-risk service identification; change size vs failure rate correlation analysis",
+   "Monthly review: Engineering Lead presents deployment analytics insights; highest-risk services get improvement investment in the next quarter"
+  ],
+  "who": [
+   "Analytics built by: DevOps + data engineering",
+   "Dashboard maintained by: automated pipeline",
+   "Monthly review: Engineering Lead with team; highest-risk services identified for investment",
+   "Insights acted on by: Engineering Lead (architecture/testing investment decisions); DevOps (pipeline improvements)"
+  ],
+  "scenario": "Deployment analytics reveals that one service — the legacy user authentication module — has a post-deployment incident rate of 52% (more than half of all deployments to this service cause a production incident). This service has never been formally identified as high-risk; it's just accepted as 'always having issues'. The analytics make the risk explicit and quantified. Engineering Lead prioritises a 2-sprint investment in test coverage and architectural simplification. Post-investment deployment incident rate: 8%. One analytics insight prevents years of recurring incidents."
+ },
+ "Dependency Analysis Baseline": {
+  "code": "LC2",
+  "cat": "Loosely Coupled Architecture",
+  "level": "F",
+  "deck": "PRODUCT & DELIVERY",
+  "what": [
+   "An initial analysis of the current inter-service and inter-module dependency structure — establishing what is tightly coupled before designing any decoupling effort",
+   "Analysis outputs: a dependency graph showing all service-to-service calls, a coupling metric per service (how many things depend on it vs how many things it depends on), and identification of the 3–5 most tightly coupled areas",
+   "Produced using: static code analysis tools (ArchUnit, Structure101), runtime call monitoring, or manual mapping from the codebase",
+   "Published to: engineering team and architecture lead — the starting point for all coupling improvement work"
+  ],
+  "why": [
+   "Teams cannot prioritise decoupling investment without knowing where the most damaging coupling exists",
+   "The dependency graph often reveals surprises: services that are supposed to be independent are calling each other extensively through undocumented paths",
+   "Coupling metrics make architecture health objective: 'our checkout service has 12 direct dependencies — this is the highest coupling point in our architecture' is actionable",
+   "Without a baseline, 'we should reduce coupling' is an aspiration; with one, it is a prioritised engineering backlog"
+  ],
+  "how": [
+   "Pull dependency data from: code imports (static analysis), service mesh telemetry (runtime calls), or manual review",
+   "Build the dependency graph: nodes = services/modules, edges = dependencies (weighted by call frequency)",
+   "Calculate coupling metrics per node: afferent coupling (how many others depend on this), efferent coupling (how many this depends on), instability score",
+   "Identify the 3–5 highest-risk coupling points; add decoupling work to the technical debt register with priority based on delivery impact"
+  ],
+  "who": [
+   "Analysis led by: Architecture Lead + Engineering Lead",
+   "Tools configured by: DevOps/platform team (for runtime data) + senior engineers (for static analysis)",
+   "Shared with: full engineering team and senior leadership",
+   "Improvement backlog: Architecture Lead + Engineering Lead (owned jointly)"
+  ],
+  "scenario": "A dependency analysis baseline reveals that the 'notification service' is depended upon by 14 of 16 services for every user-facing operation. Any change to the notification service requires cross-team coordination. Any notification service downtime cascades across the entire product. The baseline makes this invisible architectural risk explicit. A 2-sprint investment introduces an event-driven notification pattern that reduces direct dependencies to 2. Deployment independence improves measurably across all teams."
  }
 };
 const PM_LEVEL_LABEL = { F:'F · FOUNDATIONAL', D:'D · DEVELOPING', A:'A · ADVANCED' };
