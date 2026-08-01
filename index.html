@@ -7953,6 +7953,9 @@ function renderCapabilitiesPage() {
   const totalPracs = caps.reduce((s,c) => s + c.practices.length, 0);
   // If the open drawer's capability was removed, close it
   if (_capDrawerId && !caps.some(c => c.id === _capDrawerId)) _capDrawerId = null;
+  // Preserve the card-grid scroll position across re-render (opening a drawer
+  // rebuilds the page, which would otherwise jump the list back to the top)
+  const _savedScroll = page.querySelector('.cl-scroll')?.scrollTop || 0;
 
   page.innerHTML = `
     <div class="cl-wrap">
@@ -7981,6 +7984,8 @@ function renderCapabilitiesPage() {
     </div>
     <div class="cl-drawer ${_capDrawerId ? 'open' : ''}" id="capDrawer">${_capDrawerId ? capDrawerHtml(_capDrawerId) : ''}</div>
   `;
+  const _sc = page.querySelector('.cl-scroll');
+  if (_sc && _savedScroll) _sc.scrollTop = _savedScroll;
 }
 
 function capHexHtml(cap, color) {
