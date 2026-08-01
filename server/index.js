@@ -1620,6 +1620,352 @@ const OPS_CAPABILITIES = [
   }
 ];
 
+// ── Technology & Architecture Codex — full deck (9 capabilities, 54 cards) ──
+const TA_CAPABILITIES = [
+  {
+    "name": "Architecture Vision",
+    "domain": "Technology & Architecture",
+    "source": "Nexus Codex · Technology & Architecture",
+    "description": "A shared, evolving architectural direction that guides decisions without over-constraining teams.",
+    "practices": [
+      {
+        "name": "Architecture Decision Records",
+        "level": "F",
+        "description": "Short, structured documents capturing every significant architecture decision: context, options considered, decision made, and consequences"
+      },
+      {
+        "name": "Architecture Principles",
+        "level": "F",
+        "description": "A concise set of 6–10 guiding principles that shape all technical decisions — expressing the non-negotiable technical values of the organisation"
+      },
+      {
+        "name": "Architecture Fitness Functions",
+        "level": "D",
+        "description": "Automated tests that continuously verify the system's compliance with architectural principles and non-functional requirements"
+      },
+      {
+        "name": "Technical Radar",
+        "level": "D",
+        "description": "A visual, opinionated tool that categorises technologies, tools, platforms, and languages into four rings: Adopt (use in new work), Trial (experiment…"
+      },
+      {
+        "name": "Architecture Runway",
+        "level": "A",
+        "description": "A buffer of architectural enablers — infrastructure, platform capabilities, and structural improvements — that exist ahead of feature delivery needs,…"
+      },
+      {
+        "name": "Evolutionary Architecture Practice",
+        "level": "A",
+        "description": "A disciplined approach to making architectural changes incrementally and continuously — rather than in periodic big-bang redesign efforts"
+      }
+    ]
+  },
+  {
+    "name": "Loose Coupling",
+    "domain": "Technology & Architecture",
+    "source": "Nexus Codex · Technology & Architecture",
+    "description": "Designing systems whose parts can change independently, reducing blast radius and coordination.",
+    "practices": [
+      {
+        "name": "Service Interface Contracts",
+        "level": "F",
+        "description": "Explicit, versioned API contracts defining the interface between services — specifying inputs, outputs, error formats, and versioning semantics"
+      },
+      {
+        "name": "Dependency Inversion Training",
+        "level": "F",
+        "description": "A structured training programme teaching all engineers the principles of dependency inversion and loose coupling — not just the theoretical principle…"
+      },
+      {
+        "name": "Event-Driven Decoupling",
+        "level": "D",
+        "description": "An architectural pattern where services communicate through events (messages) on a shared event bus rather than through synchronous direct API calls"
+      },
+      {
+        "name": "Contract Testing",
+        "level": "D",
+        "description": "Automated tests that verify service interface contracts are honoured by both the providing and consuming sides — without requiring both services to…"
+      },
+      {
+        "name": "Domain-Driven Design Application",
+        "level": "A",
+        "description": "The practice of modelling software systems around the business domain — using a shared language (Ubiquitous Language) between technical and…"
+      },
+      {
+        "name": "Dependency Analysis Tooling",
+        "level": "A",
+        "description": "Automated tooling that continuously maps, visualises, and scores the dependency relationships within and between services — producing a dependency…"
+      }
+    ]
+  },
+  {
+    "name": "Platform Thinking",
+    "domain": "Technology & Architecture",
+    "source": "Nexus Codex · Technology & Architecture",
+    "description": "Treating internal platforms as products that give teams paved, self-service paths.",
+    "practices": [
+      {
+        "name": "Internal Developer Platform Definition",
+        "level": "F",
+        "description": "A clearly defined scope and mission statement for the internal developer platform: what capabilities it provides, what it does not provide, and what…"
+      },
+      {
+        "name": "Platform Onboarding Docs",
+        "level": "F",
+        "description": "Comprehensive, maintained documentation enabling any engineer to self-serve platform capabilities without needing to ask the platform team"
+      },
+      {
+        "name": "Platform as a Product",
+        "level": "D",
+        "description": "Managing the internal developer platform using the same product thinking applied to external products: user research with engineers, product roadmap,…"
+      },
+      {
+        "name": "Developer Experience Metrics",
+        "level": "D",
+        "description": "A set of metrics measuring the experience of engineers using the platform and internal tooling — quantifying friction, frustration, and…"
+      },
+      {
+        "name": "Golden Path Definition",
+        "level": "A",
+        "description": "The explicitly designed and supported 'paved road' for the most common development patterns — the path of least resistance that also reflects best…"
+      },
+      {
+        "name": "Platform Health Scorecard",
+        "level": "A",
+        "description": "A structured quarterly assessment of platform health across 5–7 dimensions: reliability, performance, usability, adoption, security, documentation…"
+      }
+    ]
+  },
+  {
+    "name": "Security Engineering",
+    "domain": "Technology & Architecture",
+    "source": "Nexus Codex · Technology & Architecture",
+    "description": "Building security into how software is designed, built and shipped — not bolted on.",
+    "practices": [
+      {
+        "name": "Security in Definition of Done",
+        "level": "F",
+        "description": "Explicit security criteria embedded in the team's Definition of Done — required for every story, not just 'security stories'"
+      },
+      {
+        "name": "Dependency Vulnerability Scanning",
+        "level": "F",
+        "description": "Automated scanning of all third-party dependencies for known vulnerabilities — run on every build and on a daily schedule against current production…"
+      },
+      {
+        "name": "Threat Modelling",
+        "level": "D",
+        "description": "A structured analysis process that identifies and prioritises security threats to a system before building or deploying it — not after"
+      },
+      {
+        "name": "Security Champion Programme",
+        "level": "D",
+        "description": "A network of engineers — one per team — who receive additional security training and serve as the first point of security contact within their team"
+      },
+      {
+        "name": "Continuous Security Scanning",
+        "level": "A",
+        "description": "A comprehensive, automated security scanning system running continuously across the full software supply chain — from developer workstation to…"
+      },
+      {
+        "name": "Incident Response Playbook",
+        "level": "A",
+        "description": "A documented, practised response plan for each category of security incident — specifying roles, actions, escalation paths, communication protocols,…"
+      }
+    ]
+  },
+  {
+    "name": "Cloud Native Practices",
+    "domain": "Technology & Architecture",
+    "source": "Nexus Codex · Technology & Architecture",
+    "description": "Engineering for the cloud — containers, automation, resilience and elasticity by default.",
+    "practices": [
+      {
+        "name": "12-Factor App Standards",
+        "level": "F",
+        "description": "A set of 12 engineering principles for building cloud-native applications that are portable, scalable, and maintainable"
+      },
+      {
+        "name": "Container Standards",
+        "level": "F",
+        "description": "Defined standards for building and maintaining container images: base image policy, layer caching, security scanning, image tagging, and registry…"
+      },
+      {
+        "name": "Auto-Scaling Configuration",
+        "level": "D",
+        "description": "Configured and tested automatic scaling policies for all production services — scaling up when demand exceeds capacity, scaling down when demand drops"
+      },
+      {
+        "name": "Cost Attribution Dashboard",
+        "level": "D",
+        "description": "A real-time dashboard showing cloud infrastructure cost broken down by service, team, environment, and resource type"
+      },
+      {
+        "name": "FinOps Practice",
+        "level": "A",
+        "description": "A cross-functional practice (Engineering + Finance + Product) that manages cloud spend as a business metric — not purely a technical concern"
+      },
+      {
+        "name": "Site Reliability Engineering",
+        "level": "A",
+        "description": "A practice discipline that applies software engineering principles to infrastructure and operations — replacing manual operations work with…"
+      }
+    ]
+  },
+  {
+    "name": "Observability",
+    "domain": "Technology & Architecture",
+    "source": "Nexus Codex · Technology & Architecture",
+    "description": "Making systems understandable in production through metrics, logs and traces.",
+    "practices": [
+      {
+        "name": "Structured Logging Standard",
+        "level": "F",
+        "description": "A team-wide standard for how all application logs are formatted — using structured (JSON) format with mandatory fields: timestamp, service name, log…"
+      },
+      {
+        "name": "Metric Instrumentation Standards",
+        "level": "F",
+        "description": "A standard for how all services instrument and expose metrics — using a consistent format (Prometheus metrics), naming convention, and mandatory…"
+      },
+      {
+        "name": "Distributed Tracing Implementation",
+        "level": "D",
+        "description": "End-to-end tracing of requests as they flow through multiple services — using a distributed tracing system (Jaeger, Zipkin, AWS X-Ray, Datadog APM)"
+      },
+      {
+        "name": "SLO Dashboard",
+        "level": "D",
+        "description": "A real-time dashboard displaying Service Level Objectives (SLOs) and Error Budgets for all production services — the primary operational health view…"
+      },
+      {
+        "name": "Observability-Driven Development",
+        "level": "A",
+        "description": "A development practice where instrumentation is added before or alongside feature code — not as an afterthought after deployment"
+      },
+      {
+        "name": "Runbook Automation",
+        "level": "A",
+        "description": "The progressive automation of operational runbooks — converting manual, step-by-step response procedures into automated scripts or workflows"
+      }
+    ]
+  },
+  {
+    "name": "Technical Debt Management",
+    "domain": "Technology & Architecture",
+    "source": "Nexus Codex · Technology & Architecture",
+    "description": "Making technical debt visible, prioritised and deliberately paid down.",
+    "practices": [
+      {
+        "name": "Technical Debt Register",
+        "level": "F",
+        "description": "A visible, maintained catalogue of all known technical debt items — classified by type, impact, effort to resolve, and priority"
+      },
+      {
+        "name": "Boy Scout Rule Adoption",
+        "level": "F",
+        "description": "A team norm where every engineer, on every PR, makes the code they touch slightly better than they found it — refactoring one small thing per PR as a…"
+      },
+      {
+        "name": "Debt Prioritisation Framework",
+        "level": "D",
+        "description": "A structured method for comparing and prioritising technical debt items against each other and against feature work — using consistent criteria"
+      },
+      {
+        "name": "Architecture Review Board (Lightweight)",
+        "level": "D",
+        "description": "A lightweight, low-overhead forum for reviewing and approving significant architectural decisions — meeting bi-weekly for 60 minutes maximum"
+      },
+      {
+        "name": "Incremental Modernisation",
+        "level": "A",
+        "description": "A structured approach to modernising legacy systems incrementally — replacing them piece by piece while maintaining production operation, rather than…"
+      },
+      {
+        "name": "Technical Health OKRs",
+        "level": "A",
+        "description": "OKRs set specifically for technical health metrics — elevating technical quality to the same strategic importance as feature delivery and business…"
+      }
+    ]
+  },
+  {
+    "name": "Infrastructure As Code",
+    "domain": "Technology & Architecture",
+    "source": "Nexus Codex · Technology & Architecture",
+    "description": "Defining and evolving infrastructure declaratively, versioned and automated.",
+    "practices": [
+      {
+        "name": "Everything-in-VCS Policy",
+        "level": "F",
+        "description": "An explicit policy that ALL production-relevant artefacts must be version controlled: application code, infrastructure definitions, configuration…"
+      },
+      {
+        "name": "Terraform Standards",
+        "level": "F",
+        "description": "Defined standards for how all infrastructure is coded in Terraform (or equivalent IaC tool): module structure, state management, variable naming,…"
+      },
+      {
+        "name": "GitOps Implementation",
+        "level": "D",
+        "description": "A deployment model where the entire desired state of the system — application configuration, infrastructure, and Kubernetes manifests — is declared…"
+      },
+      {
+        "name": "Infrastructure Drift Detection",
+        "level": "D",
+        "description": "Automated monitoring that continuously compares the declared infrastructure state (in version control) with the actual running state — and alerts…"
+      },
+      {
+        "name": "Immutable Infrastructure",
+        "level": "A",
+        "description": "An infrastructure design principle where servers and containers are never modified after deployment — they are replaced with new versions rather than…"
+      },
+      {
+        "name": "Platform Self-Service Expansion",
+        "level": "A",
+        "description": "A continuous programme to expand the set of capabilities stream-aligned teams can self-serve from the internal developer platform — reducing their…"
+      }
+    ]
+  },
+  {
+    "name": "Database Reliability",
+    "domain": "Technology & Architecture",
+    "source": "Nexus Codex · Technology & Architecture",
+    "description": "Operating data stores for performance, safe change and dependable recovery.",
+    "practices": [
+      {
+        "name": "Database Migration Standards",
+        "level": "F",
+        "description": "Explicit standards for how database schema changes are managed, reviewed, and deployed — making schema changes as safe and repeatable as application…"
+      },
+      {
+        "name": "Query Performance Review",
+        "level": "F",
+        "description": "A monthly practice of reviewing the 10 slowest queries in each production database — identifying candidates for optimisation"
+      },
+      {
+        "name": "Backup and Recovery Testing",
+        "level": "D",
+        "description": "A documented, regularly tested backup and recovery procedure — verified quarterly by actually restoring a production backup to a recovery environment"
+      },
+      {
+        "name": "Database Observability",
+        "level": "D",
+        "description": "Comprehensive monitoring of database health: connection pool utilisation, query throughput, replication lag, lock contention, table bloat, index…"
+      },
+      {
+        "name": "Zero-Downtime Schema Changes",
+        "level": "A",
+        "description": "An engineering practice ensuring all database schema changes can be deployed to production without any service interruption — even for tables with…"
+      },
+      {
+        "name": "Read Replica Strategy",
+        "level": "A",
+        "description": "A deliberate strategy for distributing database read load across read replicas — routing read-heavy queries away from the primary database"
+      }
+    ]
+  }
+];
+
 async function ensureCapabilities(list, label) {
   try {
     const { rows: existing } = await db.query('SELECT name FROM capabilities');
@@ -1654,6 +2000,7 @@ async function ensureCapabilities(list, label) {
 }
 async function ensureAICapabilities() { return ensureCapabilities(AI_CAPABILITIES, 'AI capabilities'); }
 async function ensureOpsCapabilities() { return ensureCapabilities(OPS_CAPABILITIES, 'Ops capabilities'); }
+async function ensureTACapabilities() { return ensureCapabilities(TA_CAPABILITIES, 'TA capabilities'); }
 
 // Merge the older short-named Operations capabilities into the new card
 // capabilities: move each old capability's distinct practices onto the new one,
@@ -1693,6 +2040,22 @@ async function reconcileOpsCapabilities() {
   }
 }
 
+// Technology & Architecture: the TA deck fully supersedes the older seeded TA
+// capabilities. Retire any TA capability that isn't one of the 9 deck ones.
+const TA_DECK_NAMES = TA_CAPABILITIES.map(c => c.name);
+async function retireSupersededTACapabilities() {
+  try {
+    const r = await db.query(
+      `DELETE FROM capabilities
+        WHERE domain='Technology & Architecture' AND name <> ALL($1::text[])`,
+      [TA_DECK_NAMES]
+    );
+    if (r.rowCount) console.log(`TA reconcile: retired ${r.rowCount} superseded capabilities`);
+  } catch (err) {
+    console.error('TA reconcile error:', err.message);
+  }
+}
+
 // Manually trigger the AI capabilities insert (idempotent, non-destructive)
 app.post('/api/admin/seed-ai', async (req, res) => {
   try {
@@ -1703,6 +2066,18 @@ app.post('/api/admin/seed-ai', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// Manually trigger the TA capabilities insert + retire superseded (idempotent)
+app.post('/api/admin/seed-ta', async (req, res) => {
+  try {
+    await ensureTACapabilities();
+    await retireSupersededTACapabilities();
+    const { rows } = await db.query(
+      `SELECT c.name, COUNT(p.*)::int AS practices FROM capabilities c
+         LEFT JOIN practices p ON p.capability_id=c.id
+        WHERE c.domain='Technology & Architecture' GROUP BY c.name ORDER BY c.name`);
+    res.json({ ok:true, taCapabilities: rows.length, capabilities: rows });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
 // Manually trigger the Ops capabilities insert + merge (idempotent, non-destructive)
 app.post('/api/admin/seed-ops', async (req, res) => {
   try {
@@ -1823,7 +2198,7 @@ app.delete('/api/practices/:id', async (req, res) => {
 
 // ── Start (local dev) or export for Vercel ──
 if (process.env.VERCEL) {
-  seedCapabilitiesIfEmpty().then(remapCapabilityDomains).then(ensureAICapabilities).then(ensureOpsCapabilities).then(reconcileOpsCapabilities);
+  seedCapabilitiesIfEmpty().then(remapCapabilityDomains).then(ensureAICapabilities).then(ensureOpsCapabilities).then(reconcileOpsCapabilities).then(ensureTACapabilities).then(retireSupersededTACapabilities);
   module.exports = app;
 } else {
   const PORT = process.env.PORT || 3000;
@@ -1834,5 +2209,7 @@ if (process.env.VERCEL) {
     await ensureAICapabilities();
     await ensureOpsCapabilities();
     await reconcileOpsCapabilities();
+    await ensureTACapabilities();
+    await retireSupersededTACapabilities();
   });
 }
