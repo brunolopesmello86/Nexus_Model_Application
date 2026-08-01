@@ -922,7 +922,7 @@ const SEED_CAPABILITIES = [
   // ═══════════════════════════════════════════
   // AGILITY (Scrum · XP · Agnostic Agility) — 2 capabilities
   // ═══════════════════════════════════════════
-  { name: 'Agility', domain: 'Agility', source: 'Scrum · XP · Agnostic Agility',
+  { name: 'Agility', domain: 'Product & Delivery', source: 'Scrum · XP · Agnostic Agility',
     description: 'Team-level agile delivery — the deduplicated blend of Scrum, Extreme Programming and Agnostic Agility patterns that generate good delivery habits.',
     practices: [
       { name: 'Sprint', level: 'F', description: 'Work in a fixed-length timebox that produces a Done, potentially releasable increment each cycle.' },
@@ -976,7 +976,7 @@ const SEED_CAPABILITIES = [
       { name: 'The Law of the Customer', level: 'D', description: 'Anchor everything in empathy, dialogue and collaboration with the customer.' },
     ]
   },
-  { name: 'Agility at Scale', domain: 'Agility', source: 'Scrum@Scale · Nexus · Agnostic Agility',
+  { name: 'Agility at Scale', domain: 'Product & Delivery', source: 'Scrum@Scale · Nexus · Agnostic Agility',
     description: 'Coordinating many agile teams as one network of teams — the practices that scale team-level agility across an organisation while minimising dependencies.',
     practices: [
       { name: 'The Law of the Network', level: 'F', description: 'Treat the organisation as a network of interacting teams and agents rather than a hierarchy of silos.' },
