@@ -1157,21 +1157,467 @@ const AI_CAPABILITIES = [
   },
 ];
 
-// ── Operations Codex — test capability (Incident Management, IM1–IM6) ──────
-// Practice card content (WHAT/WHY/HOW/WHO/SCENARIO) lives client-side in
-// index.html (PRACTICE_CARDS); the DB only needs name/level/description.
-const OPS_TEST_CAPABILITIES = [
-  { name: 'Incident Management', domain: 'Operations', source: 'Nexus Codex · Operations',
-    description: 'How the organization detects, responds to, coordinates and learns from production incidents.',
-    practices: [
-      { name: 'Incident Severity Classification', level: 'F', description: 'A shared P1–P4 taxonomy with explicit criteria so the first responder classifies consistently.' },
-      { name: 'On-Call Rotation Design', level: 'F', description: 'A structured, equitable on-call rotation that distributes the operational burden across the team.' },
-      { name: 'Incident Commander Role', level: 'D', description: 'A single owner of coordination, decisions and communication for P1/P2 incidents.' },
-      { name: 'Incident Communication Templates', level: 'D', description: 'Pre-written, pre-approved templates for every incident communication type.' },
-      { name: 'Mean Time to Detect Optimisation', level: 'A', description: 'A focused programme to shrink the time between a problem starting and the team knowing.' },
-      { name: 'Game Day Exercises', level: 'A', description: 'Quarterly simulated incidents that build and stress-test response capability safely.' },
+// ── Operations Codex — full practice-cards deck (12 capabilities, 72 cards) ──
+// Source: Nexus-OPS-Practices-Library-Cards. The rich card content
+// (WHAT/WHY/HOW/WHO/SCENARIO) lives client-side in index.html (PRACTICE_CARDS);
+// the DB only needs name/level/description. Added non-destructively by name.
+const OPS_CAPABILITIES = [
+  {
+    "name": "Incident Management",
+    "domain": "Operations",
+    "source": "Nexus Codex · Operations",
+    "description": "Detecting, responding to, coordinating and learning from production incidents.",
+    "practices": [
+      {
+        "name": "Incident Severity Classification",
+        "level": "F",
+        "description": "A defined, shared taxonomy for classifying incident severity — P1 through P4 with explicit criteria for each level"
+      },
+      {
+        "name": "On-Call Rotation Design",
+        "level": "F",
+        "description": "A structured, equitable on-call rotation that distributes the operational burden across the engineering team — nobody is permanently on-call"
+      },
+      {
+        "name": "Incident Commander Role",
+        "level": "D",
+        "description": "A defined Incident Commander (IC) role for all P1 and P2 incidents — a single person who owns incident coordination, decision-making, and…"
+      },
+      {
+        "name": "Incident Communication Templates",
+        "level": "D",
+        "description": "Pre-written, structured templates for all incident communication types: initial notification, status update (every 30 minutes during P1/P2), and…"
+      },
+      {
+        "name": "Mean Time to Detect Optimisation",
+        "level": "A",
+        "description": "A focused programme to reduce the average time between when a problem begins and when the team first knows about it — MTTD"
+      },
+      {
+        "name": "Game Day Exercises",
+        "level": "A",
+        "description": "Quarterly, planned exercises where the team simulates major incident scenarios to practise and improve their incident response capabilities in a…"
+      }
     ]
   },
+  {
+    "name": "Continuous Monitoring",
+    "domain": "Operations",
+    "source": "Nexus Codex · Operations",
+    "description": "Knowing the health of systems and services before customers do.",
+    "practices": [
+      {
+        "name": "Health Check Endpoints",
+        "level": "F",
+        "description": "A standard /health endpoint (and /ready endpoint) on every service — responding with structured JSON indicating the service's operational status and…"
+      },
+      {
+        "name": "Alert Routing and Escalation",
+        "level": "F",
+        "description": "A defined configuration specifying where each alert goes, who receives it, and what happens if no one acknowledges it within the defined timeframe"
+      },
+      {
+        "name": "Capacity Monitoring",
+        "level": "D",
+        "description": "Continuous monitoring of infrastructure capacity utilisation against defined limits — with early warning alerts before capacity constraints affect…"
+      },
+      {
+        "name": "Synthetic Monitoring",
+        "level": "D",
+        "description": "Automated tests that continuously simulate real user journeys against the production environment — verifying that critical user flows work end-to-end…"
+      },
+      {
+        "name": "Business Metrics Monitoring",
+        "level": "A",
+        "description": "Monitoring and alerting on business metrics — not just system metrics — to detect incidents that are invisible to infrastructure monitoring"
+      },
+      {
+        "name": "Observability Budget",
+        "level": "A",
+        "description": "An explicit, managed budget allocation for observability infrastructure — monitoring, logging, tracing, and synthetic testing — treated as a product…"
+      }
+    ]
+  },
+  {
+    "name": "Change Management",
+    "domain": "Operations",
+    "source": "Nexus Codex · Operations",
+    "description": "Shipping change safely and frequently with fast, low-risk approval and rollback.",
+    "practices": [
+      {
+        "name": "Change Advisory Board (Lightweight)",
+        "level": "F",
+        "description": "A weekly, time-boxed (30-minute) forum for reviewing planned high-risk changes — not all changes, only those meeting defined risk criteria"
+      },
+      {
+        "name": "Rollback Procedures",
+        "level": "F",
+        "description": "Documented, tested, and regularly practised rollback procedures for every production deployment type"
+      },
+      {
+        "name": "Deployment Window Policy",
+        "level": "D",
+        "description": "An explicit policy defining when high-risk deployments may and may not occur — protecting the team from deployment-related incidents during high-risk…"
+      },
+      {
+        "name": "Forward and Backward Compatibility",
+        "level": "D",
+        "description": "An engineering discipline ensuring that changes to APIs, data formats, and interfaces are compatible with both their predecessors (backward…"
+      },
+      {
+        "name": "Deployment Frequency Targets",
+        "level": "A",
+        "description": "Explicit quarterly targets for how often each service deploys to production — set based on DORA benchmarks and current performance, increasing over…"
+      },
+      {
+        "name": "Environment Promotion Pipeline",
+        "level": "A",
+        "description": "A structured, automated process for promoting code from development through staging environments to production — with defined quality gates at each…"
+      }
+    ]
+  },
+  {
+    "name": "Delivery Cadence",
+    "domain": "Operations",
+    "source": "Nexus Codex · Operations",
+    "description": "A steady, predictable rhythm of planning, integrating and releasing work.",
+    "practices": [
+      {
+        "name": "Sprint Rhythm Standardisation",
+        "level": "F",
+        "description": "A consistent, predictable sprint rhythm that is identical week over week — same day for planning, same day for review, same day for retrospective,…"
+      },
+      {
+        "name": "Sprint Review Stakeholder Management",
+        "level": "F",
+        "description": "A structured approach to managing stakeholder participation in sprint reviews — defining who should attend, how they receive value, and how their…"
+      },
+      {
+        "name": "Cross-Team Release Coordination",
+        "level": "D",
+        "description": "A structured process for coordinating releases that involve changes from multiple teams — ensuring dependencies are resolved, release sequences are…"
+      },
+      {
+        "name": "Release Notes Practice",
+        "level": "D",
+        "description": "A consistent practice of producing structured release notes for every production release — targeted at different audiences (technical team, product…"
+      },
+      {
+        "name": "Continuous Integration Cadence",
+        "level": "A",
+        "description": "A team norm where all engineers integrate their code into the main branch at least once per day — enabling the team to detect integration conflicts…"
+      },
+      {
+        "name": "Trunk-Based Development",
+        "level": "A",
+        "description": "A version control practice where all engineers commit directly to the main branch (trunk) — or use very short-lived branches (less than 1 day) that…"
+      }
+    ]
+  },
+  {
+    "name": "Service Level Management",
+    "domain": "Operations",
+    "source": "Nexus Codex · Operations",
+    "description": "Defining, measuring and managing reliability against explicit objectives.",
+    "practices": [
+      {
+        "name": "SLO Definition Workshop",
+        "level": "F",
+        "description": "A facilitated session where engineering and product jointly define Service Level Objectives for each critical service — connecting technical metrics…"
+      },
+      {
+        "name": "Error Budget Policy",
+        "level": "F",
+        "description": "A documented policy specifying what happens when the error budget for a service is consumed at different rates — connecting reliability metrics to…"
+      },
+      {
+        "name": "SLO Review Cadence",
+        "level": "D",
+        "description": "A regular, structured review of SLO performance — monthly for engineering teams, quarterly for leadership and product teams"
+      },
+      {
+        "name": "Customer SLA Management",
+        "level": "D",
+        "description": "A structured process for managing commercial Service Level Agreements with enterprise customers — ensuring commitments match capabilities and…"
+      },
+      {
+        "name": "Reliability Roadmap",
+        "level": "A",
+        "description": "A planned, sequenced set of reliability investments — improving SLO achievement, reducing MTTD/MTTR, and building resilience — treated as a product…"
+      },
+      {
+        "name": "Multi-Region Reliability",
+        "level": "A",
+        "description": "Architecture and operational practices enabling the system to continue serving users in one geographic region when another region experiences a…"
+      }
+    ]
+  },
+  {
+    "name": "Platform Operations",
+    "domain": "Operations",
+    "source": "Nexus Codex · Operations",
+    "description": "Running the platform as a product — infrastructure, cost and self-service.",
+    "practices": [
+      {
+        "name": "Infrastructure as Code Standards",
+        "level": "F",
+        "description": "Standards for how all infrastructure is defined, managed, and deployed as code — covering tooling, file organisation, variable management, module…"
+      },
+      {
+        "name": "Container Orchestration Standards",
+        "level": "F",
+        "description": "Defined standards for deploying and managing containerised applications — covering Kubernetes configuration, resource limits, health probes, affinity…"
+      },
+      {
+        "name": "Toil Quantification",
+        "level": "D",
+        "description": "A structured measurement of operational toil — the repetitive, manual work that operational teams perform that provides no enduring value"
+      },
+      {
+        "name": "Cost Optimisation Programme",
+        "level": "D",
+        "description": "A structured, ongoing programme to identify and implement cloud infrastructure cost optimisation opportunities — running quarterly"
+      },
+      {
+        "name": "Platform Self-Service Expansion",
+        "level": "A",
+        "description": "A continuous programme to expand the set of capabilities stream-aligned teams can self-serve from the internal developer platform — reducing their…"
+      },
+      {
+        "name": "GitOps Implementation",
+        "level": "A",
+        "description": "A deployment model where the entire desired state of the system — application configuration, infrastructure, and Kubernetes manifests — is declared…"
+      }
+    ]
+  },
+  {
+    "name": "Knowledge Management",
+    "domain": "Operations",
+    "source": "Nexus Codex · Operations",
+    "description": "Capturing and sharing operational knowledge so it outlives any individual.",
+    "practices": [
+      {
+        "name": "Runbook Standards",
+        "level": "F",
+        "description": "A defined standard for how all operational runbooks are structured, maintained, and tested — ensuring they are usable under pressure by any engineer,…"
+      },
+      {
+        "name": "Architecture Documentation",
+        "level": "F",
+        "description": "Living documentation that captures the architecture of each service and the system as a whole — maintained alongside the code, not as a separate…"
+      },
+      {
+        "name": "Post-Incident Knowledge Capture",
+        "level": "D",
+        "description": "A structured process for capturing and distributing the knowledge generated in every significant incident — ensuring the learning benefits the whole…"
+      },
+      {
+        "name": "Onboarding Documentation",
+        "level": "D",
+        "description": "Comprehensive, maintained documentation specifically designed for engineers joining the team — enabling them to become productive contributors within…"
+      },
+      {
+        "name": "Engineering Wiki Governance",
+        "level": "A",
+        "description": "A structured governance model for the engineering wiki — defining who creates content, how it is reviewed, how it is kept current, and when it is…"
+      },
+      {
+        "name": "Technical Writing Investment",
+        "level": "A",
+        "description": "A deliberate investment in the quality of engineering documentation — treating technical writing as a professional discipline, not an administrative…"
+      }
+    ]
+  },
+  {
+    "name": "Continuous Improvement",
+    "domain": "Operations",
+    "source": "Nexus Codex · Operations",
+    "description": "Systematically removing waste and turning learning into measurable improvement.",
+    "practices": [
+      {
+        "name": "Kaizen Culture",
+        "level": "F",
+        "description": "A team-wide commitment to continuous, incremental improvement — every team member regularly identifies and acts on small improvement opportunities…"
+      },
+      {
+        "name": "Retrospective Action Tracking",
+        "level": "F",
+        "description": "A disciplined process for tracking, reviewing, and closing retrospective action items — ensuring retrospectives produce lasting change, not just good…"
+      },
+      {
+        "name": "Improvement Backlog Management",
+        "level": "D",
+        "description": "A separate, visible backlog dedicated to technical and process improvement items — maintained alongside (but distinct from) the feature and bug…"
+      },
+      {
+        "name": "Learning from Incidents Programme",
+        "level": "D",
+        "description": "A structured programme that converts incident learnings into operational improvements — treating incidents as the richest source of operational…"
+      },
+      {
+        "name": "DORA Metrics Programme",
+        "level": "A",
+        "description": "A structured programme measuring the four DORA metrics (Deployment Frequency, Lead Time for Changes, Change Failure Rate, and Mean Time to Restore) —…"
+      },
+      {
+        "name": "Engineering Effectiveness Review",
+        "level": "A",
+        "description": "A quarterly structured review of overall engineering effectiveness — examining DORA metrics, technical health metrics, team health metrics, and…"
+      }
+    ]
+  },
+  {
+    "name": "Capacity Planning",
+    "domain": "Operations",
+    "source": "Nexus Codex · Operations",
+    "description": "Anticipating demand and scaling capacity ahead of need, cost-effectively.",
+    "practices": [
+      {
+        "name": "Traffic Pattern Analysis",
+        "level": "F",
+        "description": "A regular analysis of production traffic patterns — understanding how demand varies by time of day, day of week, seasonal events, and product release…"
+      },
+      {
+        "name": "Load Testing Cadence",
+        "level": "F",
+        "description": "Regularly scheduled load tests — run before every major release and at least quarterly against the current production system — verifying that the…"
+      },
+      {
+        "name": "Capacity Forecasting Model",
+        "level": "D",
+        "description": "A quantitative model that forecasts infrastructure capacity requirements 6–12 months ahead — based on traffic growth trends, planned product changes,…"
+      },
+      {
+        "name": "Cost vs Performance Trade-off Analysis",
+        "level": "D",
+        "description": "A structured analytical approach to making informed decisions about infrastructure investment — evaluating the cost of capacity vs the performance…"
+      },
+      {
+        "name": "Predictive Auto-Scaling",
+        "level": "A",
+        "description": "Auto-scaling that acts before traffic arrives — using scheduled scaling (based on known traffic patterns) and predictive scaling (using ML models to…"
+      },
+      {
+        "name": "Infrastructure Chaos Testing",
+        "level": "A",
+        "description": "Structured, planned experiments that test infrastructure resilience by intentionally creating infrastructure failure scenarios — verifying that the…"
+      }
+    ]
+  },
+  {
+    "name": "Release Management",
+    "domain": "Operations",
+    "source": "Nexus Codex · Operations",
+    "description": "Coordinating, de-risking and measuring how software reaches production.",
+    "practices": [
+      {
+        "name": "Release Checklist",
+        "level": "F",
+        "description": "A standard, mandatory checklist completed before every production release — ensuring all required steps are verified, not assumed"
+      },
+      {
+        "name": "Release Candidate Process",
+        "level": "F",
+        "description": "A defined process for creating and validating Release Candidates (RCs) — specific software versions that have passed all quality gates and are…"
+      },
+      {
+        "name": "Release Impact Assessment",
+        "level": "D",
+        "description": "A structured analysis of the potential impact of a planned release — examining risk, affected systems, customer impact, and mitigation strategies…"
+      },
+      {
+        "name": "Hotfix Process",
+        "level": "D",
+        "description": "A defined, streamlined process for deploying urgent fixes to production outside the normal release cadence — with explicit criteria for when the…"
+      },
+      {
+        "name": "Zero-Downtime Migration Strategy",
+        "level": "A",
+        "description": "A comprehensive strategy for executing major system migrations (database migrations, major version upgrades, infrastructure changes) with no…"
+      },
+      {
+        "name": "Release Metrics Programme",
+        "level": "A",
+        "description": "A comprehensive set of release metrics that track the effectiveness, safety, and efficiency of the release process — measured continuously and…"
+      }
+    ]
+  },
+  {
+    "name": "Reliability Engineering",
+    "domain": "Operations",
+    "source": "Nexus Codex · Operations",
+    "description": "Engineering for resilience, error budgets and reliability as a first-class goal.",
+    "practices": [
+      {
+        "name": "Reliability Baseline Assessment",
+        "level": "F",
+        "description": "An initial comprehensive assessment of the current reliability posture — measuring MTTD, MTTR, incident frequency, SLO achievement, and change…"
+      },
+      {
+        "name": "Blameless Post-Incident Reviews",
+        "level": "F",
+        "description": "Every significant incident (P1 and P2) triggers a structured blameless review within 72 hours — no exceptions"
+      },
+      {
+        "name": "Error Budget Management",
+        "level": "D",
+        "description": "A structured practice of tracking, managing, and acting on error budget consumption — using the error budget as the primary mechanism for balancing…"
+      },
+      {
+        "name": "Chaos Engineering Practice",
+        "level": "D",
+        "description": "The disciplined practice of intentionally introducing controlled failures into the production system to identify weaknesses before they cause…"
+      },
+      {
+        "name": "Reliability OKRs",
+        "level": "A",
+        "description": "OKRs set specifically for reliability metrics — elevating reliability to the same strategic importance as feature delivery and business outcomes"
+      },
+      {
+        "name": "SRE Embedded Model",
+        "level": "A",
+        "description": "A deployment model where SRE expertise is embedded directly within delivery teams — not centralised in a separate SRE team that acts as a shared…"
+      }
+    ]
+  },
+  {
+    "name": "DORA Excellence",
+    "domain": "Operations",
+    "source": "Nexus Codex · Operations",
+    "description": "Driving elite delivery performance using the four DORA metrics.",
+    "practices": [
+      {
+        "name": "DORA Metrics Baseline",
+        "level": "F",
+        "description": "An initial measurement of all four DORA metrics (Deployment Frequency, Lead Time for Changes, Change Failure Rate, and Mean Time to Restore) —…"
+      },
+      {
+        "name": "DORA Improvement Planning",
+        "level": "F",
+        "description": "A structured process for translating DORA metric baselines into actionable improvement plans — identifying the specific practices and investments…"
+      },
+      {
+        "name": "Deployment Frequency Programme",
+        "level": "D",
+        "description": "A focused, time-boxed programme to remove all blockers to increasing deployment frequency — treating deployment frequency as a product capability,…"
+      },
+      {
+        "name": "Lead Time Reduction Programme",
+        "level": "D",
+        "description": "A structured programme to reduce the time from a commit entering the codebase to it being available in production — targeting the DORA Lead Time for…"
+      },
+      {
+        "name": "Elite DORA Target Programme",
+        "level": "A",
+        "description": "A sustained programme targeting Elite DORA performance across all four metrics — maintained as an ongoing engineering excellence commitment, not a…"
+      },
+      {
+        "name": "DORA Culture Programme",
+        "level": "A",
+        "description": "A programme to embed DORA thinking — the four metrics, their causal relationships, and their business implications — into the culture of the…"
+      }
+    ]
+  }
 ];
 
 async function ensureCapabilities(list, label) {
@@ -1207,7 +1653,7 @@ async function ensureCapabilities(list, label) {
   }
 }
 async function ensureAICapabilities() { return ensureCapabilities(AI_CAPABILITIES, 'AI capabilities'); }
-async function ensureOpsCapabilities() { return ensureCapabilities(OPS_TEST_CAPABILITIES, 'Ops capabilities'); }
+async function ensureOpsCapabilities() { return ensureCapabilities(OPS_CAPABILITIES, 'Ops capabilities'); }
 
 // Manually trigger the AI capabilities insert (idempotent, non-destructive)
 app.post('/api/admin/seed-ai', async (req, res) => {
