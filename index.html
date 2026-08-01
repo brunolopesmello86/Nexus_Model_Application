@@ -301,6 +301,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .pm-col-left { min-width:0; }
 .pm-col-right { position:sticky; top:12px; }
 @media (max-width:1080px) { .pm-layout { grid-template-columns:1fr; } .pm-col-right { position:static; } }
+/* Practices tab — full-width 3-column layout (info · practices · radar) */
+.pm-page { width:100%; max-width:2000px; margin:0 auto; }
+.pm-layout3 { display:grid; grid-template-columns:290px minmax(0,1fr) 640px; gap:22px; align-items:start; }
+.pm-col-info { display:flex; flex-direction:column; gap:14px; }
+.pm-col-info .am-title { margin:0; }
+.pm-col-info .am-subtitle { margin:0; }
+.pm-stats { display:flex; flex-direction:column; gap:10px; }
+.pm-stats .am-summary-card { display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+.pm-stats .am-summary-label { margin:0; }
+.pm-col-mid { min-width:0; }
+.pm-col-radar { position:sticky; top:12px; }
+@media (max-width:1500px) { .pm-layout3 { grid-template-columns:270px minmax(0,1fr) 480px; } }
+@media (max-width:1160px) { .pm-layout3 { grid-template-columns:1fr; } .pm-col-radar { position:static; } .pm-stats { flex-direction:row; flex-wrap:wrap; } .pm-stats .am-summary-card { flex:1; min-width:150px; flex-direction:column; align-items:flex-start; } }
 /* Practice radar */
 .pm-radar-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px 18px; margin-bottom:0; }
 .pm-radar-hdr { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
@@ -3355,27 +3368,22 @@ function renderPracticesPage() {
   }).join('');
 
   page.innerHTML = `
-    <div class="am-inner">
-    <div class="am-hdr">
-      <div>
+    <div class="pm-page">
+    <div class="pm-layout3">
+      <div class="pm-col-info">
         <div class="am-title">📈 Practice Maturity Tracker</div>
-        <div class="am-subtitle">Track how each practice matures as Nexus Facilitators drive adoption. Expand a practice to score its <b>good habits</b> (1–100), log <b>repetitions</b>, and review the <b>experiments</b> run against it. Each practice earns a <b>Fitness Score /100</b> = maturity × repetition-multiplier + adopted experiments − failed experiments. The <b>Organizational Fitness</b> is the average across all board practices — repetition and validated experiments are required to progress.</div>
-      </div>
-      <div class="am-actions">
+        <div class="am-subtitle">Track how each practice matures as Nexus Facilitators drive adoption. Expand a practice to score its <b>good habits</b> (1–100), log <b>repetitions</b>, and review the <b>experiments</b> run against it. Each practice earns a <b>Fitness Score /100</b> = maturity × repetition-multiplier + adopted − failed experiments. <b>Organizational Fitness</b> is the average across all board practices.</div>
         <button class="am-btn primary" onclick="switchBoardView('report')">Open Org Fit Report →</button>
+        <div class="pm-stats">
+          <div class="am-summary-card"><div class="am-summary-label">Practices tracked</div><div class="am-summary-value blue">${rows.length}</div></div>
+          <div class="am-summary-card"><div class="am-summary-label">Avg. maturity</div><div class="am-summary-value" style="color:${amMaturityColor(avgMat)}">${avgMat}</div></div>
+          <div class="am-summary-card"><div class="am-summary-label">Experiments run</div><div class="am-summary-value orange">${totRan}</div></div>
+          <div class="am-summary-card"><div class="am-summary-label">Total repetitions</div><div class="am-summary-value teal">${totReps}</div></div>
+          <div class="am-summary-card"><div class="am-summary-label">Org Fitness (avg)</div><div class="am-summary-value" style="color:${amMaturityColor(orgAvg)}">${orgAvg}</div></div>
+        </div>
       </div>
-    </div>
 
-    <div class="am-summary" style="grid-template-columns:repeat(5,1fr)">
-      <div class="am-summary-card"><div class="am-summary-label">Practices tracked</div><div class="am-summary-value blue">${rows.length}</div></div>
-      <div class="am-summary-card"><div class="am-summary-label">Avg. maturity</div><div class="am-summary-value" style="color:${amMaturityColor(avgMat)}">${avgMat}</div></div>
-      <div class="am-summary-card"><div class="am-summary-label">Experiments run</div><div class="am-summary-value orange">${totRan}</div></div>
-      <div class="am-summary-card"><div class="am-summary-label">Total repetitions</div><div class="am-summary-value teal">${totReps}</div></div>
-      <div class="am-summary-card"><div class="am-summary-label">Org Fitness (avg)</div><div class="am-summary-value" style="color:${amMaturityColor(orgAvg)}">${orgAvg}</div></div>
-    </div>
-
-    <div class="pm-layout">
-      <div class="pm-col-left">
+      <div class="pm-col-mid">
         <div class="am-add-panel">
           <div class="pm-addbar">
             <select class="am-select" id="pmAddSelect">
@@ -3391,7 +3399,8 @@ function renderPracticesPage() {
             : rows.map(r => pmRenderCard(r)).join('')}
         </div>
       </div>
-      <div class="pm-col-right">
+
+      <div class="pm-col-radar">
         ${pmRadarPanel(rows)}
       </div>
     </div>
@@ -3787,6 +3796,7 @@ const CAP_DOMAINS = [
   { name:'Strategy & Portfolio',           color:'#d94a8a' },
   { name:'Product & Delivery',             color:'#38b2a0' },
   { name:'Technology & Architecture',      color:'#7b5ea7' },
+  { name:'Artificial Intelligence',        color:'#6366f1' },
   { name:'People, Culture & Governance',   color:'#2d9d5e' },
   { name:'Operations',                     color:'#e8943a' },
 ];

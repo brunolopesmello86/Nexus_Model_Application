@@ -1072,6 +1072,134 @@ async function remapCapabilityDomains() {
   }
 }
 
+// ── Artificial Intelligence capabilities (business + technology) ──────────
+// Added non-destructively (insert-by-name-if-missing) so they don't trigger a
+// full re-seed or delete any existing/custom capabilities.
+const AI_CAPABILITIES = [
+  // ── Business-facing AI ──
+  { name: 'AI Strategy & Governance', domain: 'Artificial Intelligence', source: 'Nexus AI',
+    description: 'How the organization frames AI ambition, governs its use and manages risk responsibly.',
+    practices: [
+      { name: 'AI Ambition & Value Framing', level: 'F', description: 'Define where AI can create value and set a clear, outcome-based ambition tied to strategy.' },
+      { name: 'Responsible AI Policy', level: 'F', description: 'Publish principles for fair, transparent and accountable AI that teams can apply day to day.' },
+      { name: 'AI Governance Board', level: 'D', description: 'Stand up a cross-functional body to approve, prioritise and oversee AI initiatives.' },
+      { name: 'Model & Use-Case Inventory', level: 'D', description: 'Maintain a live register of AI use cases and models with owners, purpose and risk tier.' },
+      { name: 'AI Risk & Compliance Register', level: 'A', description: 'Track regulatory, ethical and operational AI risks with mitigations and review cadence.' },
+      { name: 'AI Ethics Review', level: 'A', description: 'Run structured ethics reviews for higher-risk use cases before and during deployment.' },
+    ]
+  },
+  { name: 'AI Value & Adoption', domain: 'Artificial Intelligence', source: 'Nexus AI',
+    description: 'Turning AI opportunities into adopted, value-generating change across the business.',
+    practices: [
+      { name: 'Use-Case Discovery & Prioritisation', level: 'F', description: 'Surface candidate use cases and rank them by value, feasibility and risk.' },
+      { name: 'Value Hypothesis per Use Case', level: 'F', description: 'State the measurable outcome each AI use case is expected to move, and how it is tested.' },
+      { name: 'Human-in-the-Loop Design', level: 'D', description: 'Design where humans review, override or approve AI output to keep judgement in the loop.' },
+      { name: 'AI Change & Upskilling', level: 'D', description: 'Prepare people with the skills, framing and support to work alongside AI.' },
+      { name: 'Adoption Metrics & Feedback', level: 'A', description: 'Measure real usage and gather user feedback to steer iteration, not just go-live.' },
+      { name: 'Benefits Realisation Tracking', level: 'A', description: 'Follow value from hypothesis to realised outcome and feed learnings back to the portfolio.' },
+    ]
+  },
+  { name: 'AI-Augmented Ways of Working', domain: 'Artificial Intelligence', source: 'Nexus AI',
+    description: 'Embedding AI assistants and copilots into how teams do their everyday work.',
+    practices: [
+      { name: 'Assistant & Copilot Patterns', level: 'F', description: 'Establish reusable patterns for how teams use assistants safely and effectively.' },
+      { name: 'Acceptable-Use Guardrails', level: 'F', description: 'Set clear, practical rules for what may (and may not) be shared with AI tools.' },
+      { name: 'Knowledge Retrieval for Teams', level: 'D', description: 'Give teams grounded answers from their own trusted knowledge via retrieval.' },
+      { name: 'AI-Assisted Decision Support', level: 'D', description: 'Use AI to summarise, draft and surface options while people make the call.' },
+      { name: 'Prompt & Template Library', level: 'A', description: 'Curate shared, versioned prompts and templates so good practice spreads.' },
+      { name: 'Productivity Measurement', level: 'A', description: 'Assess the real impact of AI on flow and quality, avoiding vanity metrics.' },
+    ]
+  },
+  // ── Technology-facing AI ──
+  { name: 'Data Foundation for AI', domain: 'Artificial Intelligence', source: 'Nexus AI',
+    description: 'The data quality, access and governance that make AI trustworthy and possible.',
+    practices: [
+      { name: 'Data Quality & Lineage', level: 'F', description: 'Ensure data is accurate and traceable from source to model input.' },
+      { name: 'Data Contracts', level: 'F', description: 'Agree explicit schemas and expectations between data producers and consumers.' },
+      { name: 'Privacy & PII Handling', level: 'D', description: 'Protect sensitive data with minimisation, masking and access controls.' },
+      { name: 'Labeling & Annotation', level: 'D', description: 'Produce high-quality labelled data with consistent, reviewed guidelines.' },
+      { name: 'Feature Store', level: 'A', description: 'Share consistent, reusable features across training and serving.' },
+      { name: 'Vector Store & Embeddings', level: 'A', description: 'Manage embeddings and vector search for retrieval and semantic use cases.' },
+    ]
+  },
+  { name: 'ML Engineering & MLOps', domain: 'Artificial Intelligence', source: 'Nexus AI',
+    description: 'Engineering discipline to build, ship and operate machine-learning models reliably.',
+    practices: [
+      { name: 'Experiment Tracking', level: 'F', description: 'Record datasets, parameters and metrics so experiments are comparable and reproducible.' },
+      { name: 'Reproducible Training', level: 'F', description: 'Pin data, code and environment so a model can be rebuilt deterministically.' },
+      { name: 'Model Registry & Versioning', level: 'D', description: 'Version, stage and govern models from candidate to production.' },
+      { name: 'Model CI/CD Pipelines', level: 'D', description: 'Automate testing, packaging and deployment of models like any other software.' },
+      { name: 'Automated Retraining', level: 'A', description: 'Refresh models on schedule or trigger as data and performance change.' },
+      { name: 'Training/Serving Parity', level: 'A', description: 'Guarantee features and logic match between training and live serving.' },
+    ]
+  },
+  { name: 'LLM & Generative AI Engineering', domain: 'Artificial Intelligence', source: 'Nexus AI',
+    description: 'Building reliable applications on large language and generative models.',
+    practices: [
+      { name: 'Prompt Engineering & Templating', level: 'F', description: 'Design, test and version prompts as first-class, reviewable artifacts.' },
+      { name: 'Retrieval-Augmented Generation (RAG)', level: 'F', description: 'Ground generation in trusted sources to improve accuracy and reduce hallucination.' },
+      { name: 'Evaluation & Benchmarking (Evals)', level: 'D', description: 'Score outputs against curated test sets and quality criteria before shipping changes.' },
+      { name: 'Guardrails & Safety Filters', level: 'D', description: 'Constrain inputs and outputs to keep responses safe, on-policy and on-topic.' },
+      { name: 'Fine-Tuning & Adapters', level: 'A', description: 'Adapt models to domain data when prompting and retrieval are not enough.' },
+      { name: 'Cost & Latency Optimisation', level: 'A', description: 'Tune models, caching and routing to balance quality, speed and spend.' },
+    ]
+  },
+  { name: 'AI Observability & Assurance', domain: 'Artificial Intelligence', source: 'Nexus AI',
+    description: 'Monitoring, testing and assuring AI systems in production for quality and safety.',
+    practices: [
+      { name: 'Model Monitoring & Drift Detection', level: 'F', description: 'Watch inputs and outputs for drift and degradation over time.' },
+      { name: 'Groundedness & Hallucination Checks', level: 'F', description: 'Verify generated answers are supported by sources and flag unsupported claims.' },
+      { name: 'Bias & Fairness Testing', level: 'D', description: 'Test for and mitigate unfair or biased behaviour across groups.' },
+      { name: 'Model Performance SLOs', level: 'D', description: 'Define and track service-level objectives for accuracy, latency and availability.' },
+      { name: 'Red-Teaming & Adversarial Testing', level: 'A', description: 'Probe models for jailbreaks, misuse and failure modes before attackers do.' },
+      { name: 'Incident Response for AI', level: 'A', description: 'Detect, triage and remediate AI incidents with clear ownership and learning.' },
+    ]
+  },
+];
+
+async function ensureAICapabilities() {
+  try {
+    const { rows: existing } = await db.query('SELECT name FROM capabilities');
+    const have = new Set(existing.map(r => r.name));
+    const toAdd = AI_CAPABILITIES.filter(c => !have.has(c.name));
+    if (!toAdd.length) return;
+    const { rows: mx } = await db.query('SELECT COALESCE(MAX(sort_order),0) AS m FROM capabilities');
+    let order = parseInt(mx[0].m) || 0;
+    await db.query('BEGIN');
+    for (const cap of toAdd) {
+      order++;
+      const { rows: cr } = await db.query(
+        `INSERT INTO capabilities (name, description, domain, source, sort_order)
+         VALUES ($1,$2,$3,$4,$5) RETURNING id`,
+        [cap.name, cap.description, cap.domain, cap.source, order]
+      );
+      const capId = cr[0].id;
+      const pN = [], pD = [], pL = [], pO = [];
+      cap.practices.forEach((p, j) => { pN.push(p.name); pD.push(p.description); pL.push(p.level || null); pO.push(j + 1); });
+      await db.query(
+        `INSERT INTO practices (capability_id, name, description, level, sort_order)
+         SELECT $1::uuid, n, d, l, o FROM unnest($2::text[],$3::text[],$4::text[],$5::int[]) AS t(n,d,l,o)`,
+        [capId, pN, pD, pL, pO]
+      );
+    }
+    await db.query('COMMIT');
+    console.log(`AI capabilities ensured: +${toAdd.length} added`);
+  } catch (err) {
+    await db.query('ROLLBACK').catch(() => {});
+    console.error('AI capabilities seed error:', err.message);
+  }
+}
+
+// Manually trigger the AI capabilities insert (idempotent, non-destructive)
+app.post('/api/admin/seed-ai', async (req, res) => {
+  try {
+    await ensureAICapabilities();
+    const { rows } = await db.query(
+      `SELECT COUNT(*)::int AS n FROM capabilities WHERE domain = 'Artificial Intelligence'`);
+    res.json({ ok: true, aiCapabilities: rows[0].n });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 // Manually trigger the non-destructive domain realignment
 app.post('/api/admin/remap-domains', async (req, res) => {
   try {
@@ -1179,7 +1307,7 @@ app.delete('/api/practices/:id', async (req, res) => {
 
 // ── Start (local dev) or export for Vercel ──
 if (process.env.VERCEL) {
-  seedCapabilitiesIfEmpty().then(remapCapabilityDomains);
+  seedCapabilitiesIfEmpty().then(remapCapabilityDomains).then(ensureAICapabilities);
   module.exports = app;
 } else {
   const PORT = process.env.PORT || 3000;
@@ -1187,5 +1315,6 @@ if (process.env.VERCEL) {
     console.log(`Nexus server running on http://localhost:${PORT}`);
     await seedCapabilitiesIfEmpty();
     await remapCapabilityDomains();
+    await ensureAICapabilities();
   });
 }
