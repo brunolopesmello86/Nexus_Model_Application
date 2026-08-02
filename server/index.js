@@ -1969,6 +1969,24 @@ const TA_CAPABILITIES = [
 // ── Product & Delivery Codex — full deck (14 capabilities, 84 cards) ──
 const PD_CAPABILITIES = [
   {
+    "name": "Delivery Capacity Planning",
+    "domain": "Product & Delivery",
+    "source": "Nexus Codex · Product & Delivery",
+    "description": "Measuring and planning delivery against the team's actual capacity — the ratio of available hours in a work cycle to the work produced — and committing to backlog items within that constraint.",
+    "practices": [
+      {
+        "name": "Capacity Ratio Baseline",
+        "level": "F",
+        "description": "Measure real delivery capacity as the ratio of available hours in a work cycle to the work actually produced — establishing throughput (backlog items completed per available hour) as the empirical baseline for planning, rather than estimating effort task by task."
+      },
+      {
+        "name": "Backlog-Constrained Capacity Planning",
+        "level": "D",
+        "description": "Plan each cycle by pulling backlog work items up to the limit of available hours — treating hours as the constraint (the time the team actually has), not the unit of estimation — so commitments reflect demonstrated throughput instead of optimistic per-task effort estimates."
+      }
+    ]
+  },
+  {
     "name": "Flow Optimization",
     "domain": "Product & Delivery",
     "source": "Nexus Codex · Product & Delivery",
