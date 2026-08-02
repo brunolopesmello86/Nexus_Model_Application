@@ -2699,10 +2699,20 @@ app.post('/api/admin/remap-domains', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Force-reseed the capabilities library (call when DB is out of sync)
+// Force-reseed the capabilities library (call when DB is out of sync).
+// Awaits the full chain — base seed plus every domain reconcile — so this one
+// synchronous call brings the DB fully in line with the source catalogs, which
+// the fire-and-forget module-init chain can't guarantee on serverless cold starts.
 app.post('/api/admin/seed-capabilities', async (req, res) => {
   try {
     await seedCapabilitiesIfEmpty(true);
+    await remapCapabilityDomains();
+    await ensureAICapabilities();
+    await ensureOpsCapabilities();
+    await reconcileOpsCapabilities();
+    await ensureTACapabilities();
+    await retireSupersededTACapabilities();
+    await ensurePDCapabilities();
     const { rows } = await db.query('SELECT COUNT(*) FROM capabilities');
     const { rows: pr } = await db.query('SELECT COUNT(*) FROM practices');
     res.json({ ok: true, capabilities: parseInt(rows[0].count), practices: parseInt(pr[0].count) });
