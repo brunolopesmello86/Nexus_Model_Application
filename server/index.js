@@ -1003,7 +1003,10 @@ async function seedCapabilitiesIfEmpty(force = false) {
 
     const { rows } = await db.query('SELECT COUNT(*) FROM capabilities');
     const count = parseInt(rows[0].count);
-    if (!force && count >= SEED_CAPABILITIES.length) return;
+    // Only seed when the library is truly empty. Never re-seed just because the
+    // count changed — a destructive DELETE + re-insert re-issues every practice
+    // UUID and orphans every board's practice-maturity / experiment data.
+    if (!force && count > 0) return;
 
     // Bulk delete + re-insert inside a single transaction (avoids Vercel timeout)
     await db.query('BEGIN');

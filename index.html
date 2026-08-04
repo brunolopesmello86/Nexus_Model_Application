@@ -19272,7 +19272,12 @@ function calcFitnessBreakdown(){
   let pracMaturitySum = 0, pracAdopted = 0, pracFailed = 0;
   ids.forEach(id => { const st = pmStats(id); pracMaturitySum += st.maturity; pracAdopted += st.adopted; pracFailed += st.failed; });
   const avgMaturity = ids.length ? Math.round(pracMaturitySum / ids.length) : 0;
-  const total = org.count ? org.avg : legacyTotal;
+  // Organizational Fitness = average of every engaged practice's fitness.
+  // Use the legacy points total ONLY as an early-game fallback when no practice
+  // is engaged AND there is no orphaned practice-maturity data — otherwise stale
+  // reps/experiments would wrongly inflate the score (e.g. to 100).
+  const hasPracticeData = (typeof practiceMaturity === 'object' && Object.keys(practiceMaturity||{}).length > 0);
+  const total = org.count ? org.avg : (hasPracticeData ? 0 : legacyTotal);
   return { total, legacyTotal, expRan, expAdopted, expScore, totalReps, repScore, expLinkedPracs: expLinkedPracs.size,
     practicesAvg: org.avg, practiceCount: org.count, avgMaturity, pracAdopted, pracFailed,
     hexScore:0, capScore:0, capCount:0, uniqueCaps:0, linkedPracScore:0, pracCount:org.count, pracScore:org.avg,
