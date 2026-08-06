@@ -701,8 +701,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 /* ══ EXPERIMENT TRACKER (Kanban) ══ */
 .exp-tracker-page { display:flex; flex:1; flex-direction:column; overflow:hidden; min-height:0; }
 .exp-tracker-hdr { padding:10px 14px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; flex-shrink:0; }
-.kanban-board { display:flex; gap:10px; padding:12px; overflow-x:auto; flex:1; min-height:0; align-items:flex-start; }
-.kanban-col { display:flex; flex-direction:column; min-width:230px; max-width:260px; flex-shrink:0; background:var(--surface); border-radius:10px; overflow:hidden; max-height:100%; }
+.kanban-board { display:flex; gap:14px; padding:14px 18px; overflow-x:auto; flex:1; min-height:0; align-items:flex-start; justify-content:safe center; }
+.kanban-col { display:flex; flex-direction:column; flex:1 1 0; min-width:300px; max-width:360px; flex-shrink:0; background:var(--surface); border-radius:10px; overflow:hidden; max-height:100%; }
 .kanban-col-hdr { padding:9px 12px; font-size:11px; font-weight:700; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
 .kanban-col-count { background:var(--surface2); color:var(--text-muted); padding:1px 7px; border-radius:8px; font-size:9px; font-weight:500; }
 .kanban-col-body { flex:1; overflow-y:auto; padding:8px; display:flex; flex-direction:column; gap:7px; min-height:0; transition:background .15s; }
@@ -722,6 +722,43 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .kanban-mv-btn.primary:hover { background:var(--accent); color:#fff; }
 .kanban-empty { font-size:10px; color:var(--text-muted); text-align:center; padding:18px 8px; font-style:italic; }
 .kanban-stage-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:6px; }
+/* Compact (Jira-style) experiment card — click to open the editor */
+.kanban-card.kc { padding:9px 11px; cursor:pointer; display:flex; flex-direction:column; gap:5px; border-left:3px solid var(--kc-c,var(--border)); }
+.kc-top { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+.kc-code { font-family:ui-monospace,monospace; font-size:9.5px; font-weight:800; letter-spacing:.5px; color:var(--kc-c,var(--accent)); }
+.kc-title { font-size:12px; font-weight:700; color:var(--text); line-height:1.3; }
+.kc-prac { font-size:9.5px; color:var(--cyan); line-height:1.25; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.kc-prac.muted { color:var(--text-muted); font-style:italic; }
+.kc-foot { display:flex; align-items:center; justify-content:space-between; gap:6px; margin-top:1px; }
+.kc-pts { font-size:9px; font-weight:800; color:var(--text-muted); background:var(--surface2); border-radius:999px; padding:2px 8px; }
+.kc-pts.on { color:#fff; }
+/* ══ EXPERIMENT EDITOR MODAL ══ */
+.exp-modal { position:fixed; inset:0; z-index:390; display:flex; align-items:center; justify-content:center; padding:22px; background:rgba(2,7,14,.78); backdrop-filter:blur(3px); animation:gsFadeIn .16s ease-out; }
+.exp-box { position:relative; width:680px; max-width:96vw; max-height:92vh; overflow-y:auto; background:var(--surface); border:1px solid var(--border); border-top:5px solid var(--stage-c,var(--accent)); border-radius:14px; padding:18px 20px 16px; box-shadow:0 24px 70px rgba(0,0,0,.55); }
+.exp-close { position:absolute; top:11px; right:12px; width:28px; height:28px; border-radius:8px; border:1px solid var(--border); background:var(--surface2); color:var(--text-muted); cursor:pointer; font-size:13px; }
+.exp-close:hover { color:var(--text); border-color:var(--accent); }
+.exp-hd { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding-right:34px; }
+.exp-code { font-family:ui-monospace,monospace; font-size:13px; font-weight:800; letter-spacing:1px; color:var(--stage-c,var(--accent)); }
+.exp-domain { font-size:10.5px; color:var(--text-muted); letter-spacing:.4px; }
+.exp-pill { margin-left:auto; font-size:9.5px; font-weight:800; letter-spacing:.8px; color:#fff; border-radius:999px; padding:3px 11px; }
+.exp-title { font-size:18px; font-weight:800; color:var(--text); margin:10px 0 4px; line-height:1.2; }
+.exp-sub-row { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+.exp-sub-row select { flex:1; padding:6px 9px; background:var(--bg); border:1px solid var(--border); border-radius:7px; color:var(--text); font-size:12px; }
+.exp-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.exp-field { display:flex; flex-direction:column; gap:4px; }
+.exp-field.full { grid-column:1 / -1; }
+.exp-field label { font-size:9.5px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:var(--lbl-c,var(--text-muted)); }
+.exp-field textarea { width:100%; box-sizing:border-box; background:var(--surface2); border:1px solid var(--border); border-radius:7px; color:var(--text); font-size:12px; font-family:inherit; line-height:1.45; padding:8px 10px; resize:vertical; min-height:56px; }
+.exp-field textarea:focus { outline:none; border-color:var(--accent); }
+.exp-field textarea:disabled { opacity:.45; cursor:not-allowed; }
+.exp-hint { font-size:9px; font-weight:600; color:var(--text-muted); letter-spacing:0; text-transform:none; }
+.exp-ready-row { margin:12px 0 4px; }
+.exp-actions { display:flex; align-items:center; gap:10px; margin-top:16px; padding-top:13px; border-top:1px solid var(--border); }
+.exp-actions .exp-pts { margin-left:auto; font-size:11px; font-weight:800; }
+.exp-mv { padding:7px 15px; border-radius:8px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:12px; font-weight:700; cursor:pointer; }
+.exp-mv:hover { border-color:var(--accent); }
+.exp-mv.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+.exp-mv.primary:hover { opacity:.9; }
 .cap-page { display:flex; flex:1; overflow:hidden; min-height:0; }
 .cap-add-form { display:flex; flex-direction:column; gap:6px; background:var(--surface2); border:1px dashed var(--border); border-radius:7px; padding:8px 10px; margin-top:6px; }
 .cap-add-form input, .cap-add-form textarea { width:100%; padding:5px 8px; background:var(--bg); border:1px solid var(--border); border-radius:5px; color:var(--text); font-size:11px; font-family:inherit; }
@@ -2709,6 +2746,17 @@ const KANBAN_STAGES = [
   {id:'adopted',   label:'✅ Adopted',    color:'var(--green)',      dot:'#10b981'},
   {id:'abandoned', label:'⏸ Abandoned',  color:'var(--red)',        dot:'#ef4444'},
 ];
+// Stable EXP-NN codes + per-stage colour / pill / points for the tracker cards & modal
+let _expKeyOrder = [];
+function expCodeOf(key){ let i=_expKeyOrder.indexOf(key); if(i<0)i=_expKeyOrder.length; return 'EXP-'+String(i+1).padStart(2,'0'); }
+const EXP_STAGE_META = {
+  pending:  {c:'#8b93a5', pill:'PENDING',   pts:0},
+  running:  {c:'#e8943a', pill:'RUNNING',   pts:5},
+  review:   {c:'#8b5cf6', pill:'REVIEW',    pts:5},
+  adopted:  {c:'#2d9d5e', pill:'ADOPTED',   pts:10},
+  abandoned:{c:'#d94a4a', pill:'ABANDONED', pts:0},
+};
+function expStageMeta(key){ const st=(experimentResults[key]||{}).stage||'pending'; return EXP_STAGE_META[st]||EXP_STAGE_META.pending; }
 
 // ══════════════════════════════════════════
 // ANCHOR MAPPING (Org Fitness assessment)
@@ -3604,6 +3652,7 @@ function renderExperimentsPage() {
   const capExpKeys    = Object.keys(experimentResults).filter(k => k.includes('::') && onBoardSet.has(k.split('::')[0]));
   const legacyExpKeys = boardMarkers.filter(m => m.type === 's2f' && allOnBoard.includes(m.hexId)).map(m => m.hexId);
   const allExpKeys    = [...new Set([...capExpKeys, ...nexusExpKeys, ...legacyExpKeys])];
+  _expKeyOrder = allExpKeys.slice().sort();  // stable EXP-NN numbering
 
   // Helper: get display title and capIds for a key (handles connId::pracId format)
   function getExpMeta(key) {
@@ -3673,40 +3722,23 @@ function renderExperimentsPage() {
     } else {
       stageKeys.forEach(key => {
         const er = experimentResults[key]||{};
-        const { title, icon, capIds } = getExpMeta(key);
+        const { title, icon } = getExpMeta(key);
         const linkedPracId = er.practiceId || '';
         const linkedPrac   = linkedPracId ? allPracs.find(p => p.id === linkedPracId) : null;
-
-        // Build practice dropdown: only practices from the connected card's capabilities
-        const linkedCapPracs = capIds.flatMap(cid => {
-          const cap = capabilitiesLibrary.find(c => c.id === cid);
-          return cap ? cap.practices.map(p => ({...p, capName: cap.name})) : [];
-        });
-        const pracOptions = linkedCapPracs.length > 0
-          ? linkedCapPracs.map(p => `<option value="${p.id}"${linkedPracId===p.id?' selected':''}>${escHtml(p.capName)} → ${escHtml(p.name)}</option>`).join('')
-          : `<option disabled>No capabilities on connected card</option>`;
-
-        const canResults = ['review','adopted','abandoned'].includes(stage.id);
+        const meta = expStageMeta(key);
         const safeKey = escHtml(key);
-        html += `<div class="kanban-card" draggable="true"
+        html += `<div class="kanban-card kc" style="--kc-c:${meta.c}" draggable="true"
           ondragstart="_draggedExpKey='${safeKey}';event.dataTransfer.setData('text/plain','${safeKey}')"
-          ondragend="_draggedExpKey=null">
-          <div class="kanban-card-name">${icon} ${escHtml(title)}</div>
-          ${expReadinessChip(safeKey)}
+          ondragend="_draggedExpKey=null"
+          onclick="openExperimentModal('${safeKey}')" title="Open experiment to edit">
+          <div class="kc-top"><span class="kc-code">${expCodeOf(key)}</span>${expReadinessChip(safeKey)}</div>
+          <div class="kc-title">${icon} ${escHtml(title)}</div>
           ${linkedPrac
-            ? `<div class="kanban-card-prac">◈ ${escHtml(linkedPrac.capName||'')} → ${escHtml(linkedPrac.name)}</div>`
-            : `<div class="kanban-card-prac" style="color:var(--text-muted);font-style:italic;">No practice linked</div>`}
-          <select class="kanban-card-field" style="resize:none;min-height:unset;padding:4px 6px;" onchange="setExpField('${safeKey}','practiceId',this.value)">
-            <option value="">— Link practice —</option>${pracOptions}
-          </select>
-          <div class="kanban-card-label">Hypothesis:</div>
-          <textarea class="kanban-card-field" rows="2" placeholder="If we do X, then Y will happen because Z..." oninput="setExpField('${safeKey}','hypothesis',this.value)">${escHtml(er.hypothesis||'')}</textarea>
-          <div class="kanban-card-label" style="opacity:${canResults?1:.45};">Results / Observations: ${canResults?'':'<span style="font-size:9px;color:var(--text-muted);">(available from Review)</span>'}</div>
-          <textarea class="kanban-card-field" rows="2" placeholder="What happened? What did we learn?" oninput="setExpField('${safeKey}','result',this.value)" ${canResults?'':'disabled'}
-            style="${canResults?'':'opacity:.4;cursor:not-allowed;'}">${escHtml(er.result||'')}</textarea>
-          <div class="kanban-card-footer">
-            ${prevStageId ? `<button class="kanban-mv-btn" onclick="moveExpStage('${safeKey}','${prevStageId}')">← Back</button>` : `<span></span>`}
-            ${nextStageId ? `<button class="kanban-mv-btn primary" onclick="moveExpStage('${safeKey}','${nextStageId}')">Next →</button>` : `<span style="font-size:9px;color:${stage.color};">● ${stage.label.replace(/^[^\w]+ ?/,'')}</span>`}
+            ? `<div class="kc-prac">◈ ${escHtml(linkedPrac.capName||'')} → ${escHtml(linkedPrac.name)}</div>`
+            : `<div class="kc-prac muted">No practice linked</div>`}
+          <div class="kc-foot">
+            <span style="font-size:9px;color:var(--text-muted)">${er.hypothesis ? '✎ hypothesis set' : 'no hypothesis yet'}</span>
+            <span class="kc-pts ${meta.pts?'on':''}" style="${meta.pts?`background:${meta.c}`:''}">${meta.pts?'+':''}${meta.pts} pts</span>
           </div>
         </div>`;
       });
@@ -3813,15 +3845,114 @@ function moveExpStage(id, stage) {
   renderExperimentsPage();
   renderFitnessPanel();
   updateStats();
+  if (typeof refreshExperimentModal === 'function') refreshExperimentModal();
   scheduleAutoSave();
 }
 
 function setExpField(id, field, value) {
   if (!experimentResults[id]) experimentResults[id] = { gated:true };
   experimentResults[id][field] = value;
-  if (field === 'practiceId') { renderExperimentsPage(); renderFitnessPanel(); }
+  if (field === 'practiceId') { renderExperimentsPage(); renderFitnessPanel(); if (typeof refreshExperimentModal === 'function') refreshExperimentModal(); }
   scheduleAutoSave();
 }
+
+// ══════════════════════════════════════════
+// EXPERIMENT EDITOR MODAL (click a tracker card to open)
+// ══════════════════════════════════════════
+let _expModalKey = null;
+function expModalMeta(key) {
+  const colonIdx = key.indexOf('::');
+  const connId = colonIdx >= 0 ? key.substring(0, colonIdx) : key;
+  const conn = connections.find(c => c.id === connId);
+  let title, capIds = [], domain = '—', icon = '⬡';
+  if (conn) {
+    const f = resolveItem(conn.from), t = resolveItem(conn.to);
+    title = `${f?.name || '?'} → ${t?.name || '?'}`; icon = '🔗';
+    const toCap = boardMarkers.find(m => m.hexId === conn.to && m.type === 'capability');
+    const fromCap = boardMarkers.find(m => m.hexId === conn.from && m.type === 'capability');
+    capIds = getCapabilityIds(toCap); if (!capIds.length) capIds = getCapabilityIds(fromCap);
+    domain = (t || f)?.domain || '—';
+  } else {
+    const hexId = key.includes('::') ? key.split('::')[0] : key;
+    const item = resolveItem(hexId); title = item?.name || hexId; domain = item?.domain || '—';
+    const capMk = boardMarkers.find(m => m.hexId === hexId && m.type === 'capability');
+    capIds = getCapabilityIds(capMk);
+    if (item && item.type === 'capability' && item._capRef && !capIds.includes(item._capRef)) capIds = [...capIds, item._capRef];
+  }
+  const er = experimentResults[key] || {};
+  if (domain === '—' && er.practiceId) {
+    const cap = capabilitiesLibrary.find(c => (c.practices||[]).some(p => p.id === er.practiceId));
+    if (cap && cap.domain) domain = cap.domain;
+  }
+  return { title, icon, capIds, domain };
+}
+function expModalPracticeOptions(capIds, linkedPracId) {
+  const fromCap = capIds.flatMap(cid => { const cap = capabilitiesLibrary.find(c => c.id === cid); return cap ? cap.practices.map(p => ({...p, capName: cap.name})) : []; });
+  let opts = fromCap.map(p => `<option value="${p.id}"${linkedPracId===p.id?' selected':''}>${escHtml(p.capName)} → ${escHtml(p.name)}</option>`).join('');
+  const needAll = !fromCap.length || (linkedPracId && !fromCap.some(p => p.id === linkedPracId));
+  if (needAll) {
+    const all = capabilitiesLibrary.flatMap(c => c.practices.map(p => `<option value="${p.id}"${linkedPracId===p.id?' selected':''}>${escHtml(c.name)} → ${escHtml(p.name)}</option>`)).join('');
+    opts = opts + (opts ? '<option disabled>──────────</option>' : '') + all;
+  }
+  return opts;
+}
+function experimentModalHtml(key) {
+  const er = experimentResults[key] || {};
+  const m = expModalMeta(key);
+  const meta = expStageMeta(key);
+  const stage = er.stage || 'pending';
+  const canResults = ['review','adopted','abandoned'].includes(stage);
+  const idx = KANBAN_STAGES.findIndex(s => s.id === stage);
+  const prev = idx > 0 ? KANBAN_STAGES[idx-1] : null;
+  const next = idx >= 0 && idx < KANBAN_STAGES.length-1 ? KANBAN_STAGES[idx+1] : null;
+  const clean = lbl => lbl.replace(/^[^\w]+ ?/, '');
+  const ta = (field, ph, extra='') => `<textarea placeholder="${escHtml(ph)}" oninput="setExpField('${escHtml(key)}','${field}',this.value)" ${extra}>${escHtml(er[field]||'')}</textarea>`;
+  return `
+    <button class="exp-close" onclick="closeExperimentModal()" title="Close">✕</button>
+    <div class="exp-hd">
+      <span class="exp-code">${expCodeOf(key)}</span>
+      <span class="exp-domain">${escHtml(m.domain)}</span>
+      <span class="exp-pill" style="background:${meta.c}">${meta.pill}</span>
+    </div>
+    <div class="exp-title">${m.icon} ${escHtml(m.title)}</div>
+    <div class="exp-sub-row">
+      <select onchange="setExpField('${escHtml(key)}','practiceId',this.value)">
+        <option value="">— Link practice —</option>${expModalPracticeOptions(m.capIds, er.practiceId || '')}
+      </select>
+    </div>
+    ${expReadinessChip(escHtml(key)) ? `<div class="exp-ready-row">${expReadinessChip(escHtml(key))}</div>` : ''}
+    <div class="exp-grid">
+      <div class="exp-field full"><label>Hypothesis</label>${ta('hypothesis','If we do X, then Y will happen because Z...')}</div>
+      <div class="exp-field"><label style="--lbl-c:#2d9d5e">✓ Adopted signals</label>${ta('adoptedSignals','What tells us it works — the signals to adopt it?')}</div>
+      <div class="exp-field"><label style="--lbl-c:#d94a4a">✕ Fail signals</label>${ta('failSignals','What tells us to stop — the signals it is failing?')}</div>
+      <div class="exp-field full"><label>Adaptation needed</label>${ta('adaptationNeeded','What would we change or adapt to make it work?')}</div>
+      <div class="exp-field full"><label>Results ${canResults ? '' : '<span class="exp-hint">(available from Review)</span>'}</label>${ta('result','What happened? What did we learn?', canResults ? '' : 'disabled')}</div>
+      <div class="exp-field full"><label>Observations</label>${ta('observations','Facilitator notes, context, quotes, links...')}</div>
+    </div>
+    <div class="exp-actions">
+      ${prev ? `<button class="exp-mv" onclick="moveExpStage('${escHtml(key)}','${prev.id}')">← ${clean(prev.label)}</button>` : ''}
+      ${next ? `<button class="exp-mv primary" onclick="moveExpStage('${escHtml(key)}','${next.id}')">${clean(next.label)} →</button>` : `<span style="font-size:11px;font-weight:700;color:${meta.c}">● ${clean(KANBAN_STAGES[idx].label)}</span>`}
+      <span class="exp-pts" style="color:${meta.pts?meta.c:'var(--text-muted)'}">${meta.pts?'+':''}${meta.pts} pts</span>
+    </div>`;
+}
+function openExperimentModal(key) {
+  closeExperimentModal();
+  _expModalKey = key;
+  const meta = expStageMeta(key);
+  const div = document.createElement('div');
+  div.id = 'expModal'; div.className = 'exp-modal';
+  div.innerHTML = `<div class="exp-box" style="--stage-c:${meta.c}">${experimentModalHtml(key)}</div>`;
+  div.addEventListener('click', e => { if (e.target === div) closeExperimentModal(); });
+  document.body.appendChild(div);
+}
+function refreshExperimentModal() {
+  if (!_expModalKey) return;
+  const box = document.querySelector('#expModal .exp-box');
+  if (!box) return;
+  box.style.setProperty('--stage-c', expStageMeta(_expModalKey).c);
+  box.innerHTML = experimentModalHtml(_expModalKey);
+}
+function closeExperimentModal() { const m = document.getElementById('expModal'); if (m) m.remove(); _expModalKey = null; }
 
 // Organizational domains for the Capabilities Library (NTT DATA Nexus Capability Map)
 const CAP_DOMAINS = [
