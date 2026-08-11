@@ -3261,7 +3261,10 @@ function pmScore(pid) {
 // All experiments linked to a practice: er.practiceId or key suffix connId::pracId
 function pmExperimentsFor(pid) {
   const out = [];
-  Object.entries(experimentResults).forEach(([key, er]) => {
+  // Only experiments actually on the board — off-board/removed records must not
+  // count toward a practice's experiments (keeps Practices, Wall & Report in sync).
+  onBoardExperimentKeys().forEach(key => {
+    const er = experimentResults[key];
     if (!er) return;
     const linked = er.practiceId === pid || (key.includes('::') && key.split('::')[1] === pid);
     if (linked) out.push({ key, er });
@@ -3293,7 +3296,8 @@ function pmExpState(er) {
 function pmStats(pid) {
   const exps = pmExperimentsFor(pid);
   let ran = 0, adopted = 0, failed = 0;
-  exps.forEach(({ er }) => { const s = pmExpState(er); if (s.ran) ran++; if (s.adopted) adopted++; if (s.failed) failed++; });
+  // Same stage buckets as the Wall and Report: "ran" = anything past Pending.
+  exps.forEach(({ key }) => { const c = expStageCategory(key); if (c !== 'pending') ran++; if (c === 'passed') adopted++; if (c === 'abandoned') failed++; });
   const reps = practiceRepetitions[pid] || 0;
   const maturity = pmScore(pid);
   const repMult = 0.4 + 0.6 * Math.min(1, reps / PM_REP_TARGET);
