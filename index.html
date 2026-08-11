@@ -1399,13 +1399,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .pps-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:#1E4266; border-radius:8px 0 0 8px; }
 .pps-num { position:absolute; left:9px; top:8px; font-family:ui-monospace,monospace; font-size:11px; font-weight:800; color:#48607A; }
 .pps-ic { position:absolute; left:9px; bottom:7px; font-size:12px; opacity:.65; }
-.pps-title { font-size:11.5px; font-weight:800; letter-spacing:1.2px; color:var(--text); }
-.pps-key { font-family:ui-monospace,monospace; font-size:8px; font-weight:700; letter-spacing:1.4px; color:#48607A; margin:1px 0 3px; }
+.pps-title { font-size:12.5px; font-weight:800; letter-spacing:1.6px; color:var(--text); margin-bottom:3px; }
 .pps-desc { font-size:9px; color:var(--text-muted); line-height:1.3; }
 .pps-card:hover { border-color:var(--accent); }
 .pps-card.on { border-color:var(--accent); background:linear-gradient(180deg, rgba(25,167,161,.12), #050D18); box-shadow:inset 0 0 0 1px var(--accent), 0 0 14px rgba(25,167,161,.15); }
 .pps-card.on::before { background:var(--accent); }
-.pps-card.on .pps-key { color:var(--accent); }
+.pps-card.on .pps-title { color:var(--accent); }
 .pps-card.done::before { background:#3C6EB4; }
 .pps-foot { text-align:center; font-size:8.5px; font-weight:700; letter-spacing:1.4px; color:var(--text-muted); margin-top:6px; opacity:.85; }
 [data-theme="light"] .poster-phase-strip { display:block; }
@@ -19359,8 +19358,7 @@ function renderPosterPhaseStrip(){
     let cls='pps-card';if(i===cyclePhase)cls+=' on';if(completedPhases.has(i))cls+=' done';
     return `<div class="${cls}" onclick="setCyclePhase(${i})" title="${escHtml(p.d)}">
       <div class="pps-num">0${i+1}</div><div class="pps-ic">${p.i}</div>
-      <div class="pps-title">${PPS_TITLES[i]}</div>
-      <div class="pps-key">PHASE · ${PPS_KEYS[i]}</div>
+      <div class="pps-title">${PPS_KEYS[i]}</div>
       <div class="pps-desc">${escHtml(p.d)}</div>
     </div>`;
   }).join('')+'</div><div class="pps-foot">SENSE → FOCUS → EXPERIMENT → STABILIZE → DIFFUSE → back to SENSE.&nbsp;&nbsp;·&nbsp;&nbsp;The board never closes.</div>';
