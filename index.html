@@ -759,6 +759,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .exp-mv:hover { border-color:var(--accent); }
 .exp-mv.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
 .exp-mv.primary:hover { opacity:.9; }
+.exp-mv.danger { color:#d94a4a; border-color:rgba(217,74,74,.5); }
+.exp-mv.danger:hover { background:rgba(217,74,74,.12); border-color:#d94a4a; }
 .cap-page { display:flex; flex:1; overflow:hidden; min-height:0; }
 .cap-add-form { display:flex; flex-direction:column; gap:6px; background:var(--surface2); border:1px dashed var(--border); border-radius:7px; padding:8px 10px; margin-top:6px; }
 .cap-add-form input, .cap-add-form textarea { width:100%; padding:5px 8px; background:var(--bg); border:1px solid var(--border); border-radius:5px; color:var(--text); font-size:11px; font-family:inherit; }
@@ -2756,6 +2758,25 @@ const EXP_STAGE_META = {
   abandoned:{c:'#d94a4a', pill:'ABANDONED', pts:0},
 };
 function expStageMeta(key){ const st=(experimentResults[key]||{}).stage||'pending'; return EXP_STAGE_META[st]||EXP_STAGE_META.pending; }
+// Experiments actually ON the board — the single source of truth used by the
+// tracker, the report and the fitness panel so their counts always agree.
+function onBoardExperimentKeys(){
+  const allOnBoard = Object.values(gridState);
+  const onBoardSet = new Set(allOnBoard);
+  const nexusExpKeys  = connections.filter(c => c.type === 'nexus').flatMap(c => getConnExpKeys(c.id).filter(k => experimentResults[k]));
+  const capExpKeys    = Object.keys(experimentResults).filter(k => k.includes('::') && onBoardSet.has(k.split('::')[0]));
+  const legacyExpKeys = boardMarkers.filter(m => m.type === 's2f' && allOnBoard.includes(m.hexId)).map(m => m.hexId);
+  return [...new Set([...capExpKeys, ...nexusExpKeys, ...legacyExpKeys])];
+}
+// Mutually-exclusive stage bucket for an experiment (review folds into running).
+function expStageCategory(key){
+  const e = experimentResults[key] || {};
+  const st = e.stage || e.status || 'pending';
+  if (st==='adopted'||st==='passed') return 'passed';
+  if (st==='abandoned'||st==='failed') return 'abandoned';
+  if (st==='running'||st==='testing'||st==='review') return 'running';
+  return 'pending';
+}
 
 // ══════════════════════════════════════════
 // ANCHOR MAPPING (Org Fitness assessment)
@@ -3463,18 +3484,9 @@ function renderPracticesPage() {
       </div>
 
       <div class="pm-col-mid">
-        <div class="am-add-panel">
-          <div class="pm-addbar">
-            <select class="am-select" id="pmAddSelect">
-              <option value="">${addOpts ? '— Add a practice to track —' : 'All library practices already listed'}</option>
-              ${addOpts}
-            </select>
-            <button class="am-btn primary" onclick="pmAddPractice()">Add Practice</button>
-          </div>
-        </div>
         <div id="pmList">
           ${rows.length === 0
-            ? `<div class="am-empty">No practices in play yet. Link a capability or run an S2F experiment against a practice on the board, or add one above to start tracking its maturity.</div>`
+            ? `<div class="am-empty">No practices in play yet. Map capabilities and score their practices in the <b>Anchors</b> tab, or build an experiment against a practice on the board — they'll appear here automatically.</div>`
             : rows.map(r => pmRenderCard(r)).join('')}
         </div>
       </div>
@@ -3825,8 +3837,17 @@ function showReadinessModal(key) {
 
 function moveExpStage(id, stage) {
   if (!experimentResults[id]) experimentResults[id] = { gated: true };
-  // Readiness gate — new experiments must pass all 4 checks to leave Pending
-  if (stage !== 'pending' && experimentResults[id].gated) {
+  // Experiments only move forward. Abandoning (a valid outcome) is always allowed.
+  const order = KANBAN_STAGES.map(s => s.id);
+  const curIdx = Math.max(0, order.indexOf(experimentResults[id].stage || 'pending'));
+  const tgtIdx = order.indexOf(stage);
+  if (stage !== 'abandoned' && tgtIdx <= curIdx) {
+    showToast('Experiments only move forward — drag to a later stage (or Abandon).', 'info');
+    return;
+  }
+  // Readiness gate — an experiment must have its full card (capability on board,
+  // one practice assigned, ≥3 good habits) before it can leave Pending. Abandoning is exempt.
+  if (stage !== 'pending' && stage !== 'abandoned' && experimentResults[id].gated) {
     const r = expReadiness(id);
     if (!r.ready) { showReadinessModal(id); return; }
   }
@@ -3929,8 +3950,10 @@ function experimentModalHtml(key) {
       <div class="exp-field full"><label>Observations</label>${ta('observations','Facilitator notes, context, quotes, links...')}</div>
     </div>
     <div class="exp-actions">
-      ${prev ? `<button class="exp-mv" onclick="moveExpStage('${escHtml(key)}','${prev.id}')">← ${clean(prev.label)}</button>` : ''}
-      ${next ? `<button class="exp-mv primary" onclick="moveExpStage('${escHtml(key)}','${next.id}')">${clean(next.label)} →</button>` : `<span style="font-size:11px;font-weight:700;color:${meta.c}">● ${clean(KANBAN_STAGES[idx].label)}</span>`}
+      ${next && next.id !== 'abandoned' ? `<button class="exp-mv primary" onclick="moveExpStage('${escHtml(key)}','${next.id}')">${clean(next.label)} →</button>` : ''}
+      ${(stage==='pending'||stage==='running'||stage==='review') ? `<button class="exp-mv danger" onclick="moveExpStage('${escHtml(key)}','abandoned')">⏸ Abandon</button>` : ''}
+      ${stage==='adopted' ? `<span style="font-size:11px;font-weight:700;color:${meta.c}">● ${clean(KANBAN_STAGES[idx].label)}</span>` : ''}
+      ${stage==='abandoned' ? `<span style="font-size:11px;font-weight:700;color:${meta.c}">● Abandoned</span>` : ''}
       <span class="exp-pts" style="color:${meta.pts?meta.c:'var(--text-muted)'}">${meta.pts?'+':''}${meta.pts} pts</span>
     </div>`;
 }
@@ -19375,21 +19398,16 @@ function advanceCycle(){
 // STATS & FITNESS
 // ══════════════════════════════════════════
 function calcFitnessBreakdown(){
-  // 1. Nexus line experiments (keyed as connId::pracId or connId)
-  const nexusConns = connections.filter(c => c.type === 'nexus');
-  const allNexusExpKeys = nexusConns.flatMap(c => getConnExpKeys(c.id).filter(k => experimentResults[k]));
-  const nexusExpRan     = allNexusExpKeys.filter(k => { const s = experimentResults[k]?.stage; return s && s !== 'pending'; }).length;
-  const nexusExpAdopted = allNexusExpKeys.filter(k => experimentResults[k]?.stage === 'adopted').length;
-  // 2. Legacy hex-based experiments (boardMarkers s2f, backward compat)
-  const all = Object.values(gridState);
-  const legacyIds = boardMarkers.filter(m => m.type === 's2f' && all.includes(m.hexId)).map(m => m.hexId);
-  const legacyRan     = legacyIds.filter(id => { const s = (experimentResults[id]||{}).status; return s && s !== ''; }).length;
-  const legacyAdopted = legacyIds.filter(id => { const er = experimentResults[id]||{}; return er.status === 'passed' || er.stage === 'adopted'; }).length;
-  const expRan     = nexusExpRan     + legacyRan;
-  const expAdopted = nexusExpAdopted + legacyAdopted;
+  // 1. Experiments on the board (capability-hex + nexus + legacy) — one source
+  //    of truth, so the report/tracker/panel all agree. "Ran" = left Pending.
+  const _obExpKeys = onBoardExperimentKeys();
+  const expRan     = _obExpKeys.filter(k => expStageCategory(k) !== 'pending').length;
+  const expAdopted = _obExpKeys.filter(k => expStageCategory(k) === 'passed').length;
   const expScore   = expRan * 5 + expAdopted * 10;
-  // 3. Practice repetitions
-  const totalReps = Object.values(practiceRepetitions).reduce((s,n) => s+n, 0);
+  // 3. Practice repetitions — only for practices still engaged (ignore reps left
+  //    behind by practices that were removed/untracked, so the report matches).
+  const _engagedReps = (typeof pmEngagedIds === 'function') ? new Set(pmEngagedIds()) : null;
+  const totalReps = Object.entries(practiceRepetitions).reduce((s,[id,n]) => s + ((!_engagedReps || _engagedReps.has(id)) ? (n||0) : 0), 0);
   const repScore  = totalReps * 2;
   const legacyTotal = Math.max(0, Math.min(100, Math.round(expScore + repScore)));
   const expLinkedPracs = new Set(Object.values(experimentResults).map(er => er.practiceId).filter(Boolean));
@@ -19701,11 +19719,12 @@ function renderReportPage() {
   // Drivers
   const drTotal = Object.values(driverAssignments).reduce((s,arr)=>s+arr.length,0);
 
-  // Experiments (all sources)
-  const expEntries = Object.entries(experimentResults);
-  const expPassed  = expEntries.filter(([,e])=>e.stage==='adopted'||e.status==='passed').length;
-  const expRunning = expEntries.filter(([,e])=>e.stage==='running'||e.stage==='testing'||e.status==='running').length;
-  const expPending = expEntries.filter(([,e])=>!e.stage||e.stage==='pending'||e.status===''||e.status==='pending').length;
+  // Experiments — only those on the board (matches the tracker); mutually-exclusive buckets
+  const expEntries   = onBoardExperimentKeys().map(k => [k, experimentResults[k] || {}]);
+  const expPassed    = expEntries.filter(([k]) => expStageCategory(k)==='passed').length;
+  const expRunning   = expEntries.filter(([k]) => expStageCategory(k)==='running').length;
+  const expPending   = expEntries.filter(([k]) => expStageCategory(k)==='pending').length;
+  const expAbandoned = expEntries.filter(([k]) => expStageCategory(k)==='abandoned').length;
 
   // Nexus lines
   const nexusLines = connections.filter(c=>c.type==='nexus').length;
@@ -19962,7 +19981,7 @@ function renderReportPage() {
               <div class="rp-stat">
                 <div class="rp-stat-chip">${expEntries.length}</div>
                 <div class="rp-stat-name">Active<br>Experiments</div>
-                <div class="rp-stat-detail">${expPassed} passed · ${expRunning} running · ${expPending} pending</div>
+                <div class="rp-stat-detail">${expPassed} passed · ${expRunning} running · ${expPending} pending${expAbandoned?` · ${expAbandoned} abandoned`:''}</div>
               </div>
               <div class="rp-stat">
                 <div class="rp-stat-chip" style="background:#123c86">${pCount}</div>
@@ -20179,10 +20198,10 @@ function generateCyclePDF() {
   const drTotal = Object.values(driverAssignments).reduce((s,a) => s+a.length, 0);
   const nexusL  = connections.filter(c => c.type==='nexus').length;
 
-  const expE       = Object.entries(experimentResults);
-  const expPassed  = expE.filter(([,e]) => e.stage==='adopted'||e.status==='passed').length;
-  const expRunning = expE.filter(([,e]) => e.stage==='running'||e.stage==='testing'||e.status==='running').length;
-  const expPending = expE.filter(([,e]) => !e.stage||e.stage==='pending'||e.status===''||e.status==='pending').length;
+  const expE       = onBoardExperimentKeys().map(k => [k, experimentResults[k] || {}]);
+  const expPassed  = expE.filter(([k]) => expStageCategory(k)==='passed').length;
+  const expRunning = expE.filter(([k]) => expStageCategory(k)==='running').length;
+  const expPending = expE.filter(([k]) => expStageCategory(k)==='pending').length;
 
   const STD = [
     {name:'Foundational / Systemic Transformation'},
