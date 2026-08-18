@@ -5,7 +5,9 @@
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
-    "migrate": "node server/migrate.js"
+    "migrate": "node server/migrate.js",
+    "setup:auth": "node server/setup-auth.js",
+    "add-domain": "node server/register-domain.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

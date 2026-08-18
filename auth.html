@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexus Board — Sign up</title>
+<style>
+  :root{
+    --navy:#0B1F3A; --ink:#33425A; --muted:#6B7686; --line:#DDE5F0;
+    --bg:#F4F7FB; --card:#FFFFFF; --teal:#009AA4; --blue:#3C6EB4;
+    --green:#178A5A; --amber:#B8620F; --red:#C0392B; --r:14px;
+    --shadow:0 1px 2px rgba(11,31,58,.06),0 8px 24px rgba(11,31,58,.06);
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+  .shell{display:grid;grid-template-columns:minmax(0,430px) 1fr;min-height:100vh}
+  @media (max-width:900px){.shell{grid-template-columns:1fr}.brand{display:none!important}}
+  .brand{background:radial-gradient(900px 600px at 20% 10%,rgba(0,154,164,.22),transparent 60%),
+    radial-gradient(700px 500px at 80% 90%,rgba(60,110,180,.28),transparent 60%),var(--navy);
+    color:#fff;padding:48px 44px;display:flex;flex-direction:column;justify-content:space-between}
+  .brand .mark{display:flex;align-items:center;gap:12px;margin-bottom:26px}
+  .brand .mark b{font-size:17px;font-weight:650;letter-spacing:-.01em}
+  .brand h1{font-size:26px;line-height:1.2;margin:0 0 12px;font-weight:650;letter-spacing:-.01em}
+  .brand p{font-size:14.5px;line-height:1.65;color:#AFC2DA;margin:0;max-width:34ch}
+  .brand .foot{font-size:11.5px;color:#6C82A2;letter-spacing:.03em}
+  .steps{margin:34px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2px}
+  .steps li{display:flex;align-items:center;gap:12px;font-size:13.5px;color:#7189AB;padding:9px 0}
+  .steps li .dot{width:22px;height:22px;border-radius:50%;flex:0 0 22px;border:1.5px solid rgba(255,255,255,.2);
+    display:grid;place-items:center;font-size:11px;font-weight:700;color:#7189AB}
+  .steps li.done{color:#8FD8D2} .steps li.done .dot{background:rgba(0,154,164,.25);border-color:var(--teal);color:#8FD8D2}
+  .steps li.now{color:#fff;font-weight:600} .steps li.now .dot{background:var(--teal);border-color:var(--teal);color:#fff}
+  .stage{display:grid;place-items:center;padding:44px 28px}
+  .panel{width:100%;max-width:430px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:34px 32px}
+  h2.t{font-size:23px;margin:0 0 7px;color:var(--navy);font-weight:650;letter-spacing:-.01em}
+  p.sub{font-size:14px;color:var(--muted);margin:0 0 24px;line-height:1.6}
+  p.sub b{color:var(--ink);font-weight:600}
+  label{display:block;font-size:12.5px;font-weight:650;color:var(--navy);margin:0 0 7px}
+  .field{margin-bottom:18px}
+  input[type=text],input[type=email],input[type=password]{width:100%;font:inherit;font-size:15px;padding:12px 14px;
+    color:var(--ink);border:1.5px solid var(--line);border-radius:10px;background:#fff;transition:.15s}
+  input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,154,164,.13)}
+  .hint{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.5}
+  .btn{width:100%;font:inherit;font-size:15px;font-weight:600;padding:13px 18px;border:none;border-radius:10px;
+    cursor:pointer;transition:.15s;background:linear-gradient(180deg,#0FA7B1,#00838C);color:#fff;
+    box-shadow:0 6px 16px rgba(0,131,140,.28)}
+  .btn:hover{filter:brightness(1.06)} .btn:disabled{opacity:.55;cursor:not-allowed;filter:none}
+  .sep{height:1px;background:var(--line);margin:22px 0}
+  .center{text-align:center;font-size:13.5px;color:var(--muted)}
+  .link{color:var(--blue);text-decoration:none;cursor:pointer;font-weight:550}
+  .link:hover{text-decoration:underline}
+  .msg{display:none;gap:9px;padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.5;margin-bottom:18px}
+  .msg.show{display:flex} .msg.err{background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.25);color:#8A241B}
+  .msg.ok{background:rgba(0,154,164,.07);border:1px solid rgba(0,154,164,.22);color:#0A5F66}
+  .codes{display:flex;gap:9px;justify-content:space-between;margin:6px 0 8px}
+  .codes input{width:100%;aspect-ratio:1/1.15;text-align:center;font-size:24px;font-weight:650;color:var(--navy);
+    border:1.5px solid var(--line);border-radius:11px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+  .codes input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,154,164,.13)}
+  .timer{font-size:12.5px;color:var(--muted);text-align:center;margin:14px 0 20px}
+  .timer b{color:var(--navy);font-variant-numeric:tabular-nums}
+  .checks{list-style:none;margin:12px 0 20px;padding:0;display:grid;gap:8px}
+  .checks li{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+  .checks li .mk{width:17px;height:17px;border-radius:50%;flex:0 0 17px;border:1.5px solid var(--line);
+    display:grid;place-items:center;font-size:10px;color:transparent;transition:.15s}
+  .checks li.ok{color:var(--green)} .checks li.ok .mk{background:var(--green);border-color:var(--green);color:#fff}
+  .meter{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin:4px 0 6px}
+  .meter i{display:block;height:100%;width:0;background:var(--red);transition:.25s}
+  .scr{display:none} .scr.on{display:block}
+  .success .glyph{width:56px;height:56px;border-radius:50%;background:rgba(0,154,164,.1);display:grid;place-items:center;margin-bottom:18px}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="brand">
+    <div>
+      <div class="mark">
+        <svg width="30" height="30" viewBox="0 0 40 40" fill="none">
+          <circle cx="14" cy="20" r="9" stroke="#4FD0C6" stroke-width="2.6"/>
+          <circle cx="26" cy="20" r="9" stroke="#6FA8E0" stroke-width="2.6"/>
+        </svg>
+        <b>Nexus Board</b>
+      </div>
+      <h1 id="brandTitle">Create your account</h1>
+      <p id="brandSub">Nexus is available to partner organizations. Your access is granted board by board.</p>
+      <ul class="steps" id="steps">
+        <li data-s="1" class="now"><span class="dot">1</span> Verify your work email</li>
+        <li data-s="2"><span class="dot">2</span> Enter the emailed code</li>
+        <li data-s="3"><span class="dot">3</span> Create a password</li>
+        <li data-s="4"><span class="dot">4</span> Wait for board assignment</li>
+      </ul>
+    </div>
+    <div class="foot">NTT DATA · DS&amp;A USA</div>
+  </aside>
+
+  <div class="stage">
+    <div class="panel">
+
+      <!-- 1. SIGNUP -->
+      <section class="scr on" id="s-signup">
+        <div class="card">
+          <h2 class="t">Get started</h2>
+          <p class="sub">Only email addresses from registered partner domains can create an account.</p>
+          <div class="msg" id="m-signup"></div>
+          <div class="field">
+            <label for="full_name">Full name</label>
+            <input id="full_name" type="text" placeholder="Ana Silva" autocomplete="name">
+          </div>
+          <div class="field">
+            <label for="email">Work email</label>
+            <input id="email" type="email" placeholder="you@company.com" autocomplete="email">
+            <div class="hint">Personal addresses (gmail, outlook, yahoo…) are not accepted.</div>
+          </div>
+          <button class="btn" id="btn-signup">Send verification code</button>
+          <div class="sep"></div>
+          <div class="center">Already have an account? <span class="link" id="go-signin">Sign in</span></div>
+        </div>
+      </section>
+
+      <!-- 2. VERIFY -->
+      <section class="scr" id="s-verify">
+        <div class="card">
+          <h2 class="t">Enter your code</h2>
+          <p class="sub">We sent a 6-digit code to <b id="verify-email">your email</b>. It expires in 10 minutes.</p>
+          <div class="msg" id="m-verify"></div>
+          <div class="codes" id="codes">
+            <input maxlength="1" inputmode="numeric" aria-label="digit 1">
+            <input maxlength="1" inputmode="numeric" aria-label="digit 2">
+            <input maxlength="1" inputmode="numeric" aria-label="digit 3">
+            <input maxlength="1" inputmode="numeric" aria-label="digit 4">
+            <input maxlength="1" inputmode="numeric" aria-label="digit 5">
+            <input maxlength="1" inputmode="numeric" aria-label="digit 6">
+          </div>
+          <div class="timer">Code expires in <b id="clock">10:00</b></div>
+          <button class="btn" id="btn-verify">Verify and continue</button>
+          <div class="center" style="margin-top:16px"><span class="link" id="resend">Resend code</span></div>
+        </div>
+      </section>
+
+      <!-- 3. PASSWORD -->
+      <section class="scr" id="s-password">
+        <div class="card">
+          <h2 class="t">Create your password</h2>
+          <p class="sub">At least 8 characters, with letters and numbers.</p>
+          <div class="msg" id="m-password"></div>
+          <div class="field">
+            <label for="pw">Password</label>
+            <input id="pw" type="password" placeholder="••••••••" autocomplete="new-password">
+            <div class="meter"><i id="bar"></i></div>
+            <ul class="checks" id="checks">
+              <li data-k="len"><span class="mk">✓</span> At least 8 characters</li>
+              <li data-k="ltr"><span class="mk">✓</span> Contains a letter</li>
+              <li data-k="num"><span class="mk">✓</span> Contains a number</li>
+            </ul>
+          </div>
+          <div class="field">
+            <label for="pw2">Confirm password</label>
+            <input id="pw2" type="password" placeholder="••••••••" autocomplete="new-password">
+          </div>
+          <button class="btn" id="btn-password">Create account</button>
+        </div>
+      </section>
+
+      <!-- 4. SUCCESS -->
+      <section class="scr" id="s-success">
+        <div class="card success">
+          <div class="glyph">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#009AA4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          </div>
+          <h2 class="t">Your account is ready</h2>
+          <p class="sub">You're all set. You'll get access to your boards as soon as an administrator assigns you to a project. Sign-in opens shortly.</p>
+          <div class="msg ok show" id="m-success">Verified and active — nothing more to do right now.</div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var state = { email:'', token:'' };
+  var $ = function(id){ return document.getElementById(id); };
+  function api(path, body){
+    return fetch('/api/auth'+path, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body||{})
+    }).then(function(r){ return r.json().then(function(j){ return {ok:r.ok, data:j}; }); });
+  }
+  function show(name){
+    ['signup','verify','password','success'].forEach(function(s){
+      $('s-'+s).classList.toggle('on', s===name);
+    });
+    var stepMap = {signup:1, verify:2, password:3, success:4};
+    var cur = stepMap[name];
+    Array.prototype.forEach.call($('steps').children, function(li){
+      var s = +li.getAttribute('data-s');
+      li.classList.toggle('done', s < cur);
+      li.classList.toggle('now', s === cur);
+    });
+  }
+  function msg(id, text, kind){
+    var el = $(id); el.textContent = text || '';
+    el.className = 'msg' + (text ? ' show '+(kind||'err') : '');
+  }
+  function busy(btn, on, label){ btn.disabled = on; if(label) btn.textContent = label; }
+
+  // 1. SIGNUP
+  $('btn-signup').addEventListener('click', function(){
+    var email = $('email').value.trim(), name = $('full_name').value.trim();
+    msg('m-signup','');
+    if(!email || email.indexOf('@')<0){ msg('m-signup','Please enter a valid work email.'); return; }
+    busy($('btn-signup'), true, 'Sending…');
+    api('/signup', {full_name:name, email:email}).then(function(res){
+      busy($('btn-signup'), false, 'Send verification code');
+      if(!res.ok){ msg('m-signup', res.data.error || 'Could not send the code.'); return; }
+      state.email = email;
+      $('verify-email').textContent = email;
+      startClock(); startResendCooldown();
+      show('verify');
+      var c = $('codes').children; if(c[0]) c[0].focus();
+    }).catch(function(){ busy($('btn-signup'), false, 'Send verification code'); msg('m-signup','Network error. Please try again.'); });
+  });
+  $('go-signin').addEventListener('click', function(){ window.location.href='/'; });
+
+  // 2. VERIFY — code boxes
+  var codeInputs = Array.prototype.slice.call($('codes').children);
+  codeInputs.forEach(function(inp, i){
+    inp.addEventListener('input', function(){
+      inp.value = inp.value.replace(/\D/g,'').slice(0,1);
+      if(inp.value && codeInputs[i+1]) codeInputs[i+1].focus();
+    });
+    inp.addEventListener('keydown', function(e){
+      if(e.key==='Backspace' && !inp.value && codeInputs[i-1]) codeInputs[i-1].focus();
+    });
+    inp.addEventListener('paste', function(e){
+      var t = (e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+      if(t){ e.preventDefault(); t.split('').forEach(function(d,j){ if(codeInputs[j]) codeInputs[j].value=d; });
+        (codeInputs[t.length]||codeInputs[5]).focus(); }
+    });
+  });
+  function readCode(){ return codeInputs.map(function(i){return i.value;}).join(''); }
+  $('btn-verify').addEventListener('click', function(){
+    var code = readCode(); msg('m-verify','');
+    if(!/^\d{6}$/.test(code)){ msg('m-verify','Enter all 6 digits.'); return; }
+    busy($('btn-verify'), true, 'Verifying…');
+    api('/verify-code', {email:state.email, code:code}).then(function(res){
+      busy($('btn-verify'), false, 'Verify and continue');
+      if(!res.ok){ msg('m-verify', res.data.error || 'Incorrect code.'); return; }
+      state.token = res.data.token;
+      show('password'); $('pw').focus();
+    }).catch(function(){ busy($('btn-verify'), false, 'Verify and continue'); msg('m-verify','Network error. Please try again.'); });
+  });
+
+  var clockTimer, resendTimer;
+  function startClock(){
+    clearInterval(clockTimer); var t = 600;
+    clockTimer = setInterval(function(){
+      if(t>0) t--; var m=Math.floor(t/60), s=t%60;
+      $('clock').textContent = m+':'+(s<10?'0':'')+s;
+      if(t===0) clearInterval(clockTimer);
+    }, 1000);
+  }
+  function startResendCooldown(){
+    clearInterval(resendTimer); var r = 60; var el = $('resend');
+    el.style.pointerEvents='none'; el.style.opacity='.5';
+    el.textContent = 'Resend code (60s)';
+    resendTimer = setInterval(function(){
+      r--; if(r<=0){ clearInterval(resendTimer); el.textContent='Resend code'; el.style.pointerEvents=''; el.style.opacity=''; }
+      else el.textContent='Resend code ('+r+'s)';
+    }, 1000);
+  }
+  $('resend').addEventListener('click', function(){
+    if($('resend').style.pointerEvents==='none') return;
+    msg('m-verify','');
+    api('/signup', {email:state.email}).then(function(res){
+      if(!res.ok){ msg('m-verify', res.data.error || 'Could not resend.'); return; }
+      startClock(); startResendCooldown(); msg('m-verify','A new code is on its way.', 'ok');
+    });
+  });
+
+  // 3. PASSWORD — live checklist
+  function evalPw(){
+    var v = $('pw').value;
+    var ok = { len:v.length>=8, ltr:/[A-Za-z]/.test(v), num:/[0-9]/.test(v) };
+    var n = 0;
+    Object.keys(ok).forEach(function(k){
+      var li = document.querySelector('.checks li[data-k="'+k+'"]');
+      li.classList.toggle('ok', ok[k]); if(ok[k]) n++;
+    });
+    var extra = Math.min(2, Math.floor(Math.max(0, v.length-8)/4));
+    var score = Math.min(100, (n/3)*70 + extra*15);
+    var bar = $('bar'); bar.style.width = score+'%';
+    bar.style.background = score<45 ? '#C0392B' : score<80 ? '#B8620F' : '#178A5A';
+    return ok.len && ok.ltr && ok.num;
+  }
+  $('pw').addEventListener('input', evalPw);
+  $('btn-password').addEventListener('click', function(){
+    msg('m-password','');
+    var v = $('pw').value, v2 = $('pw2').value;
+    if(!evalPw()){ msg('m-password','Password must be at least 8 characters with a letter and a number.'); return; }
+    if(v!==v2){ msg('m-password','The two passwords do not match.'); return; }
+    busy($('btn-password'), true, 'Creating…');
+    api('/set-password', {email:state.email, token:state.token, password:v}).then(function(res){
+      busy($('btn-password'), false, 'Create account');
+      if(!res.ok){ msg('m-password', res.data.error || 'Could not set your password.'); return; }
+      show('success');
+    }).catch(function(){ busy($('btn-password'), false, 'Create account'); msg('m-password','Network error. Please try again.'); });
+  });
+})();
+</script>
+</body>
+</html>

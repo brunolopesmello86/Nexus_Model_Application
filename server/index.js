@@ -42,6 +42,9 @@ app.use('/api', async (req, res, next) => {
   try { await ensureSchema(); next(); } catch (e) { next(); }
 });
 
+// ── Auth: login & access control (signup, verification code, password) ──
+app.use('/api/auth', require('./auth/routes'));
+
 // ── Health ──
 app.get('/api/health', async (req, res) => {
   try {
