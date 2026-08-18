@@ -35,14 +35,16 @@ async function main() {
   console.log('✓ Auth schema applied (org_email_domains, users, game_members,');
   console.log('  verification_codes, trusted_devices, sessions, audit_log).');
 
-  // 2) super admin
+  // 2) super admin  (pass --rotate to force a fresh temp password)
+  const ROTATE = process.argv.includes('--rotate');
   const email = SUPER_ADMIN_EMAIL.toLowerCase().trim();
   const existing = await db.query('SELECT id, password_hash FROM users WHERE email = $1', [email]);
-  if (existing.rows.length && existing.rows[0].password_hash) {
+  if (existing.rows.length && existing.rows[0].password_hash && !ROTATE) {
     console.log(`\n✓ Super Admin ${email} already exists with a password — leaving it unchanged.`);
-    console.log('  (To issue a fresh temp password, use the reset flow in step 3.)');
+    console.log('  (Run "npm run setup:auth -- --rotate" to issue a fresh temp password.)');
     process.exit(0);
   }
+  if (ROTATE) console.log('  --rotate: issuing a fresh temporary password for the Super Admin.');
 
   const temp = makeTempPassword();
   await db.query(

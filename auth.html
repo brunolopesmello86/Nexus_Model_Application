@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nexus Board — Sign up</title>
+<title>Nexus Board — Sign in</title>
 <style>
   :root{
     --navy:#0B1F3A; --ink:#33425A; --muted:#6B7686; --line:#DDE5F0;
@@ -48,6 +48,7 @@
   .btn:hover{filter:brightness(1.06)} .btn:disabled{opacity:.55;cursor:not-allowed;filter:none}
   .sep{height:1px;background:var(--line);margin:22px 0}
   .center{text-align:center;font-size:13.5px;color:var(--muted)}
+  .rowbetween{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
   .link{color:var(--blue);text-decoration:none;cursor:pointer;font-weight:550}
   .link:hover{text-decoration:underline}
   .msg{display:none;gap:9px;padding:12px 14px;border-radius:10px;font-size:13px;line-height:1.5;margin-bottom:18px}
@@ -66,6 +67,8 @@
   .checks li.ok{color:var(--green)} .checks li.ok .mk{background:var(--green);border-color:var(--green);color:#fff}
   .meter{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin:4px 0 6px}
   .meter i{display:block;height:100%;width:0;background:var(--red);transition:.25s}
+  .remember{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--ink);margin:2px 0 18px;cursor:pointer}
+  .remember input{width:16px;height:16px;accent-color:var(--teal)}
   .scr{display:none} .scr.on{display:block}
   .success .glyph{width:56px;height:56px;border-radius:50%;background:rgba(0,154,164,.1);display:grid;place-items:center;margin-bottom:18px}
 </style>
@@ -81,9 +84,9 @@
         </svg>
         <b>Nexus Board</b>
       </div>
-      <h1 id="brandTitle">Create your account</h1>
-      <p id="brandSub">Nexus is available to partner organizations. Your access is granted board by board.</p>
-      <ul class="steps" id="steps">
+      <h1 id="brandTitle">Welcome back</h1>
+      <p id="brandSub">Sign in to your transformation boards.</p>
+      <ul class="steps" id="steps" style="display:none">
         <li data-s="1" class="now"><span class="dot">1</span> Verify your work email</li>
         <li data-s="2"><span class="dot">2</span> Enter the emailed code</li>
         <li data-s="3"><span class="dot">3</span> Create a password</li>
@@ -96,80 +99,163 @@
   <div class="stage">
     <div class="panel">
 
-      <!-- 1. SIGNUP -->
-      <section class="scr on" id="s-signup">
+      <!-- LOGIN -->
+      <section class="scr on" id="s-login">
+        <div class="card">
+          <h2 class="t">Sign in</h2>
+          <p class="sub">Use your company email address.</p>
+          <div class="msg" id="m-login"></div>
+          <div class="field"><label for="li-email">Work email</label>
+            <input id="li-email" type="email" autocomplete="username" placeholder="you@company.com"></div>
+          <div class="field"><label for="li-pw">Password</label>
+            <input id="li-pw" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+          <button class="btn" id="btn-login">Continue</button>
+          <div class="rowbetween" style="margin-top:16px">
+            <span class="link" id="go-reset">Forgot password?</span>
+            <span class="link" id="go-signup">Create an account</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- LOGIN CODE (new device) -->
+      <section class="scr" id="s-login-code">
+        <div class="card">
+          <h2 class="t">Verify this device</h2>
+          <p class="sub">We sent a 6-digit code to <b class="who">your email</b>. It expires in 10 minutes.</p>
+          <div class="msg" id="m-login-code"></div>
+          <div class="codes"></div>
+          <div class="timer">Code expires in <b class="clock">10:00</b></div>
+          <label class="remember"><input type="checkbox" id="trust-device"> Trust this browser for 30 days</label>
+          <button class="btn" id="btn-login-code">Verify and sign in</button>
+          <div class="center" style="margin-top:16px"><span class="link go-login">Back to sign in</span></div>
+        </div>
+      </section>
+
+      <!-- FORCED CHANGE PASSWORD -->
+      <section class="scr" id="s-change">
+        <div class="card">
+          <h2 class="t">Set a new password</h2>
+          <p class="sub">Your account uses a temporary password. Please choose a new one to continue.</p>
+          <div class="msg" id="m-change"></div>
+          <div class="field"><label for="ch-cur">Current (temporary) password</label>
+            <input id="ch-cur" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+          <div class="field"><label for="ch-new">New password</label>
+            <input id="ch-new" type="password" class="pwinput" autocomplete="new-password" placeholder="••••••••">
+            <div class="meter"><i></i></div>
+            <ul class="checks">
+              <li data-k="len"><span class="mk">✓</span> At least 8 characters</li>
+              <li data-k="ltr"><span class="mk">✓</span> Contains a letter</li>
+              <li data-k="num"><span class="mk">✓</span> Contains a number</li>
+            </ul></div>
+          <div class="field"><label for="ch-confirm">Confirm new password</label>
+            <input id="ch-confirm" type="password" autocomplete="new-password" placeholder="••••••••"></div>
+          <button class="btn" id="btn-change">Update password &amp; continue</button>
+        </div>
+      </section>
+
+      <!-- SIGNUP -->
+      <section class="scr" id="s-signup">
         <div class="card">
           <h2 class="t">Get started</h2>
           <p class="sub">Only email addresses from registered partner domains can create an account.</p>
           <div class="msg" id="m-signup"></div>
-          <div class="field">
-            <label for="full_name">Full name</label>
-            <input id="full_name" type="text" placeholder="Ana Silva" autocomplete="name">
-          </div>
-          <div class="field">
-            <label for="email">Work email</label>
-            <input id="email" type="email" placeholder="you@company.com" autocomplete="email">
-            <div class="hint">Personal addresses (gmail, outlook, yahoo…) are not accepted.</div>
-          </div>
+          <div class="field"><label for="su-name">Full name</label>
+            <input id="su-name" type="text" autocomplete="name" placeholder="Ana Silva"></div>
+          <div class="field"><label for="su-email">Work email</label>
+            <input id="su-email" type="email" autocomplete="email" placeholder="you@company.com">
+            <div class="hint">Personal addresses (gmail, outlook, yahoo…) are not accepted.</div></div>
           <button class="btn" id="btn-signup">Send verification code</button>
           <div class="sep"></div>
-          <div class="center">Already have an account? <span class="link" id="go-signin">Sign in</span></div>
+          <div class="center">Already have an account? <span class="link" id="go-login">Sign in</span></div>
         </div>
       </section>
 
-      <!-- 2. VERIFY -->
-      <section class="scr" id="s-verify">
+      <!-- SIGNUP CODE -->
+      <section class="scr" id="s-signup-code">
         <div class="card">
           <h2 class="t">Enter your code</h2>
-          <p class="sub">We sent a 6-digit code to <b id="verify-email">your email</b>. It expires in 10 minutes.</p>
-          <div class="msg" id="m-verify"></div>
-          <div class="codes" id="codes">
-            <input maxlength="1" inputmode="numeric" aria-label="digit 1">
-            <input maxlength="1" inputmode="numeric" aria-label="digit 2">
-            <input maxlength="1" inputmode="numeric" aria-label="digit 3">
-            <input maxlength="1" inputmode="numeric" aria-label="digit 4">
-            <input maxlength="1" inputmode="numeric" aria-label="digit 5">
-            <input maxlength="1" inputmode="numeric" aria-label="digit 6">
-          </div>
-          <div class="timer">Code expires in <b id="clock">10:00</b></div>
-          <button class="btn" id="btn-verify">Verify and continue</button>
-          <div class="center" style="margin-top:16px"><span class="link" id="resend">Resend code</span></div>
+          <p class="sub">We sent a 6-digit code to <b class="who">your email</b>. It expires in 10 minutes.</p>
+          <div class="msg" id="m-signup-code"></div>
+          <div class="codes"></div>
+          <div class="timer">Code expires in <b class="clock">10:00</b></div>
+          <button class="btn" id="btn-signup-code">Verify and continue</button>
+          <div class="center" style="margin-top:16px"><span class="link resend">Resend code</span></div>
         </div>
       </section>
 
-      <!-- 3. PASSWORD -->
-      <section class="scr" id="s-password">
+      <!-- SIGNUP PASSWORD -->
+      <section class="scr" id="s-signup-pw">
         <div class="card">
           <h2 class="t">Create your password</h2>
           <p class="sub">At least 8 characters, with letters and numbers.</p>
-          <div class="msg" id="m-password"></div>
-          <div class="field">
-            <label for="pw">Password</label>
-            <input id="pw" type="password" placeholder="••••••••" autocomplete="new-password">
-            <div class="meter"><i id="bar"></i></div>
-            <ul class="checks" id="checks">
+          <div class="msg" id="m-signup-pw"></div>
+          <div class="field"><label for="sp-pw">Password</label>
+            <input id="sp-pw" type="password" class="pwinput" autocomplete="new-password" placeholder="••••••••">
+            <div class="meter"><i></i></div>
+            <ul class="checks">
               <li data-k="len"><span class="mk">✓</span> At least 8 characters</li>
               <li data-k="ltr"><span class="mk">✓</span> Contains a letter</li>
               <li data-k="num"><span class="mk">✓</span> Contains a number</li>
-            </ul>
-          </div>
-          <div class="field">
-            <label for="pw2">Confirm password</label>
-            <input id="pw2" type="password" placeholder="••••••••" autocomplete="new-password">
-          </div>
-          <button class="btn" id="btn-password">Create account</button>
+            </ul></div>
+          <div class="field"><label for="sp-confirm">Confirm password</label>
+            <input id="sp-confirm" type="password" autocomplete="new-password" placeholder="••••••••"></div>
+          <button class="btn" id="btn-signup-pw">Create account</button>
         </div>
       </section>
 
-      <!-- 4. SUCCESS -->
+      <!-- SIGNUP SUCCESS -->
       <section class="scr" id="s-success">
         <div class="card success">
-          <div class="glyph">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#009AA4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-          </div>
+          <div class="glyph"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#009AA4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
           <h2 class="t">Your account is ready</h2>
-          <p class="sub">You're all set. You'll get access to your boards as soon as an administrator assigns you to a project. Sign-in opens shortly.</p>
-          <div class="msg ok show" id="m-success">Verified and active — nothing more to do right now.</div>
+          <p class="sub">You're all set. You'll get access to your boards as soon as an administrator assigns you to a project.</p>
+          <div class="center"><span class="link" id="go-login-2">Go to sign in</span></div>
+        </div>
+      </section>
+
+      <!-- RESET REQUEST -->
+      <section class="scr" id="s-reset">
+        <div class="card">
+          <h2 class="t">Reset your password</h2>
+          <p class="sub">Enter your work email and we'll send you a code to reset it.</p>
+          <div class="msg" id="m-reset"></div>
+          <div class="field"><label for="rs-email">Work email</label>
+            <input id="rs-email" type="email" autocomplete="email" placeholder="you@company.com"></div>
+          <button class="btn" id="btn-reset">Send reset code</button>
+          <div class="center" style="margin-top:16px"><span class="link go-login">Back to sign in</span></div>
+        </div>
+      </section>
+
+      <!-- RESET CODE -->
+      <section class="scr" id="s-reset-code">
+        <div class="card">
+          <h2 class="t">Enter your code</h2>
+          <p class="sub">If an account exists for <b class="who">that email</b>, a 6-digit code is on its way. It expires in 10 minutes.</p>
+          <div class="msg" id="m-reset-code"></div>
+          <div class="codes"></div>
+          <div class="timer">Code expires in <b class="clock">10:00</b></div>
+          <button class="btn" id="btn-reset-code">Verify code</button>
+          <div class="center" style="margin-top:16px"><span class="link go-login">Back to sign in</span></div>
+        </div>
+      </section>
+
+      <!-- RESET PASSWORD -->
+      <section class="scr" id="s-reset-pw">
+        <div class="card">
+          <h2 class="t">Choose a new password</h2>
+          <p class="sub">At least 8 characters, with letters and numbers.</p>
+          <div class="msg" id="m-reset-pw"></div>
+          <div class="field"><label for="rp-pw">New password</label>
+            <input id="rp-pw" type="password" class="pwinput" autocomplete="new-password" placeholder="••••••••">
+            <div class="meter"><i></i></div>
+            <ul class="checks">
+              <li data-k="len"><span class="mk">✓</span> At least 8 characters</li>
+              <li data-k="ltr"><span class="mk">✓</span> Contains a letter</li>
+              <li data-k="num"><span class="mk">✓</span> Contains a number</li>
+            </ul></div>
+          <div class="field"><label for="rp-confirm">Confirm new password</label>
+            <input id="rp-confirm" type="password" autocomplete="new-password" placeholder="••••••••"></div>
+          <button class="btn" id="btn-reset-pw">Reset password</button>
         </div>
       </section>
 
@@ -180,132 +266,187 @@
 <script>
 (function(){
   var state = { email:'', token:'' };
-  var $ = function(id){ return document.getElementById(id); };
-  function api(path, body){
-    return fetch('/api/auth'+path, {
-      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body||{})
-    }).then(function(r){ return r.json().then(function(j){ return {ok:r.ok, data:j}; }); });
+  var $ = function(s, ctx){ return (ctx||document).querySelector(s); };
+  var $id = function(id){ return document.getElementById(id); };
+
+  function api(method, path, body){
+    var opts = { method:method, credentials:'same-origin', headers:{'Content-Type':'application/json'} };
+    if(body) opts.body = JSON.stringify(body);
+    return fetch('/api/auth'+path, opts).then(function(r){ return r.json().then(function(j){ return {ok:r.ok, data:j}; }, function(){ return {ok:r.ok, data:{}}; }); });
   }
+  var BRAND = {
+    login:   {t:'Welcome back', s:'Sign in to your transformation boards.', steps:false},
+    signup:  {t:'Create your account', s:'Nexus is available to partner organizations. Your access is granted board by board.', steps:true},
+    reset:   {t:'Reset your password', s:'We\'ll email you a code to set a new password.', steps:false},
+    secure:  {t:'Secure your account', s:'One password, plus an emailed code from devices we don\'t recognize.', steps:false}
+  };
+  function setBrand(mode){
+    var b = BRAND[mode]||BRAND.login;
+    $id('brandTitle').textContent = b.t; $id('brandSub').textContent = b.s;
+    $id('steps').style.display = b.steps ? '' : 'none';
+  }
+  var MODE = { 'login':'login','login-code':'secure','change':'secure','signup':'signup','signup-code':'signup','signup-pw':'signup','success':'signup','reset':'reset','reset-code':'reset','reset-pw':'reset' };
   function show(name){
-    ['signup','verify','password','success'].forEach(function(s){
-      $('s-'+s).classList.toggle('on', s===name);
-    });
-    var stepMap = {signup:1, verify:2, password:3, success:4};
-    var cur = stepMap[name];
-    Array.prototype.forEach.call($('steps').children, function(li){
-      var s = +li.getAttribute('data-s');
-      li.classList.toggle('done', s < cur);
-      li.classList.toggle('now', s === cur);
-    });
+    document.querySelectorAll('.scr').forEach(function(s){ s.classList.toggle('on', s.id==='s-'+name); });
+    setBrand(MODE[name]||'login');
+    var scr = $id('s-'+name);
+    var who = scr && scr.querySelector('.who'); if(who && state.email) who.textContent = state.email;
+    var first = scr && scr.querySelector('input,button'); if(first) try{ first.focus(); }catch(e){}
+    window.scrollTo(0,0);
   }
-  function msg(id, text, kind){
-    var el = $(id); el.textContent = text || '';
-    el.className = 'msg' + (text ? ' show '+(kind||'err') : '');
-  }
-  function busy(btn, on, label){ btn.disabled = on; if(label) btn.textContent = label; }
+  function msg(id, text, kind){ var el=$id(id); if(!el)return; el.textContent=text||''; el.className='msg'+(text?' show '+(kind||'err'):''); }
+  function busy(btn, on, label){ btn.disabled=on; if(label) btn.textContent=label; }
 
-  // 1. SIGNUP
-  $('btn-signup').addEventListener('click', function(){
-    var email = $('email').value.trim(), name = $('full_name').value.trim();
-    msg('m-signup','');
-    if(!email || email.indexOf('@')<0){ msg('m-signup','Please enter a valid work email.'); return; }
-    busy($('btn-signup'), true, 'Sending…');
-    api('/signup', {full_name:name, email:email}).then(function(res){
-      busy($('btn-signup'), false, 'Send verification code');
-      if(!res.ok){ msg('m-signup', res.data.error || 'Could not send the code.'); return; }
-      state.email = email;
-      $('verify-email').textContent = email;
-      startClock(); startResendCooldown();
-      show('verify');
-      var c = $('codes').children; if(c[0]) c[0].focus();
-    }).catch(function(){ busy($('btn-signup'), false, 'Send verification code'); msg('m-signup','Network error. Please try again.'); });
-  });
-  $('go-signin').addEventListener('click', function(){ window.location.href='/'; });
-
-  // 2. VERIFY — code boxes
-  var codeInputs = Array.prototype.slice.call($('codes').children);
-  codeInputs.forEach(function(inp, i){
-    inp.addEventListener('input', function(){
-      inp.value = inp.value.replace(/\D/g,'').slice(0,1);
-      if(inp.value && codeInputs[i+1]) codeInputs[i+1].focus();
-    });
-    inp.addEventListener('keydown', function(e){
-      if(e.key==='Backspace' && !inp.value && codeInputs[i-1]) codeInputs[i-1].focus();
-    });
-    inp.addEventListener('paste', function(e){
-      var t = (e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
-      if(t){ e.preventDefault(); t.split('').forEach(function(d,j){ if(codeInputs[j]) codeInputs[j].value=d; });
-        (codeInputs[t.length]||codeInputs[5]).focus(); }
+  // ---- generic 6-box code inputs (built into every .codes) ----
+  document.querySelectorAll('.codes').forEach(function(box){
+    for(var i=0;i<6;i++){ var inp=document.createElement('input'); inp.maxLength=1; inp.inputMode='numeric'; box.appendChild(inp); }
+    var ins = Array.prototype.slice.call(box.children);
+    ins.forEach(function(inp,i){
+      inp.addEventListener('input', function(){ inp.value=inp.value.replace(/\D/g,'').slice(0,1); if(inp.value&&ins[i+1]) ins[i+1].focus(); });
+      inp.addEventListener('keydown', function(e){ if(e.key==='Backspace'&&!inp.value&&ins[i-1]) ins[i-1].focus(); });
+      inp.addEventListener('paste', function(e){ var t=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6); if(t){ e.preventDefault(); t.split('').forEach(function(d,j){ if(ins[j]) ins[j].value=d; }); (ins[t.length]||ins[5]).focus(); } });
     });
   });
-  function readCode(){ return codeInputs.map(function(i){return i.value;}).join(''); }
-  $('btn-verify').addEventListener('click', function(){
-    var code = readCode(); msg('m-verify','');
-    if(!/^\d{6}$/.test(code)){ msg('m-verify','Enter all 6 digits.'); return; }
-    busy($('btn-verify'), true, 'Verifying…');
-    api('/verify-code', {email:state.email, code:code}).then(function(res){
-      busy($('btn-verify'), false, 'Verify and continue');
-      if(!res.ok){ msg('m-verify', res.data.error || 'Incorrect code.'); return; }
-      state.token = res.data.token;
-      show('password'); $('pw').focus();
-    }).catch(function(){ busy($('btn-verify'), false, 'Verify and continue'); msg('m-verify','Network error. Please try again.'); });
-  });
+  function readCode(scrId){ return Array.prototype.map.call($id(scrId).querySelectorAll('.codes input'), function(i){return i.value;}).join(''); }
+  function clearCode(scrId){ $id(scrId).querySelectorAll('.codes input').forEach(function(i){ i.value=''; }); }
 
+  // ---- timers (per active code screen) ----
   var clockTimer, resendTimer;
-  function startClock(){
-    clearInterval(clockTimer); var t = 600;
-    clockTimer = setInterval(function(){
-      if(t>0) t--; var m=Math.floor(t/60), s=t%60;
-      $('clock').textContent = m+':'+(s<10?'0':'')+s;
-      if(t===0) clearInterval(clockTimer);
-    }, 1000);
+  function startClock(scr){ clearInterval(clockTimer); var t=600, el=$id('s-'+scr).querySelector('.clock');
+    clockTimer=setInterval(function(){ if(t>0)t--; var m=Math.floor(t/60),s=t%60; if(el) el.textContent=m+':'+(s<10?'0':'')+s; if(t===0)clearInterval(clockTimer); },1000); }
+  function startResend(scr){ clearInterval(resendTimer); var r=60, el=$id('s-'+scr).querySelector('.resend'); if(!el)return;
+    el.style.pointerEvents='none'; el.style.opacity='.5'; el.textContent='Resend code (60s)';
+    resendTimer=setInterval(function(){ r--; if(r<=0){ clearInterval(resendTimer); el.textContent='Resend code'; el.style.pointerEvents=''; el.style.opacity=''; } else el.textContent='Resend code ('+r+'s)'; },1000); }
+
+  // ---- generic password checklist ----
+  function evalPw(scrId){
+    var scr=$id(scrId), input=scr.querySelector('.pwinput'), v=input.value;
+    var ok={len:v.length>=8, ltr:/[A-Za-z]/.test(v), num:/[0-9]/.test(v)}, n=0;
+    Object.keys(ok).forEach(function(k){ var li=scr.querySelector('.checks li[data-k="'+k+'"]'); li.classList.toggle('ok',ok[k]); if(ok[k])n++; });
+    var extra=Math.min(2,Math.floor(Math.max(0,v.length-8)/4)), score=Math.min(100,(n/3)*70+extra*15);
+    var bar=scr.querySelector('.meter i'); bar.style.width=score+'%'; bar.style.background=score<45?'#C0392B':score<80?'#B8620F':'#178A5A';
+    return ok.len&&ok.ltr&&ok.num;
   }
-  function startResendCooldown(){
-    clearInterval(resendTimer); var r = 60; var el = $('resend');
-    el.style.pointerEvents='none'; el.style.opacity='.5';
-    el.textContent = 'Resend code (60s)';
-    resendTimer = setInterval(function(){
-      r--; if(r<=0){ clearInterval(resendTimer); el.textContent='Resend code'; el.style.pointerEvents=''; el.style.opacity=''; }
-      else el.textContent='Resend code ('+r+'s)';
-    }, 1000);
-  }
-  $('resend').addEventListener('click', function(){
-    if($('resend').style.pointerEvents==='none') return;
-    msg('m-verify','');
-    api('/signup', {email:state.email}).then(function(res){
-      if(!res.ok){ msg('m-verify', res.data.error || 'Could not resend.'); return; }
-      startClock(); startResendCooldown(); msg('m-verify','A new code is on its way.', 'ok');
-    });
+  document.querySelectorAll('.pwinput').forEach(function(inp){ inp.addEventListener('input', function(){ evalPw(inp.closest('.scr').id); }); });
+
+  function goApp(){ window.location.href='/'; }
+
+  // ============ LOGIN ============
+  $id('btn-login').addEventListener('click', function(){
+    var email=$id('li-email').value.trim(), pw=$id('li-pw').value; msg('m-login','');
+    if(!email||!pw){ msg('m-login','Enter your email and password.'); return; }
+    busy($id('btn-login'),true,'Signing in…');
+    api('POST','/login',{email:email,password:pw}).then(function(res){
+      busy($id('btn-login'),false,'Continue');
+      if(!res.ok){ msg('m-login', res.data.error||'Could not sign in.'); return; }
+      state.email=email;
+      if(res.data.needsCode){ clearCode('s-login-code'); show('login-code'); startClock('login-code'); startResend('login-code'); return; }
+      if(res.data.authenticated){ if(res.data.mustChangePassword){ show('change'); } else { goApp(); } }
+    }).catch(function(){ busy($id('btn-login'),false,'Continue'); msg('m-login','Network error. Please try again.'); });
+  });
+  $id('go-signup').addEventListener('click', function(){ show('signup'); });
+  $id('go-reset').addEventListener('click', function(){ show('reset'); });
+  Array.prototype.forEach.call(document.querySelectorAll('.go-login,#go-login,#go-login-2'), function(el){ el.addEventListener('click', function(){ show('login'); }); });
+  $id('li-pw').addEventListener('keydown', function(e){ if(e.key==='Enter') $id('btn-login').click(); });
+
+  // ============ LOGIN CODE ============
+  $id('btn-login-code').addEventListener('click', function(){
+    var code=readCode('s-login-code'); msg('m-login-code','');
+    if(!/^\d{6}$/.test(code)){ msg('m-login-code','Enter all 6 digits.'); return; }
+    busy($id('btn-login-code'),true,'Verifying…');
+    api('POST','/login-verify',{email:state.email,code:code,trustDevice:$id('trust-device').checked}).then(function(res){
+      busy($id('btn-login-code'),false,'Verify and sign in');
+      if(!res.ok){ msg('m-login-code', res.data.error||'Incorrect code.'); return; }
+      if(res.data.mustChangePassword){ show('change'); } else { goApp(); }
+    }).catch(function(){ busy($id('btn-login-code'),false,'Verify and sign in'); msg('m-login-code','Network error.'); });
+  });
+  // (No resend on the device-code screen — a code needs the password, so users
+  //  go "Back to sign in" to request a fresh one. Avoids any lockout risk.)
+
+  // ============ FORCED CHANGE PASSWORD ============
+  $id('btn-change').addEventListener('click', function(){
+    msg('m-change',''); var cur=$id('ch-cur').value, nw=$id('ch-new').value, cf=$id('ch-confirm').value;
+    if(!cur){ msg('m-change','Enter your current password.'); return; }
+    if(!evalPw('s-change')){ msg('m-change','New password needs 8+ characters with a letter and a number.'); return; }
+    if(nw!==cf){ msg('m-change','The new passwords do not match.'); return; }
+    busy($id('btn-change'),true,'Updating…');
+    api('POST','/change-password',{currentPassword:cur,newPassword:nw}).then(function(res){
+      busy($id('btn-change'),false,'Update password & continue');
+      if(!res.ok){ msg('m-change', res.data.error||'Could not update password.'); return; }
+      goApp();
+    }).catch(function(){ busy($id('btn-change'),false,'Update password & continue'); msg('m-change','Network error.'); });
   });
 
-  // 3. PASSWORD — live checklist
-  function evalPw(){
-    var v = $('pw').value;
-    var ok = { len:v.length>=8, ltr:/[A-Za-z]/.test(v), num:/[0-9]/.test(v) };
-    var n = 0;
-    Object.keys(ok).forEach(function(k){
-      var li = document.querySelector('.checks li[data-k="'+k+'"]');
-      li.classList.toggle('ok', ok[k]); if(ok[k]) n++;
-    });
-    var extra = Math.min(2, Math.floor(Math.max(0, v.length-8)/4));
-    var score = Math.min(100, (n/3)*70 + extra*15);
-    var bar = $('bar'); bar.style.width = score+'%';
-    bar.style.background = score<45 ? '#C0392B' : score<80 ? '#B8620F' : '#178A5A';
-    return ok.len && ok.ltr && ok.num;
-  }
-  $('pw').addEventListener('input', evalPw);
-  $('btn-password').addEventListener('click', function(){
-    msg('m-password','');
-    var v = $('pw').value, v2 = $('pw2').value;
-    if(!evalPw()){ msg('m-password','Password must be at least 8 characters with a letter and a number.'); return; }
-    if(v!==v2){ msg('m-password','The two passwords do not match.'); return; }
-    busy($('btn-password'), true, 'Creating…');
-    api('/set-password', {email:state.email, token:state.token, password:v}).then(function(res){
-      busy($('btn-password'), false, 'Create account');
-      if(!res.ok){ msg('m-password', res.data.error || 'Could not set your password.'); return; }
-      show('success');
-    }).catch(function(){ busy($('btn-password'), false, 'Create account'); msg('m-password','Network error. Please try again.'); });
+  // ============ SIGNUP ============
+  $id('btn-signup').addEventListener('click', function(){
+    var email=$id('su-email').value.trim(), name=$id('su-name').value.trim(); msg('m-signup','');
+    if(!email||email.indexOf('@')<0){ msg('m-signup','Please enter a valid work email.'); return; }
+    busy($id('btn-signup'),true,'Sending…');
+    api('POST','/signup',{full_name:name,email:email}).then(function(res){
+      busy($id('btn-signup'),false,'Send verification code');
+      if(!res.ok){ msg('m-signup', res.data.error||'Could not send the code.'); return; }
+      state.email=email; clearCode('s-signup-code'); show('signup-code'); startClock('signup-code'); startResend('signup-code');
+    }).catch(function(){ busy($id('btn-signup'),false,'Send verification code'); msg('m-signup','Network error.'); });
   });
+  $id('btn-signup-code').addEventListener('click', function(){
+    var code=readCode('s-signup-code'); msg('m-signup-code','');
+    if(!/^\d{6}$/.test(code)){ msg('m-signup-code','Enter all 6 digits.'); return; }
+    busy($id('btn-signup-code'),true,'Verifying…');
+    api('POST','/verify-code',{email:state.email,code:code}).then(function(res){
+      busy($id('btn-signup-code'),false,'Verify and continue');
+      if(!res.ok){ msg('m-signup-code', res.data.error||'Incorrect code.'); return; }
+      state.token=res.data.token; show('signup-pw');
+    }).catch(function(){ busy($id('btn-signup-code'),false,'Verify and continue'); msg('m-signup-code','Network error.'); });
+  });
+  $id('s-signup-code').querySelector('.resend').addEventListener('click', function(){
+    if(this.style.pointerEvents==='none')return; msg('m-signup-code','');
+    api('POST','/signup',{email:state.email}).then(function(res){ if(!res.ok){ msg('m-signup-code',res.data.error||'Could not resend.'); return; } startClock('signup-code'); startResend('signup-code'); msg('m-signup-code','A new code is on its way.','ok'); });
+  });
+  $id('btn-signup-pw').addEventListener('click', function(){
+    msg('m-signup-pw',''); var v=$id('sp-pw').value, c=$id('sp-confirm').value;
+    if(!evalPw('s-signup-pw')){ msg('m-signup-pw','Password needs 8+ characters with a letter and a number.'); return; }
+    if(v!==c){ msg('m-signup-pw','The two passwords do not match.'); return; }
+    busy($id('btn-signup-pw'),true,'Creating…');
+    api('POST','/set-password',{email:state.email,token:state.token,password:v}).then(function(res){
+      busy($id('btn-signup-pw'),false,'Create account');
+      if(!res.ok){ msg('m-signup-pw', res.data.error||'Could not set your password.'); return; }
+      show('success');
+    }).catch(function(){ busy($id('btn-signup-pw'),false,'Create account'); msg('m-signup-pw','Network error.'); });
+  });
+
+  // ============ RESET ============
+  $id('btn-reset').addEventListener('click', function(){
+    var email=$id('rs-email').value.trim(); msg('m-reset','');
+    if(!email||email.indexOf('@')<0){ msg('m-reset','Please enter a valid email.'); return; }
+    busy($id('btn-reset'),true,'Sending…');
+    api('POST','/reset-request',{email:email}).then(function(res){
+      busy($id('btn-reset'),false,'Send reset code');
+      state.email=email; clearCode('s-reset-code'); show('reset-code'); startClock('reset-code');
+    }).catch(function(){ busy($id('btn-reset'),false,'Send reset code'); msg('m-reset','Network error.'); });
+  });
+  $id('btn-reset-code').addEventListener('click', function(){
+    var code=readCode('s-reset-code'); msg('m-reset-code','');
+    if(!/^\d{6}$/.test(code)){ msg('m-reset-code','Enter all 6 digits.'); return; }
+    busy($id('btn-reset-code'),true,'Verifying…');
+    api('POST','/reset-verify',{email:state.email,code:code}).then(function(res){
+      busy($id('btn-reset-code'),false,'Verify code');
+      if(!res.ok){ msg('m-reset-code', res.data.error||'Incorrect code.'); return; }
+      state.token=res.data.token; show('reset-pw');
+    }).catch(function(){ busy($id('btn-reset-code'),false,'Verify code'); msg('m-reset-code','Network error.'); });
+  });
+  $id('btn-reset-pw').addEventListener('click', function(){
+    msg('m-reset-pw',''); var v=$id('rp-pw').value, c=$id('rp-confirm').value;
+    if(!evalPw('s-reset-pw')){ msg('m-reset-pw','Password needs 8+ characters with a letter and a number.'); return; }
+    if(v!==c){ msg('m-reset-pw','The two passwords do not match.'); return; }
+    busy($id('btn-reset-pw'),true,'Resetting…');
+    api('POST','/reset-complete',{email:state.email,token:state.token,password:v}).then(function(res){
+      busy($id('btn-reset-pw'),false,'Reset password');
+      if(!res.ok){ msg('m-reset-pw', res.data.error||'Could not reset your password.'); return; }
+      show('login'); msg('m-login','Your password has been reset. Please sign in.','ok');
+    }).catch(function(){ busy($id('btn-reset-pw'),false,'Reset password'); msg('m-reset-pw','Network error.'); });
+  });
+
+  setBrand('login');
 })();
 </script>
 </body>
