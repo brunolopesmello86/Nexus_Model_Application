@@ -2520,9 +2520,11 @@ function toggleTheme() {
 // API LAYER
 // ══════════════════════════════════════════
 async function api(method, path, body) {
-  const opts = {method, headers:{'Content-Type':'application/json'}};
+  const opts = {method, credentials:'same-origin', headers:{'Content-Type':'application/json'}};
   if (body) opts.body = JSON.stringify(body);
   const r = await fetch('/api' + path, opts);
+  // When board access is enforced and the caller isn't signed in, go to sign-in.
+  if (r.status === 401) { window.location.href = '/auth'; throw new Error('Not authenticated'); }
   if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e.error || r.statusText); }
   return r.json();
 }
@@ -20755,5 +20757,41 @@ initDomainColorPicker();
 </div>
 <script src="loop-state.js"></script>
 <script src="loop-ui.js"></script>
+<script>
+/* Session chrome — Sign out + "no boards yet" empty state. Active only when the
+   user is signed in; when access isn't enforced and no one is signed in, this is
+   a no-op and the app behaves exactly as before. Gating (redirect to /auth) is
+   handled in the api() layer on any 401. */
+(function(){
+  fetch('/api/auth/me', { credentials:'same-origin' })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(me){
+      if(!me || !me.authenticated) return;
+      addSignOut(me.user);
+      fetch('/api/companies', { credentials:'same-origin' })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(cos){ if(Array.isArray(cos) && cos.length===0) showNoBoards(); });
+    })
+    .catch(function(){});
+  function addSignOut(user){
+    var b=document.createElement('button');
+    b.textContent='Sign out';
+    if(user && user.email) b.title=user.email;
+    b.style.cssText='position:fixed;top:10px;right:12px;z-index:100000;font:600 12px -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#fff;background:#0B1F3A;border:none;border-radius:8px;padding:7px 13px;cursor:pointer;box-shadow:0 4px 12px rgba(11,31,58,.28)';
+    b.onclick=function(){ fetch('/api/auth/logout',{method:'POST',credentials:'same-origin'}).then(function(){ location.href='/auth'; }); };
+    document.body.appendChild(b);
+  }
+  function showNoBoards(){
+    var o=document.createElement('div');
+    o.style.cssText='position:fixed;inset:0;z-index:99990;background:#F4F7FB;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;padding:24px';
+    o.innerHTML='<div style="max-width:440px;text-align:center;background:#fff;border:1px solid #DDE5F0;border-radius:14px;padding:44px 34px;box-shadow:0 10px 30px rgba(11,31,58,.10)">'
+      +'<div style="font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:#009AA4;font-weight:700">Nexus Board</div>'
+      +'<h2 style="color:#0B1F3A;margin:12px 0 8px;font-size:21px">No boards yet</h2>'
+      +'<p style="color:#6B7686;font-size:14px;line-height:1.65;margin:0">Your account is ready. You’ll see your boards here as soon as an administrator assigns you to one.</p>'
+      +'</div>';
+    document.body.appendChild(o);
+  }
+})();
+</script>
 </body>
 </html>

@@ -45,6 +45,25 @@ app.use('/api', async (req, res, next) => {
 // ── Auth: login & access control (signup, verification code, password) ──
 app.use('/api/auth', require('./auth/routes'));
 
+// ── Board access enforcement (step 4) — OFF unless NEXUS_ENFORCE_ACCESS=true ──
+// When off, every board endpoint behaves exactly as before. When on, boards are
+// visible only to their assigned members (Super Admin sees all); non-members get 404.
+const access = require('./auth/access');
+const authSession = require('./auth/session');
+const ENFORCE = () => process.env.NEXUS_ENFORCE_ACCESS === 'true';
+async function requireBoard(req, res, gameId) {
+  const user = await authSession.getSessionUser(req);
+  if (!user) { res.status(401).json({ error: 'Not authenticated' }); return null; }
+  if (!(await access.canAccessGame(user, gameId))) { res.status(404).json({ error: 'Game not found' }); return null; }
+  return user;
+}
+async function requireSuperAdminReq(req, res) {
+  const user = await authSession.getSessionUser(req);
+  if (!user) { res.status(401).json({ error: 'Not authenticated' }); return null; }
+  if (!user.is_super_admin) { res.status(403).json({ error: 'Only an administrator can do this.' }); return null; }
+  return user;
+}
+
 // ── Health ──
 app.get('/api/health', async (req, res) => {
   try {
@@ -58,6 +77,20 @@ app.get('/api/health', async (req, res) => {
 // ── Companies ──
 app.get('/api/companies', async (req, res) => {
   try {
+    if (ENFORCE()) {
+      const user = await authSession.getSessionUser(req);
+      if (!user) return res.status(401).json({ error: 'Not authenticated' });
+      if (!user.is_super_admin) {
+        const visible = await access.visibleGameIds(user);
+        if (!visible.length) return res.json([]);
+        const { rows } = await db.query(`
+          SELECT c.*, COUNT(g.id)::int AS game_count
+          FROM companies c JOIN games g ON g.company_id = c.id
+          WHERE g.id = ANY($1)
+          GROUP BY c.id ORDER BY c.name`, [visible]);
+        return res.json(rows);
+      }
+    }
     const { rows } = await db.query(`
       SELECT c.*, COALESCE(g.cnt, 0)::int AS game_count
       FROM companies c
@@ -75,6 +108,7 @@ app.post('/api/companies', async (req, res) => {
   const { name, slug } = req.body;
   if (!name || !slug) return res.status(400).json({ error: 'name and slug required' });
   try {
+    if (ENFORCE() && !(await requireSuperAdminReq(req, res))) return;
     const { rows } = await db.query(
       'INSERT INTO companies (name, slug) VALUES ($1, $2) RETURNING *',
       [name, slug]
@@ -89,14 +123,21 @@ app.post('/api/companies', async (req, res) => {
 // ── Games ──
 app.get('/api/companies/:companyId/games', async (req, res) => {
   try {
-    const { rows } = await db.query(`
-      SELECT id, company_id, name, description, fitness_score,
+    let visible = null;
+    if (ENFORCE()) {
+      const user = await authSession.getSessionUser(req);
+      if (!user) return res.status(401).json({ error: 'Not authenticated' });
+      visible = await access.visibleGameIds(user); // null = all (super admin)
+      if (Array.isArray(visible) && !visible.length) return res.json([]);
+    }
+    const params = [req.params.companyId];
+    let sql = `SELECT id, company_id, name, description, fitness_score,
              cycle_number, cycle_phase, created_at, updated_at,
              (password_hash IS NOT NULL) AS has_password
-      FROM games
-      WHERE company_id = $1
-      ORDER BY updated_at DESC
-    `, [req.params.companyId]);
+      FROM games WHERE company_id = $1`;
+    if (Array.isArray(visible)) { params.push(visible); sql += ` AND id = ANY($2)`; }
+    sql += ` ORDER BY updated_at DESC`;
+    const { rows } = await db.query(sql, params);
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -107,6 +148,7 @@ app.post('/api/companies/:companyId/games', async (req, res) => {
   const { name, description, password } = req.body;
   if (!name) return res.status(400).json({ error: 'name required' });
   try {
+    if (ENFORCE() && !(await requireSuperAdminReq(req, res))) return;
     await db.query('ALTER TABLE games ADD COLUMN IF NOT EXISTS password_hash TEXT');
     const pwHash = password ? hashPassword(password) : null;
     const { rows } = await db.query(
@@ -124,6 +166,7 @@ app.post('/api/companies/:companyId/games', async (req, res) => {
 
 app.get('/api/games/:gameId', async (req, res) => {
   try {
+    if (ENFORCE() && !(await requireBoard(req, res, req.params.gameId))) return;
     const { rows } = await db.query('SELECT * FROM games WHERE id = $1', [req.params.gameId]);
     if (!rows.length) return res.status(404).json({ error: 'Game not found' });
     const row = rows[0];
@@ -142,6 +185,7 @@ app.get('/api/games/:gameId', async (req, res) => {
 app.patch('/api/games/:gameId/password', async (req, res) => {
   const { currentPassword, newPassword } = req.body || {};
   try {
+    if (ENFORCE() && !(await requireBoard(req, res, req.params.gameId))) return;
     const { rows } = await db.query('SELECT password_hash FROM games WHERE id = $1', [req.params.gameId]);
     if (!rows.length) return res.status(404).json({ error: 'Game not found' });
     const existing = rows[0].password_hash;
@@ -184,6 +228,7 @@ app.put('/api/games/:gameId', async (req, res) => {
     practice_maturity
   } = req.body;
   try {
+    if (ENFORCE() && !(await requireBoard(req, res, req.params.gameId))) return;
     await db.query('ALTER TABLE games ADD COLUMN IF NOT EXISTS board_milestones JSONB NOT NULL DEFAULT \'[]\'');
     await db.query('ALTER TABLE games ADD COLUMN IF NOT EXISTS board_risks JSONB NOT NULL DEFAULT \'[]\'');
     await db.query('ALTER TABLE games ADD COLUMN IF NOT EXISTS loop_sessions JSONB NOT NULL DEFAULT \'[]\'');
@@ -227,6 +272,11 @@ app.put('/api/games/:gameId', async (req, res) => {
 
 app.delete('/api/games/:gameId', async (req, res) => {
   try {
+    if (ENFORCE()) {
+      const u = await requireBoard(req, res, req.params.gameId);
+      if (!u) return;
+      if (!u.is_super_admin) return res.status(403).json({ error: 'Only an administrator can delete a board.' });
+    }
     // Check password if game has one
     const { rows } = await db.query('SELECT password_hash FROM games WHERE id = $1', [req.params.gameId]);
     if (!rows.length) return res.status(404).json({ error: 'Game not found' });
@@ -247,6 +297,7 @@ app.patch('/api/games/:gameId/rename', async (req, res) => {
   const { name, password } = req.body || {};
   if (!name || !name.trim()) return res.status(400).json({ error: 'name required' });
   try {
+    if (ENFORCE() && !(await requireBoard(req, res, req.params.gameId))) return;
     const { rows } = await db.query('SELECT password_hash FROM games WHERE id = $1', [req.params.gameId]);
     if (!rows.length) return res.status(404).json({ error: 'Game not found' });
     if (rows[0].password_hash) {
