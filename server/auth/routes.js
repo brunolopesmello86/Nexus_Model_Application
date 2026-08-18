@@ -84,7 +84,12 @@ router.post('/signup', async (req, res) => {
       "INSERT INTO verification_codes (user_id, code_hash, purpose, expires_at) VALUES ($1,$2,'signup',$3)",
       [user.id, hashPassword(code), expires]);
     const mail = verificationCodeEmail(code, 'signup');
-    await sendEmail({ to: email, subject: mail.subject, html: mail.html, text: mail.text });
+    try {
+      await sendEmail({ to: email, subject: mail.subject, html: mail.html, text: mail.text });
+    } catch (mailErr) {
+      console.error('signup email error:', mailErr.message);
+      return res.status(502).json({ error: 'We could not send your verification email. ' + mailErr.message });
+    }
     await audit('auth.signup_code_sent', user.id, { email }, req.ip);
     return res.json({ ok: true, message: "We've emailed you a 6-digit code. It expires in 10 minutes." });
   } catch (err) {
