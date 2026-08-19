@@ -68,7 +68,7 @@ async function requireSuperAdminReq(req, res) {
 app.get('/api/health', async (req, res) => {
   try {
     await db.query('SELECT 1');
-    res.json({ status: 'ok' });
+    res.json({ status: 'ok', enforce: process.env.NEXUS_ENFORCE_ACCESS === 'true', enforce_raw: process.env.NEXUS_ENFORCE_ACCESS ?? null });
   } catch (err) {
     res.status(500).json({ status: 'error', message: err.message });
   }
