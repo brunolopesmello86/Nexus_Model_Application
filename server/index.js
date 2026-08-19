@@ -50,7 +50,7 @@ app.use('/api/auth', require('./auth/routes'));
 // visible only to their assigned members (Super Admin sees all); non-members get 404.
 const access = require('./auth/access');
 const authSession = require('./auth/session');
-const ENFORCE = () => process.env.NEXUS_ENFORCE_ACCESS === 'true';
+const ENFORCE = () => String(process.env.NEXUS_ENFORCE_ACCESS || '').trim().toLowerCase() === 'true';
 async function requireBoard(req, res, gameId) {
   const user = await authSession.getSessionUser(req);
   if (!user) { res.status(401).json({ error: 'Not authenticated' }); return null; }
@@ -68,7 +68,7 @@ async function requireSuperAdminReq(req, res) {
 app.get('/api/health', async (req, res) => {
   try {
     await db.query('SELECT 1');
-    res.json({ status: 'ok', enforce: process.env.NEXUS_ENFORCE_ACCESS === 'true', enforce_raw: process.env.NEXUS_ENFORCE_ACCESS ?? null });
+    res.json({ status: 'ok' });
   } catch (err) {
     res.status(500).json({ status: 'error', message: err.message });
   }
