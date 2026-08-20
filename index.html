@@ -32,19 +32,19 @@
 }
 /* ── Light theme — executive navy/orange (matches the Org Fit Report) ── */
 [data-theme="light"] {
-  --bg: #E7DBBE;            /* aged parchment */
-  --surface: #F3EAD3;       /* paper card */
-  --surface2: #DED0AE;      /* tan panel */
-  --border: #C4B084;        /* ink-tan border */
-  --text: #3B2F1C;          /* sepia ink */
-  --text-muted: #7C6C4E;    /* faded ink */
+  --bg: #EAECEF;            /* aged parchment */
+  --surface: #FFFFFF;       /* paper card */
+  --surface2: #E4E7EB;      /* tan panel */
+  --border: #D3D8DF;        /* ink-tan border */
+  --text: #1F2530;          /* sepia ink */
+  --text-muted: #6B7280;    /* faded ink */
   --accent: #1F6E66;        /* nautical teal */
-  --cyan: #B4531F;          /* terracotta highlight */
-  --gold: #B4531F;
-  --gold2: #C56A2E;
-  --header-bg: #6E5A38;
+  --cyan: #334155;          /* terracotta highlight */
+  --gold: #334155;
+  --gold2: #475569;
+  --header-bg: #E4E7EB;
 }
-[data-theme="light"] .app-header { background:linear-gradient(120deg,#E7DBBE,#EFE4CB 60%,#E3D6B6); border-bottom:2px solid #B4531F; }
+[data-theme="light"] .app-header { background:linear-gradient(120deg,#EAECEF,#F2F4F6 60%,#E4E7EB); border-bottom:2px solid #334155; }
 [data-theme="light"] .app-header .logo h1 { color:#ffffff; }
 [data-theme="light"] .app-header .logo .sub { color:#A9D6C9; }
 [data-theme="light"] .app-header .game-name-tag { background:rgba(255,255,255,.12); color:#ffffff; border-color:rgba(255,255,255,.25); }
@@ -52,17 +52,17 @@
 [data-theme="light"] .app-header .btn { background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.28); color:#ffffff; }
 [data-theme="light"] .app-header .btn:hover { border-color:#f5821f; }
 [data-theme="light"] .app-header .btn-primary { background:#f5821f; border-color:#f5821f; }
-[data-theme="light"] .hex-cell-bg { background:#E1D4B4; }
-[data-theme="light"] .hex-cell[data-parity="1"] .hex-cell-bg { background:#DBCDA9; }
-[data-theme="light"] .hex-cell[data-parity="2"] .hex-cell-bg { background:#D4C59E; }
-[data-theme="light"] .hex-cell.empty .hex-cell-bg::after { color:rgba(59,47,28,.22); }
+[data-theme="light"] .hex-cell-bg { background:#E6E8EC; }
+[data-theme="light"] .hex-cell[data-parity="1"] .hex-cell-bg { background:#E0E3E8; }
+[data-theme="light"] .hex-cell[data-parity="2"] .hex-cell-bg { background:#D9DDE3; }
+[data-theme="light"] .hex-cell.empty .hex-cell-bg::after { color:rgba(31,37,48,.22); }
 [data-theme="light"] .zone-headers { background:var(--surface); border-color:rgba(0,0,0,.08); }
 [data-theme="light"] .zone-headers .zh-spacer { border-color:rgba(0,0,0,.06); }
 [data-theme="light"] .zone-col-header { border-color:rgba(0,0,0,.04); }
 [data-theme="light"] .zone-bg { border-color:rgba(0,0,0,.06); }
 [data-theme="light"] .zone-bg.zb-current { background:linear-gradient(90deg,rgba(217,74,74,.08),rgba(217,74,74,.02)); }
 [data-theme="light"] .zone-bg.zb-desired { background:linear-gradient(270deg,rgba(45,157,94,.08),rgba(45,157,94,.02)); }
-[data-theme="light"] .lane-divider { background:none; border-top-color:rgba(120,90,45,.55); box-shadow:none; }
+[data-theme="light"] .lane-divider { background:none; border-top-color:rgba(120,128,140,.55); box-shadow:none; }
 [data-theme="light"] .lane-label-abs { border-color:rgba(0,0,0,.06); }
 [data-theme="light"] .hex-card:hover { box-shadow:0 4px 12px rgba(0,0,0,.1); }
 [data-theme="light"] .hex-card.foundational { border-left-color:rgba(0,0,0,.25); }
@@ -76,36 +76,36 @@
 [data-theme="light"] .gs-org-badge { background:rgba(46,139,118,.08); border-color:rgba(46,139,118,.2); }
 [data-theme="light"] #introScreen { background:var(--bg); }
 [data-theme="light"] .conn-nexus { stroke:#1F6E66; }
-[data-theme="light"] .conn-path { stroke:#8A6A3F; }
+[data-theme="light"] .conn-path { stroke:#8A94A2; }
 /* ══ Cartographer light — flip the hardcoded-dark poster panels to parchment (hex type colors kept) ══ */
-[data-theme="light"] .app-header.ptb { background:linear-gradient(120deg,#E7DBBE,#EFE4CB 60%,#E3D6B6); }
-[data-theme="light"] .ptb-nexus, [data-theme="light"] .ptb-panel { background:rgba(255,252,242,.55); border-color:#C4B084; }
-[data-theme="light"] .ptb-card { background:rgba(255,252,242,.65); }
-[data-theme="light"] .ptb-title1, [data-theme="light"] .ptb-cname { color:#3B2F1C; }
+[data-theme="light"] .app-header.ptb { background:linear-gradient(120deg,#EAECEF,#F2F4F6 60%,#E4E7EB); }
+[data-theme="light"] .ptb-nexus, [data-theme="light"] .ptb-panel { background:rgba(255,255,255,.55); border-color:#D3D8DF; }
+[data-theme="light"] .ptb-card { background:rgba(255,255,255,.65); }
+[data-theme="light"] .ptb-title1, [data-theme="light"] .ptb-cname { color:#1F2530; }
 [data-theme="light"] .ptb-title2 { color:#1F6E66; }
-[data-theme="light"] .ptb-tag, [data-theme="light"] .ptb-cdesc, [data-theme="light"] .ptb-sec b, [data-theme="light"] .ptb-sec span, [data-theme="light"] .ptb-supply { color:#7C6C4E; }
+[data-theme="light"] .ptb-tag, [data-theme="light"] .ptb-cdesc, [data-theme="light"] .ptb-sec b, [data-theme="light"] .ptb-sec span, [data-theme="light"] .ptb-supply { color:#6B7280; }
 [data-theme="light"] .ptb-nexus .hero-eyebrow { color:#1F6E66; }
-[data-theme="light"] .app-header .game-name-tag { background:rgba(59,47,28,.07); color:#3B2F1C; border-color:#C4B084; }
-[data-theme="light"] .app-header .save-status { color:#7C6C4E; }
-[data-theme="light"] .app-header .btn { background:rgba(59,47,28,.06); border-color:#C4B084; color:#3B2F1C; }
-[data-theme="light"] .app-header .btn:hover { border-color:#B4531F; }
-[data-theme="light"] .app-header .btn-primary { background:#B4531F; border-color:#B4531F; color:#fff; }
-[data-theme="light"] .toolbox { background:#EFE4CB; }
-[data-theme="light"] .deck-slot { background:#F3EAD3; }
-[data-theme="light"] .toolbox-title, [data-theme="light"] .doh-title, [data-theme="light"] .deck-slot-sub, [data-theme="light"] .deck-draw { color:#7C6C4E; }
-[data-theme="light"] .codex-axisb { background:#EFE4CB; border-right-color:#C4B084; }
-[data-theme="light"] .codex-axisb b { color:#7C6C4E; } [data-theme="light"] .codex-axisb i { color:#9A8A6A; }
-[data-theme="light"] .fitness-panel { background:linear-gradient(180deg,#EFE4CB,#F3EAD3); }
-[data-theme="light"] .fp-dest { background:linear-gradient(180deg,#EFE4CB,#F3EAD3); border-color:#1F6E66; }
-[data-theme="light"] .fdc { background:#F3EAD3; border-color:#C4B084; }
-[data-theme="light"] .poster-phase-strip { background:#EFE4CB; border-top-color:#C4B084; }
-[data-theme="light"] .pps-card { background:#F3EAD3; border-color:#C4B084; }
-[data-theme="light"] .pps-title, [data-theme="light"] .cl-card-name, [data-theme="light"] .cl-prac-hex-name { color:#3B2F1C; }
-[data-theme="light"] .cl-card { background:#F3EAD3; }
-[data-theme="light"] .cl-prac-hex-inner { background:#E7DBBE; }
-[data-theme="light"] .board-domains, [data-theme="light"] .board-drivers, [data-theme="light"] .domain-toolbar { background:#EFE4CB; }
-[data-theme="light"] .domain-label { background:#F3EAD3; }
-[data-theme="light"] .driver-chip { background:#F3EAD3; }
+[data-theme="light"] .app-header .game-name-tag { background:rgba(31,37,48,.07); color:#1F2530; border-color:#D3D8DF; }
+[data-theme="light"] .app-header .save-status { color:#6B7280; }
+[data-theme="light"] .app-header .btn { background:rgba(31,37,48,.06); border-color:#D3D8DF; color:#1F2530; }
+[data-theme="light"] .app-header .btn:hover { border-color:#334155; }
+[data-theme="light"] .app-header .btn-primary { background:#334155; border-color:#334155; color:#fff; }
+[data-theme="light"] .toolbox { background:#F2F4F6; }
+[data-theme="light"] .deck-slot { background:#FFFFFF; }
+[data-theme="light"] .toolbox-title, [data-theme="light"] .doh-title, [data-theme="light"] .deck-slot-sub, [data-theme="light"] .deck-draw { color:#6B7280; }
+[data-theme="light"] .codex-axisb { background:#F2F4F6; border-right-color:#D3D8DF; }
+[data-theme="light"] .codex-axisb b { color:#6B7280; } [data-theme="light"] .codex-axisb i { color:#8A94A2; }
+[data-theme="light"] .fitness-panel { background:linear-gradient(180deg,#F2F4F6,#FFFFFF); }
+[data-theme="light"] .fp-dest { background:linear-gradient(180deg,#F2F4F6,#FFFFFF); border-color:#1F6E66; }
+[data-theme="light"] .fdc { background:#FFFFFF; border-color:#D3D8DF; }
+[data-theme="light"] .poster-phase-strip { background:#F2F4F6; border-top-color:#D3D8DF; }
+[data-theme="light"] .pps-card { background:#FFFFFF; border-color:#D3D8DF; }
+[data-theme="light"] .pps-title, [data-theme="light"] .cl-card-name, [data-theme="light"] .cl-prac-hex-name { color:#1F2530; }
+[data-theme="light"] .cl-card { background:#FFFFFF; }
+[data-theme="light"] .cl-prac-hex-inner { background:#EAECEF; }
+[data-theme="light"] .board-domains, [data-theme="light"] .board-drivers, [data-theme="light"] .domain-toolbar { background:#F2F4F6; }
+[data-theme="light"] .domain-label { background:#FFFFFF; }
+[data-theme="light"] .driver-chip { background:#FFFFFF; }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
@@ -1306,20 +1306,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .fdc-l { font-family:ui-monospace,monospace; font-size:7px; letter-spacing:1px; color:var(--text-muted); margin-top:2px; }
 .fp-dest-foot { text-align:center; font-size:7.5px; font-weight:700; letter-spacing:1.4px; color:var(--text-muted); margin-top:10px; opacity:.8; }
 [data-theme="light"] .fp-dest { background:linear-gradient(180deg,#EAE1C7,#E1D5B6); border-color:#B79A6A; }
-[data-theme="light"] .report-page { background:#E7DBBE; }
+[data-theme="light"] .report-page { background:#EAECEF; }
 /* light-mode selected/active states — lighten the dark navy */
 [data-theme="light"] .ptb-card.agent:hover { background:rgba(31,110,102,.10); }
 [data-theme="light"] .ptb-card.agent.selected { box-shadow:inset 0 0 0 1px var(--ac), 0 0 12px rgba(31,110,102,.18); }
 [data-theme="light"] .pps-card.on { background:linear-gradient(180deg,rgba(31,110,102,.16),#EDE2C7); box-shadow:inset 0 0 0 1px #1F6E66, 0 0 12px rgba(31,110,102,.18); }
 [data-theme="light"] .pps-card.on .pps-title { color:#1a4d47; }
 [data-theme="light"] .pps-card:hover { background:rgba(31,110,102,.07); }
-[data-theme="light"] .fdc { background:#E7DBBE; border-color:#8A6A3F; }
-[data-theme="light"] .fp-dest .fb-name, [data-theme="light"] .fp-dest-score { color:#3B2F1C; }
+[data-theme="light"] .fdc { background:#EAECEF; border-color:#8A94A2; }
+[data-theme="light"] .fp-dest .fb-name, [data-theme="light"] .fp-dest-score { color:#1F2530; }
 [data-theme="light"] .fp-dest-title { color:#1F6E66; }
-[data-theme="light"] .fp-dest-sub { color:#7C6C4E; border-bottom-color:#B79A6A; }
-[data-theme="light"] .fp-dest-score .fds-max, [data-theme="light"] .fp-dest-foot, [data-theme="light"] .fb-desc, [data-theme="light"] .fdc-l { color:#7C6C4E; }
+[data-theme="light"] .fp-dest-sub { color:#6B7280; border-bottom-color:#B79A6A; }
+[data-theme="light"] .fp-dest-score .fds-max, [data-theme="light"] .fp-dest-foot, [data-theme="light"] .fb-desc, [data-theme="light"] .fdc-l { color:#6B7280; }
 [data-theme="light"] .fdc-v { color:#1F6E66; }
-[data-theme="light"] .fp-band { background:rgba(59,47,28,.06); }
+[data-theme="light"] .fp-band { background:rgba(31,37,48,.06); }
 /* ══ EXPERIMENT READINESS GATE ══ */
 .exp-ready-chip { display:inline-flex; align-items:center; margin:4px 0 2px; padding:3px 9px; border-radius:999px; font-size:8.5px; font-weight:800; letter-spacing:1.2px; cursor:pointer; border:1px solid #E2801E; color:#E2801E; background:rgba(226,128,30,.1); }
 .exp-ready-chip.ok { border-color:var(--accent); color:var(--cyan); background:rgba(25,167,161,.12); }
@@ -1492,8 +1492,26 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .connect-toolbar { display:none; }
 :root:not([data-theme="light"]) #hexBoardArea .zone-headers { display:none; }
 /* compact vertical "playing-card" agent + arrow cards (icon/hex on top, text below) */
-.app-header.ptb { height:230px; }
-.main-layout { height:calc(100vh - 230px); }
+.app-header.ptb { height:150px; }
+.main-layout { height:calc(100vh - 150px); }
+/* compacted top band so more of the board shows */
+.app-header.ptb .ptb-nexus { padding:8px 16px; }
+.app-header.ptb .ptb-title1 { font-size:20px; }
+.app-header.ptb .ptb-title2 { font-size:15px; margin-top:2px; }
+.app-header.ptb .ptb-tag { font-size:8px; margin-top:5px; line-height:1.4; }
+.app-header.ptb .ptb-panel { padding:8px 12px; }
+.app-header.ptb .ptb-sec { margin-bottom:5px; }
+.app-header.ptb .ptb-hex { width:34px; height:30px; }
+.app-header.ptb .ptb-hex svg { width:20px; height:20px; }
+.app-header.ptb .ptb-cdesc { font-size:7px; line-height:1.3; margin:2px 0 3px; }
+.app-header.ptb .ptb-supply { display:none; }
+.app-header.ptb .ptb-card { padding:7px 6px 6px; }
+/* hamburger top menu */
+.ptb-menu-wrap { position:relative; }
+.ptb-menu { display:none; position:absolute; top:calc(100% + 6px); right:0; z-index:200; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:8px; flex-direction:column; gap:4px; min-width:172px; box-shadow:0 14px 34px rgba(0,0,0,.32); }
+.ptb-menu.open { display:flex; }
+.ptb-menu .btn { justify-content:flex-start; text-align:left; width:100%; }
+.ptb-burger { font-size:13px; }
 .ptb-cards { gap:8px; }
 .ptb-card { flex-direction:column !important; align-items:center; text-align:center; gap:4px; padding:10px 8px 8px; justify-content:flex-start; }
 .ptb-hex { width:44px; height:38px; align-self:center; }
@@ -1585,7 +1603,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 /* light (executive) theme — poster layer fully off */
 [data-theme="light"] #bioField, [data-theme="light"] #posterVignette, [data-theme="light"] #posterFrame,
 [data-theme="light"] #posterGrain, [data-theme="light"] .field-contours, [data-theme="light"] .cell-tag { display:none; }
-[data-theme="light"] #hexBoardArea::after { display:block; background:rgba(243,234,211,.92); border-color:rgba(120,90,45,.55); color:#3B2F1C; }
+[data-theme="light"] #hexBoardArea::after { display:block; background:rgba(243,234,211,.92); border-color:rgba(120,128,140,.55); color:#1F2530; }
 [data-theme="light"] #hexScrollArea { background:transparent; border:none; margin:0; box-shadow:none; border-radius:0; }
 [data-theme="light"] .board-map { background:var(--bg); }
 [data-theme="light"] .hex-cell-bg::before { display:none; }
@@ -1918,15 +1936,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
     <div class="ptb-actions">
       <span class="game-name-tag" id="gameNameTag">—</span>
       <span class="save-status" id="saveStatus"></span>
-      <button class="btn btn-sm" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme" style="min-width:70px">☀ Light</button>
-      <button class="btn btn-sm" onclick="showModal('howToPlayModal')">? Help</button>
-      <button class="btn btn-sm" onclick="showModal('addPatternModal')">+ Pattern</button>
-      <button class="btn btn-sm" onclick="switchGame()">Switch Game</button>
-      <button class="btn btn-sm" onclick="resetBoard()">Reset</button>
-      <button class="btn btn-sm" onclick="exportSession()">Export</button>
-      <button class="btn btn-sm" onclick="addBoardRow()" title="Add 2 rows">＋ Rows</button>
-      <button class="btn btn-sm" onclick="addBoardCol()" title="Add 2 columns">＋ Cols</button>
-      <button class="btn btn-sm btn-primary" onclick="advanceCycle()">Next Phase →</button>
+      <button class="btn btn-sm btn-primary" onclick="advanceCycle()" style="margin-left:auto">Next Phase →</button>
+      <div class="ptb-menu-wrap">
+        <button class="btn btn-sm ptb-burger" onclick="toggleTopMenu(event)" aria-label="Menu" title="Menu">☰ Menu</button>
+        <div class="ptb-menu" id="ptbMenu">
+          <button class="btn btn-sm" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">☀ Light</button>
+          <button class="btn btn-sm" onclick="showModal('howToPlayModal')">? Help</button>
+          <button class="btn btn-sm" onclick="showModal('addPatternModal')">＋ Pattern</button>
+          <button class="btn btn-sm" onclick="switchGame()">Switch Game</button>
+          <button class="btn btn-sm" onclick="addBoardRow()" title="Add 2 rows">＋ Rows</button>
+          <button class="btn btn-sm" onclick="addBoardCol()" title="Add 2 columns">＋ Cols</button>
+          <button class="btn btn-sm" onclick="exportSession()">Export</button>
+          <button class="btn btn-sm" onclick="resetBoard()" style="color:var(--red)">Reset</button>
+        </div>
+      </div>
     </div>
     <div class="ptb-grid">
       <div class="ptb-nexus">
@@ -20762,6 +20785,8 @@ initDomainColorPicker();
    user is signed in; when access isn't enforced and no one is signed in, this is
    a no-op and the app behaves exactly as before. Gating (redirect to /auth) is
    handled in the api() layer on any 401. */
+function toggleTopMenu(e){ if(e){ e.stopPropagation(); } var m=document.getElementById('ptbMenu'); if(m) m.classList.toggle('open'); }
+document.addEventListener('click', function(e){ var m=document.getElementById('ptbMenu'); if(m && m.classList.contains('open') && !e.target.closest('.ptb-menu-wrap')) m.classList.remove('open'); });
 (function(){
   fetch('/api/auth/me', { credentials:'same-origin' })
     .then(function(r){ return r.ok ? r.json() : null; })
@@ -20774,12 +20799,16 @@ initDomainColorPicker();
     })
     .catch(function(){});
   function addSignOut(user){
-    var b=document.createElement('button');
-    b.textContent='Sign out';
-    if(user && user.email) b.title=user.email;
-    b.style.cssText='position:fixed;top:10px;right:12px;z-index:100000;font:600 12px -apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:#fff;background:#0B1F3A;border:none;border-radius:8px;padding:7px 13px;cursor:pointer;box-shadow:0 4px 12px rgba(11,31,58,.28)';
-    b.onclick=function(){ fetch('/api/auth/logout',{method:'POST',credentials:'same-origin'}).then(function(){ location.href='/auth'; }); };
-    document.body.appendChild(b);
+    var menu=document.getElementById('ptbMenu');
+    var mk=function(label,fn,danger){ var b=document.createElement('button'); b.className='btn btn-sm'; b.textContent=label; if(danger) b.style.color='var(--red)'; b.onclick=fn; return b; };
+    var out=mk('⎋ Sign out', function(){ fetch('/api/auth/logout',{method:'POST',credentials:'same-origin'}).then(function(){ location.href='/auth'; }); }, true);
+    if(menu){
+      if(user && user.is_super_admin) menu.appendChild(mk('⚙ Admin console', function(){ location.href='/admin'; }));
+      menu.appendChild(out);
+    } else {
+      out.style.cssText='position:fixed;top:10px;right:12px;z-index:100000;background:#0B1F3A;color:#fff;border:none;border-radius:8px;padding:7px 13px;cursor:pointer;font:600 12px sans-serif';
+      document.body.appendChild(out);
+    }
   }
   function showNoBoards(){
     var o=document.createElement('div');
