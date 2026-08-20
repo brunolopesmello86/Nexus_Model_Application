@@ -317,7 +317,7 @@ app.patch('/api/games/:gameId/rename', async (req, res) => {
   }
 });
 
-// ── Capabilities Library — NTT DATA Nexus Transformation (v2 · 58 caps · 348 practices) ──
+// ── Capabilities Library — Nexus Transformation (v2 · 58 caps · 348 practices) ──
 // Source: NTT-DATA-Nexus-Capabilities-Map.xlsx + NTT-DATA-Nexus-Practices.pptx
 // Domains: Strategy & Portfolio · Product & Delivery · Technology & Architecture · People, Culture & Governance · Operations
 const SEED_CAPABILITIES = [
@@ -1107,7 +1107,7 @@ async function seedCapabilitiesIfEmpty(force = false) {
     );
 
     await db.query('COMMIT');
-    console.log(`NTT DATA Nexus Capabilities Library seeded: ${SEED_CAPABILITIES.length} capabilities, ${pNames.length} practices`);
+    console.log(`Nexus Capabilities Library seeded: ${SEED_CAPABILITIES.length} capabilities, ${pNames.length} practices`);
   } catch (err) {
     await db.query('ROLLBACK').catch(() => {});
     console.error('Seed error:', err.message);
