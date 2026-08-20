@@ -12,12 +12,18 @@
     {
       "src": "auth.html",
       "use": "@vercel/static"
+    },
+    {
+      "src": "admin.html",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.js" },
     { "src": "/auth", "dest": "/auth.html" },
     { "src": "/auth.html", "dest": "/auth.html" },
+    { "src": "/admin", "dest": "/admin.html" },
+    { "src": "/admin.html", "dest": "/admin.html" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }

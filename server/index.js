@@ -44,6 +44,8 @@ app.use('/api', async (req, res, next) => {
 
 // ── Auth: login & access control (signup, verification code, password) ──
 app.use('/api/auth', require('./auth/routes'));
+// ── Admin console API (step 5) — Super-Admin only ──
+app.use('/api/console', require('./auth/admin'));
 
 // ── Board access enforcement (step 4) — OFF unless NEXUS_ENFORCE_ACCESS=true ──
 // When off, every board endpoint behaves exactly as before. When on, boards are

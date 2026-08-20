@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nexus Board — Admin Console</title>
+<style>
+  :root{
+    --navy:#0B1F3A; --ink:#33425A; --muted:#6B7686; --line:#DDE5F0; --bg:#F4F7FB;
+    --card:#FFFFFF; --teal:#009AA4; --blue:#3C6EB4; --green:#178A5A; --amber:#B8620F;
+    --red:#C0392B; --violet:#6B4EA8; --r:12px; --shadow:0 1px 2px rgba(11,31,58,.06),0 6px 18px rgba(11,31,58,.05);
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+  .top{background:var(--navy);color:#fff;height:58px;display:flex;align-items:center;gap:16px;padding:0 22px}
+  .top .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;letter-spacing:-.01em}
+  .top .brand svg{width:24px;height:24px}
+  .top .sp{margin-left:auto;display:flex;align-items:center;gap:14px;font-size:13px;color:#AFC2DA}
+  .top a,.top button{font:inherit;font-size:13px;color:#C9D6E8;background:transparent;border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:6px 12px;cursor:pointer;text-decoration:none}
+  .top a:hover,.top button:hover{background:rgba(255,255,255,.08);color:#fff}
+  .wrap{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 58px)}
+  .nav{padding:20px 12px;border-right:1px solid var(--line);background:#fff}
+  .nav a{display:block;font-size:13.5px;color:var(--muted);text-decoration:none;padding:9px 13px;border-radius:8px;cursor:pointer;font-weight:550;margin-bottom:2px}
+  .nav a.on{background:rgba(0,154,164,.1);color:#00757D;font-weight:650}
+  .nav a:hover:not(.on){background:#F4F7FB}
+  .main{padding:28px 30px 60px;max-width:1000px}
+  h1{font-size:22px;color:var(--navy);margin:0 0 4px;font-weight:700;letter-spacing:-.01em}
+  .sub{font-size:13.5px;color:var(--muted);margin:0 0 22px}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:8px}
+  @media(max-width:800px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 16px;box-shadow:var(--shadow)}
+  .kpi .n{font-size:25px;font-weight:700;color:var(--navy);line-height:1;letter-spacing:-.02em}
+  .kpi .l{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-top:7px;font-weight:650}
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
+  .orghd{background:#F2F6FB;padding:10px 16px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:750;color:var(--navy);display:flex;align-items:center;gap:8px}
+  .row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-top:1px solid #EEF3F9}
+  .row:first-child{border-top:none}
+  .row .grow{flex:1;min-width:0}
+  .row .bn{font-weight:600;color:var(--navy);font-size:14px}
+  .row .sm{font-size:12px;color:var(--muted);margin-top:2px}
+  .st{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:99px;white-space:nowrap}
+  .st.live,.st.active{background:rgba(23,138,90,.12);color:var(--green)}
+  .st.draft,.st.pending_verification{background:rgba(184,98,15,.12);color:var(--amber)}
+  .st.archived,.st.suspended{background:rgba(192,57,43,.12);color:var(--red)}
+  .st.sa{background:rgba(107,78,168,.12);color:var(--violet)}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;background:#EEF3F9;color:var(--ink);border-radius:99px;padding:4px 10px;margin:3px 4px 0 0}
+  .chip button{border:none;background:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:0}
+  .chip button:hover{color:var(--red)}
+  button.btn{font:inherit;font-size:13px;font-weight:600;padding:8px 14px;border:none;border-radius:8px;cursor:pointer;background:linear-gradient(180deg,#0FA7B1,#00838C);color:#fff}
+  button.btn:hover{filter:brightness(1.06)} button.btn.sm{padding:6px 11px;font-size:12px}
+  button.btn.ghost{background:#fff;color:var(--blue);border:1px solid var(--line)}
+  button.btn.danger{background:#fff;color:var(--red);border:1px solid rgba(192,57,43,.3)}
+  input,select{font:inherit;font-size:13.5px;padding:8px 11px;border:1.5px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+  input:focus,select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,154,164,.12)}
+  .inline{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 16px;background:#FAFCFE;border-top:1px solid #EEF3F9}
+  .members{padding:6px 16px 12px;background:#FBFDFF;border-top:1px solid #EEF3F9;display:none}
+  .members.open{display:block}
+  .memrow{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:13px;border-top:1px solid #EEF3F9}
+  .memrow:first-child{border-top:none}
+  table{width:100%;border-collapse:collapse}
+  thead th{text-align:left;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:11px 16px;background:#FAFCFE;border-bottom:1px solid var(--line)}
+  tbody td{padding:12px 16px;font-size:13.5px;border-bottom:1px solid #EEF3F9;color:var(--ink)}
+  tbody tr:last-child td{border-bottom:none}
+  .scr{display:none} .scr.on{display:block}
+  .msg{display:none;margin-bottom:16px;padding:11px 14px;border-radius:9px;font-size:13px}
+  .msg.show{display:block} .msg.err{background:rgba(192,57,43,.08);color:#8A241B;border:1px solid rgba(192,57,43,.2)}
+  .msg.ok{background:rgba(0,154,164,.08);color:#0A5F66;border:1px solid rgba(0,154,164,.2)}
+  .empty{padding:40px;text-align:center;color:var(--muted);font-size:14px}
+  .gate{display:grid;place-items:center;min-height:70vh;text-align:center;padding:30px}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="brand">
+    <svg viewBox="0 0 40 40" fill="none"><circle cx="14" cy="20" r="9" stroke="#4FD0C6" stroke-width="2.6"/><circle cx="26" cy="20" r="9" stroke="#6FA8E0" stroke-width="2.6"/></svg>
+    Nexus Admin
+  </div>
+  <div class="sp"><span id="who"></span><a href="/">Open app</a><button id="signout">Sign out</button></div>
+</div>
+
+<div id="app" style="display:none">
+<div class="wrap">
+  <nav class="nav">
+    <a data-s="overview" class="on">Overview</a>
+    <a data-s="boards">All boards</a>
+    <a data-s="users">Users</a>
+    <a data-s="orgs">Organizations</a>
+    <a data-s="audit">Audit log</a>
+  </nav>
+  <div class="main">
+    <div class="msg" id="msg"></div>
+
+    <section class="scr on" id="s-overview">
+      <h1>Overview</h1><p class="sub">Everything across every organization.</p>
+      <div class="kpis" id="kpis"></div>
+    </section>
+
+    <section class="scr" id="s-boards">
+      <h1>All boards</h1><p class="sub">Every board, grouped by organization. Manage who can access each one.</p>
+      <div id="boards"></div>
+    </section>
+
+    <section class="scr" id="s-users">
+      <h1>Users</h1><p class="sub">Everyone with a Nexus account. Suspend to revoke access immediately.</p>
+      <div class="card"><table><thead><tr><th>User</th><th>Status</th><th>Org</th><th>Boards</th><th>Last login</th><th></th></tr></thead><tbody id="users"></tbody></table></div>
+    </section>
+
+    <section class="scr" id="s-orgs">
+      <h1>Organizations</h1><p class="sub">Organizations and the email domains allowed to sign up for each.</p>
+      <div class="inline" style="background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:16px">
+        <input id="new-org" placeholder="New organization name" style="min-width:220px">
+        <button class="btn" id="add-org">Add organization</button>
+      </div>
+      <div id="orgs"></div>
+    </section>
+
+    <section class="scr" id="s-audit">
+      <h1>Audit log</h1><p class="sub">Recent access-control and account activity.</p>
+      <div class="card"><table><thead><tr><th>Action</th><th>By</th><th>When</th></tr></thead><tbody id="audit"></tbody></table></div>
+    </section>
+  </div>
+</div>
+</div>
+
+<div id="gate" class="gate" style="display:none"></div>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id);};
+  function api(method,path,body){
+    var o={method:method,credentials:'same-origin',headers:{'Content-Type':'application/json'}};
+    if(body)o.body=JSON.stringify(body);
+    return fetch('/api/console'+path,o).then(function(r){return r.json().then(function(j){return{ok:r.ok,status:r.status,data:j};},function(){return{ok:r.ok,status:r.status,data:{}};});});
+  }
+  function msg(t,kind){var m=$('msg');m.textContent=t||'';m.className='msg'+(t?' show '+(kind||'ok'):'');if(t)setTimeout(function(){m.className='msg';},4000);}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function shortBoard(n){return esc(String(n).split(' - ')[0].split(' (')[0]);}
+  function when(t){return t?new Date(t).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'never';}
+
+  // ---- gate: must be a super admin ----
+  fetch('/api/auth/me',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null;}).then(function(me){
+    if(!me||!me.authenticated){ location.href='/auth'; return; }
+    if(!me.user.is_super_admin){
+      $('gate').style.display='grid';
+      $('gate').innerHTML='<div><h1>Admins only</h1><p class="sub">This console is for administrators. <a class="link" href="/">Go to your boards</a></p></div>';
+      return;
+    }
+    $('who').textContent=me.user.email;
+    $('app').style.display='block';
+    show('overview');
+  });
+  $('signout').onclick=function(){fetch('/api/auth/logout',{method:'POST',credentials:'same-origin'}).then(function(){location.href='/auth';});};
+
+  // ---- nav ----
+  document.querySelectorAll('.nav a').forEach(function(a){a.onclick=function(){show(a.dataset.s);};});
+  function show(s){
+    document.querySelectorAll('.nav a').forEach(function(a){a.classList.toggle('on',a.dataset.s===s);});
+    document.querySelectorAll('.scr').forEach(function(x){x.classList.toggle('on',x.id==='s-'+s);});
+    if(s==='overview')loadOverview();
+    if(s==='boards')loadBoards();
+    if(s==='users')loadUsers();
+    if(s==='orgs')loadOrgs();
+    if(s==='audit')loadAudit();
+  }
+
+  function loadOverview(){api('GET','/overview').then(function(r){if(!r.ok)return;var o=r.data;
+    $('kpis').innerHTML=[['Organizations',o.orgs],['Boards',o.boards],['Users',o.users],['Active',o.active_users],['Pending',o.pending_users]]
+      .map(function(k){return '<div class="kpi"><div class="n">'+k[1]+'</div><div class="l">'+k[0]+'</div></div>';}).join('');
+  });}
+
+  // ---- boards ----
+  function loadBoards(){api('GET','/boards').then(function(r){if(!r.ok)return;
+    var byOrg={};r.data.forEach(function(b){(byOrg[b.org]=byOrg[b.org]||[]).push(b);});
+    var html=Object.keys(byOrg).map(function(org){
+      return '<div class="card"><div class="orghd">'+esc(org)+' — '+byOrg[org].length+' board'+(byOrg[org].length>1?'s':'')+'</div>'+
+        byOrg[org].map(function(b){
+          return '<div class="row"><div class="grow"><div class="bn">'+shortBoard(b.name)+'</div>'+
+            '<div class="sm">'+b.members+' member'+(b.members===1?'':'s')+' · updated '+when(b.updated_at)+'</div></div>'+
+            '<button class="btn ghost sm" data-manage="'+b.id+'">Manage access</button></div>'+
+            '<div class="members" id="mem-'+b.id+'"></div>';
+        }).join('')+'</div>';
+    }).join('');
+    $('boards').innerHTML=html||'<div class="empty">No boards yet.</div>';
+  });}
+  function loadMembers(gameId){
+    api('GET','/boards/'+gameId+'/members').then(function(r){
+      var box=$('mem-'+gameId);if(!box)return;
+      var list=(r.data||[]).map(function(m){
+        return '<div class="memrow"><div class="grow"><b>'+esc(m.email)+'</b> <span class="st '+m.status+'" style="margin-left:6px">'+esc(m.status)+'</span></div>'+
+          '<span class="st" style="background:rgba(60,110,180,.1);color:var(--blue)">'+esc(m.role)+'</span>'+
+          '<button class="btn danger sm" data-remove="'+m.user_id+'" data-board="'+gameId+'">Remove</button></div>';
+      }).join('')||'<div class="sm" style="padding:8px 0">No one assigned yet.</div>';
+      box.innerHTML='<div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;padding:10px 0 2px">Members</div>'+list+
+        '<div class="inline" style="padding:12px 0 4px;background:none;border:none">'+
+        '<input placeholder="email@company.com" data-email="'+gameId+'" style="min-width:220px">'+
+        '<select data-role="'+gameId+'"><option value="facilitator">Facilitator</option><option value="player">Player</option><option value="observer">Observer</option></select>'+
+        '<button class="btn sm" data-assign="'+gameId+'">Assign</button></div>';
+      box.classList.add('open');
+    });
+  }
+
+  // ---- users ----
+  function loadUsers(){api('GET','/users').then(function(r){if(!r.ok)return;
+    $('users').innerHTML=(r.data||[]).map(function(u){
+      var actions=u.is_super_admin?'<span class="st sa">Super Admin</span>':
+        (u.status==='suspended'?'<button class="btn ghost sm" data-activate="'+u.id+'">Reactivate</button>':'<button class="btn danger sm" data-suspend="'+u.id+'">Suspend</button>');
+      return '<tr><td><b>'+esc(u.email)+'</b>'+(u.full_name?'<div class="sm">'+esc(u.full_name)+'</div>':'')+'</td>'+
+        '<td><span class="st '+u.status+'">'+esc(u.status.replace('_verification',''))+'</span></td>'+
+        '<td>'+esc(u.org||'—')+'</td><td>'+u.boards+'</td><td>'+when(u.last_login_at)+'</td><td style="text-align:right">'+actions+'</td></tr>';
+    }).join('')||'<tr><td colspan="6" class="empty">No users.</td></tr>';
+  });}
+
+  // ---- orgs ----
+  function loadOrgs(){api('GET','/orgs').then(function(r){if(!r.ok)return;
+    $('orgs').innerHTML=(r.data||[]).map(function(o){
+      var domains=(o.domains||[]).map(function(d){return '<span class="chip">'+esc(d)+' <button data-deldom="'+d+'" data-org="'+o.id+'">×</button></span>';}).join('')||'<span class="sm">No domains yet</span>';
+      return '<div class="card"><div class="orghd">'+esc(o.name)+' · '+o.boards+' board'+(o.boards===1?'':'s')+'</div>'+
+        '<div style="padding:12px 16px"><div class="sm" style="margin-bottom:6px">Allowed email domains (anyone with these can sign up):</div>'+domains+
+        '<div class="inline" style="padding:12px 0 0;background:none;border:none"><input placeholder="company.com" data-newdom="'+o.id+'" style="min-width:180px"><button class="btn sm" data-adddom="'+o.id+'">Add domain</button></div></div></div>';
+    }).join('')||'<div class="empty">No organizations.</div>';
+  });}
+  $('add-org').onclick=function(){var n=$('new-org').value.trim();if(!n)return;
+    api('POST','/orgs',{name:n}).then(function(r){if(!r.ok){msg(r.data.error||'Failed','err');return;}$('new-org').value='';msg('Organization created.');loadOrgs();});};
+
+  // ---- audit ----
+  function loadAudit(){api('GET','/audit').then(function(r){if(!r.ok)return;
+    $('audit').innerHTML=(r.data||[]).map(function(a){
+      return '<tr><td><b>'+esc(a.action)+'</b></td><td>'+esc(a.actor||'system')+'</td><td>'+when(a.created_at)+'</td></tr>';
+    }).join('')||'<tr><td colspan="3" class="empty">No activity yet.</td></tr>';
+  });}
+
+  // ---- event delegation for dynamic buttons ----
+  document.addEventListener('click',function(e){
+    var t=e.target.closest('button, .chip button'); if(!t)return;
+    var d=t.dataset;
+    if(d.manage){var box=$('mem-'+d.manage);if(box.classList.contains('open')){box.classList.remove('open');box.innerHTML='';}else loadMembers(d.manage);}
+    else if(d.assign){var email=document.querySelector('[data-email="'+d.assign+'"]').value.trim();var role=document.querySelector('[data-role="'+d.assign+'"]').value;
+      if(!email)return;api('POST','/assign',{email:email,gameId:d.assign,role:role}).then(function(r){if(!r.ok){msg(r.data.error||'Failed','err');return;}msg('Assigned '+email+'.');loadMembers(d.assign);});}
+    else if(d.remove){api('DELETE','/assign',{userId:d.remove,gameId:d.board}).then(function(r){if(!r.ok){msg(r.data.error||'Failed','err');return;}msg('Removed.');loadMembers(d.board);});}
+    else if(d.suspend){if(confirm('Suspend this user? They will be signed out immediately.'))api('POST','/users/'+d.suspend+'/suspend').then(function(r){if(!r.ok){msg(r.data.error||'Failed','err');return;}msg('User suspended.');loadUsers();});}
+    else if(d.activate){api('POST','/users/'+d.activate+'/activate').then(function(r){if(!r.ok){msg(r.data.error||'Failed','err');return;}msg('User reactivated.');loadUsers();});}
+    else if(d.adddom){var dom=document.querySelector('[data-newdom="'+d.adddom+'"]').value.trim();if(!dom)return;
+      api('POST','/domains',{orgId:d.adddom,domain:dom}).then(function(r){if(!r.ok){msg(r.data.error||'Failed','err');return;}msg('Domain added.');loadOrgs();});}
+    else if(d.deldom){if(confirm('Remove '+d.deldom+'? New people from this domain won\'t be able to sign up.'))api('DELETE','/domains',{orgId:d.org,domain:d.deldom}).then(function(r){if(!r.ok){msg(r.data.error||'Failed','err');return;}msg('Domain removed.');loadOrgs();});}
+  });
+})();
+</script>
+</body>
+</html>
