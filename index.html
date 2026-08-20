@@ -1372,8 +1372,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 /* open field — backlog collapses to a slim drawer (dark only; poster: one open field) */
 #hexBoardArea:not(.bl-open) .cr-backlog { width:0; min-width:0; padding:0; border:none; overflow:hidden; }
 #hexBoardArea:not(.bl-open) .cr-zone-hdr { width:32px; min-width:32px; overflow:hidden; white-space:nowrap; color:var(--accent); }
-.cr-arrow::before { content:'▼'; font-size:9px; margin-right:1px; }
+.cr-arrow::before { content:'▼'; font-size:9px; }
 #hexBoardArea.bl-open .cr-arrow::before { content:'▶'; }
+#hexBoardArea:not(.bl-open) .cr-label { display:none; }
+#hexBoardArea:not(.bl-open) .cr-zone-hdr { justify-content:center; padding-left:0; padding-right:0; }
 /* left rail = poster CODEX: centered header, AXIS B gradient strip, clean cards */
 .toolbox-title { justify-content:center; text-align:center; letter-spacing:4px; color:var(--text-muted); }
 .codex-divider { height:1px; background:#1E4266; opacity:.7; margin:8px 4px 12px; }
@@ -2061,7 +2063,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
           <div id="hexBoardArea" style="flex:7;display:flex;flex-direction:column;overflow:hidden;">
             <!-- Header row: backlog label + path zone header -->
             <div style="display:flex;flex-shrink:0;">
-              <div class="cr-zone-hdr" onclick="toggleBacklog()" title="Show / hide the Current Reality backlog"><span class="cr-arrow"></span> Current Reality</div>
+              <div class="cr-zone-hdr" onclick="toggleBacklog()" title="Show / hide the Current Reality backlog"><span class="cr-arrow"></span><span class="cr-label"> Current Reality</span></div>
               <div class="zone-headers" style="flex:1;">
                 <div class="zh-spacer"></div>
                 <div class="zone-col-header hdr-path" style="flex:1"><span class="zone-tag">⟷ Transformation Path</span></div>
