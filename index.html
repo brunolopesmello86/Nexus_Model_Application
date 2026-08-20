@@ -20289,9 +20289,10 @@ function generateCyclePDF() {
   // Creatività Co. wordmark (white) — small ring + text, right-aligned ending at xRight
   // Creatività Co. white logo — aspect ratio 1549:318 (≈4.871). Draws right-aligned ending at xRight.
   const NTT_AR = 1549 / 318;
-  const nttImgRight = (xRight, yTop, h) => { const w = h * NTT_AR; doc.addImage(CRE_LOGO, 'PNG', xRight - w, yTop, w, h); };
-  const nttImgLeft  = (xLeft, yTop, h)  => { const w = h * NTT_AR; doc.addImage(CRE_LOGO, 'PNG', xLeft, yTop, w, h); };
-  const nttImgCenter= (cx, yTop, h)     => { const w = h * NTT_AR; doc.addImage(CRE_LOGO, 'PNG', cx - w/2, yTop, w, h); };
+  // No logo in the PDF (removed per request). No-ops keep the layout calls harmless.
+  const nttImgRight = () => {};
+  const nttImgLeft  = () => {};
+  const nttImgCenter= () => {};
 
   // Content page header — navy strip with orange rule (deck style)
   function hdr(title, sub) {
