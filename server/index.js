@@ -63,6 +63,11 @@ async function requireSuperAdminReq(req, res) {
   if (!user.is_super_admin) { res.status(403).json({ error: 'Only an administrator can do this.' }); return null; }
   return user;
 }
+async function requireSession(req, res) {
+  const user = await authSession.getSessionUser(req);
+  if (!user) { res.status(401).json({ error: 'Not authenticated' }); return null; }
+  return user;
+}
 
 // ── Health ──
 app.get('/api/health', async (req, res) => {
@@ -2704,6 +2709,7 @@ async function retireSupersededTACapabilities() {
 // Manually trigger the AI capabilities insert (idempotent, non-destructive)
 app.post('/api/admin/seed-ai', async (req, res) => {
   try {
+    if (!(await requireSuperAdminReq(req, res))) return;
     await ensureAICapabilities();
     const { rows } = await db.query(
       `SELECT COUNT(*)::int AS n FROM capabilities WHERE domain = 'Artificial Intelligence'`);
@@ -2714,6 +2720,7 @@ app.post('/api/admin/seed-ai', async (req, res) => {
 // Manually trigger the TA capabilities insert + retire superseded (idempotent)
 app.post('/api/admin/seed-pd', async (req, res) => {
   try {
+    if (!(await requireSuperAdminReq(req, res))) return;
     await ensurePDCapabilities();
     const { rows } = await db.query(
       `SELECT c.name, COUNT(p.*)::int AS practices FROM capabilities c
@@ -2724,6 +2731,7 @@ app.post('/api/admin/seed-pd', async (req, res) => {
 });
 app.post('/api/admin/seed-ta', async (req, res) => {
   try {
+    if (!(await requireSuperAdminReq(req, res))) return;
     await ensureTACapabilities();
     await retireSupersededTACapabilities();
     const { rows } = await db.query(
@@ -2736,6 +2744,7 @@ app.post('/api/admin/seed-ta', async (req, res) => {
 // Manually trigger the Ops capabilities insert + merge (idempotent, non-destructive)
 app.post('/api/admin/seed-ops', async (req, res) => {
   try {
+    if (!(await requireSuperAdminReq(req, res))) return;
     await ensureOpsCapabilities();
     await reconcileOpsCapabilities();
     const { rows } = await db.query(
@@ -2749,6 +2758,7 @@ app.post('/api/admin/seed-ops', async (req, res) => {
 // Manually trigger the non-destructive domain realignment
 app.post('/api/admin/remap-domains', async (req, res) => {
   try {
+    if (!(await requireSuperAdminReq(req, res))) return;
     await remapCapabilityDomains();
     const { rows } = await db.query(
       `SELECT domain, COUNT(*)::int AS n FROM capabilities GROUP BY domain ORDER BY domain`);
@@ -2762,6 +2772,7 @@ app.post('/api/admin/remap-domains', async (req, res) => {
 // the fire-and-forget module-init chain can't guarantee on serverless cold starts.
 app.post('/api/admin/seed-capabilities', async (req, res) => {
   try {
+    if (!(await requireSuperAdminReq(req, res))) return;
     await seedCapabilitiesIfEmpty(true);
     await remapCapabilityDomains();
     await ensureAICapabilities();
@@ -2792,6 +2803,7 @@ app.post('/api/capabilities', async (req, res) => {
   const { name, description, domain } = req.body;
   if (!name) return res.status(400).json({ error: 'name required' });
   try {
+    if (ENFORCE() && !(await requireSession(req, res))) return;
     await db.query('ALTER TABLE capabilities ADD COLUMN IF NOT EXISTS domain TEXT');
     const { rows } = await db.query(
       'INSERT INTO capabilities (name, description, domain) VALUES ($1, $2, $3) RETURNING *',
@@ -2804,6 +2816,7 @@ app.post('/api/capabilities', async (req, res) => {
 app.put('/api/capabilities/:id', async (req, res) => {
   const { name, description, domain } = req.body;
   try {
+    if (ENFORCE() && !(await requireSession(req, res))) return;
     await db.query('ALTER TABLE capabilities ADD COLUMN IF NOT EXISTS domain TEXT');
     // domain is only overwritten when the key is present in the body (undefined = leave as-is)
     const setDomain = Object.prototype.hasOwnProperty.call(req.body, 'domain');
@@ -2819,6 +2832,7 @@ app.put('/api/capabilities/:id', async (req, res) => {
 
 app.delete('/api/capabilities/:id', async (req, res) => {
   try {
+    if (ENFORCE() && !(await requireSession(req, res))) return;
     const { rowCount } = await db.query('DELETE FROM capabilities WHERE id=$1', [req.params.id]);
     if (!rowCount) return res.status(404).json({ error: 'Not found' });
     res.json({ deleted: true });
@@ -2829,6 +2843,7 @@ app.post('/api/capabilities/:capId/practices', async (req, res) => {
   const { name, description, level } = req.body;
   if (!name) return res.status(400).json({ error: 'name required' });
   try {
+    if (ENFORCE() && !(await requireSession(req, res))) return;
     await db.query('ALTER TABLE practices ADD COLUMN IF NOT EXISTS level TEXT');
     const { rows } = await db.query(
       'INSERT INTO practices (capability_id, name, description, level) VALUES ($1, $2, $3, $4) RETURNING *',
@@ -2841,6 +2856,7 @@ app.post('/api/capabilities/:capId/practices', async (req, res) => {
 app.put('/api/practices/:id', async (req, res) => {
   const { name, description, level } = req.body;
   try {
+    if (ENFORCE() && !(await requireSession(req, res))) return;
     await db.query('ALTER TABLE practices ADD COLUMN IF NOT EXISTS level TEXT');
     const setLevel = Object.prototype.hasOwnProperty.call(req.body, 'level');
     const { rows } = setLevel
@@ -2855,6 +2871,7 @@ app.put('/api/practices/:id', async (req, res) => {
 
 app.delete('/api/practices/:id', async (req, res) => {
   try {
+    if (ENFORCE() && !(await requireSession(req, res))) return;
     const { rowCount } = await db.query('DELETE FROM practices WHERE id=$1', [req.params.id]);
     if (!rowCount) return res.status(404).json({ error: 'Not found' });
     res.json({ deleted: true });
