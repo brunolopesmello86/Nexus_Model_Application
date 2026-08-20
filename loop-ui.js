@@ -25,26 +25,31 @@ window.renderLoopDock = function() {
 
   let body = '';
   if (open) {
-    if (loop) {
+    if (!loop) {
+      body = `
+        <div class="loop-dock-empty">Start a cycle at <strong>Sense</strong> — probe the system for anti-patterns, friction and tensions.</div>
+        <div class="loop-dock-meta">${done} cycle${done!==1?'s':''} completed</div>
+        <button class="loop-dock-btn primary" style="width:100%;margin-top:8px" onclick="startLoop()">▶ Start Möbius Loop</button>`;
+    } else {
       const ph = LOOP_PHASE_META[loop.phase];
-      const phaseDots = LOOP_PHASE_META.map((p, i) => {
+      const dots = LOOP_PHASE_META.map((p, i) => {
         const cls = i < loop.phase ? 'loop-dot done' : i === loop.phase ? 'loop-dot active' : 'loop-dot';
         return `<span class="${cls}" title="${p.n}" style="background:${i<=loop.phase?ph.color:''}"></span>`;
       }).join('');
+      const rd = window.getLoopReadiness(loop.phase);
+      const gate = rd.missing.length ? `<div class="loop-dock-gate">${rd.missing.map(m => '• ' + esc(m)).join('<br>')}</div>` : '';
+      const advLabel = loop.phase === 4 ? '✓ Complete cycle' : esc(LOOP_PHASE_META[loop.phase + 1].n) + ' →';
       body = `
-        <div class="loop-dock-anchor"><span class="loop-dock-anchor-icon">C</span>${esc(loop.anchorName)}</div>
-        <div class="loop-dock-meta">Cycle ${loop.cycleNum} &nbsp;·&nbsp; ${ph.i} ${ph.n}</div>
-        <div class="loop-dock-dots">${phaseDots}</div>
-        <div class="loop-dock-actions">
-          <button class="loop-dock-btn primary" onclick="openLoopModal()">Open Loop</button>
-          <button class="loop-dock-btn danger"  onclick="cancelLoop()">Cancel</button>
+        <div class="loop-dock-anchor"><span class="loop-dock-anchor-icon">${ph.i}</span>${esc(ph.n)}</div>
+        <div class="loop-dock-meta">Cycle ${loop.cycleNum} &nbsp;·&nbsp; phase ${loop.phase + 1} of 5</div>
+        <div class="loop-dock-dots">${dots}</div>
+        <div class="loop-dock-tip">${esc(ph.hint)}</div>
+        ${gate}
+        <div class="loop-dock-actions" style="margin-top:9px">
+          ${loop.phase > 0 ? `<button class="loop-dock-btn" onclick="backLoopPhase()" title="Back a phase">←</button>` : ''}
+          <button class="loop-dock-btn primary" id="loopAdvanceBtn" style="flex:1${rd.ready ? '' : ';opacity:.5'}" onclick="advanceLoopPhase()">${advLabel}</button>
+          <button class="loop-dock-btn danger" onclick="cancelLoop()" title="Cancel this cycle">✕</button>
         </div>`;
-    } else {
-      body = `
-        <div class="loop-dock-empty">No active loop session.</div>
-        <div class="loop-dock-meta">${done} cycle${done!==1?'s':''} completed</div>
-        ${done ? `<button class="loop-dock-btn" onclick="openLoopLog()">View Cycle Log</button>` : ''}
-        <div class="loop-dock-tip">Place a <strong>Capability hex</strong> on the board, or drag a <strong>C marker</strong> onto any hex, then hover to start a loop.</div>`;
     }
   }
 

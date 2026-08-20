@@ -1072,7 +1072,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 
 /* ── Möbius Loop Layer ────────────────────────────────────────────── */
 /* Dock */
-.loop-dock { display:none; position:fixed; bottom:20px; right:20px; z-index:1100; background:var(--surface); border:1px solid var(--border); border-radius:12px; min-width:52px; max-width:230px; box-shadow:0 4px 20px rgba(0,0,0,.5); overflow:hidden; transition:max-width .25s, box-shadow .25s; }
+.loop-dock { position:fixed; bottom:20px; right:20px; z-index:1100; background:var(--surface); border:1px solid var(--border); border-radius:12px; min-width:52px; max-width:230px; box-shadow:0 4px 20px rgba(0,0,0,.5); overflow:hidden; transition:max-width .25s, box-shadow .25s; }
 .loop-dock-active { border-color:var(--accent); box-shadow:0 4px 24px rgba(25,167,161,.3); }
 .loop-dock-toggle { display:flex; align-items:center; gap:6px; padding:10px 14px; background:none; border:none; color:var(--text); font-size:12px; font-weight:700; cursor:pointer; width:100%; text-align:left; letter-spacing:.3px; }
 .loop-dock-toggle:hover { background:rgba(255,255,255,.05); }
@@ -1088,6 +1088,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .loop-dock-actions { display:flex; gap:6px; }
 .loop-dock-empty { font-size:11px; color:var(--text-muted); margin-bottom:6px; }
 .loop-dock-tip { font-size:10px; color:var(--text-muted); margin-top:8px; line-height:1.4; }
+.loop-dock-gate { font-size:9.5px; color:var(--anti-hex); background:rgba(226,128,30,.09); border-radius:6px; padding:6px 8px; margin-top:6px; line-height:1.55; }
+.loop-dock-actions { display:flex; gap:6px; }
+.loop-dock-btn.shake { animation:loopShake .4s; }
+@keyframes loopShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
 .loop-dock-btn { padding:5px 10px; border-radius:5px; border:1px solid var(--border); background:var(--surface2); color:var(--text); font-size:10px; font-weight:600; cursor:pointer; white-space:nowrap; }
 .loop-dock-btn:hover { background:rgba(255,255,255,.08); }
 .loop-dock-btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
@@ -2807,6 +2811,20 @@ function expStageCategory(key){
   if (st==='running'||st==='testing'||st==='review') return 'running';
   return 'pending';
 }
+// Bridge for the Möbius Loop (loop-state.js) — exposes the real board/experiment state.
+window.loopBoardStats = function(){
+  var keys = (typeof onBoardExperimentKeys === 'function') ? onBoardExperimentKeys() : [];
+  var exps = keys.map(function(k){
+    var e = experimentResults[k] || {};
+    return { cat: expStageCategory(k), filled: !!(e.hypothesis && String(e.hypothesis).trim()) };
+  });
+  return {
+    agents: (typeof agentAssignments === 'object' && agentAssignments) ? Object.keys(agentAssignments).length : 0,
+    total: exps.length,
+    filled: exps.filter(function(e){ return e.filled; }).length,
+    unresolved: exps.filter(function(e){ return e.cat==='pending' || e.cat==='running'; }).length
+  };
+};
 
 // ══════════════════════════════════════════
 // ANCHOR MAPPING (Org Fitness assessment)

@@ -88,28 +88,18 @@ window.getLoopReadiness = function(phase) {
   const loop = window.activeLoop;
   if (!loop) return { ready: false, missing: ['No active loop'] };
 
+  const s = (typeof window.loopBoardStats === 'function')
+    ? window.loopBoardStats() : { agents: 0, total: 0, filled: 0, unresolved: 0 };
   const missing = [];
 
-  if (phase === 0) { // SENSE → FOCUS
-    if (!loop.sense.signals.length) missing.push('Add at least 1 signal observation');
-    if (_boardAntipatternCount() === 0) missing.push('Place at least 1 anti-pattern on the board');
-  } else if (phase === 1) { // FOCUS → EXPERIMENT
-    if (!loop.focus.selected.length) missing.push('Select 1–2 anti-patterns to focus on');
-    if ((loop.focus.behavior || '').trim().length < 10) missing.push('Describe the behaviour / habit being targeted (min 10 chars)');
+  if (phase === 1) {        // FOCUS → EXPERIMENT
+    if (s.agents < 1) missing.push('Place at least 1 Agent on the board — nothing moves without one');
+    if (s.filled  < 1) missing.push('Build at least 1 experiment card (fully filled) from a capability hex');
   } else if (phase === 2) { // EXPERIMENT → STABILIZE
-    const cards = loop.experiment || [];
-    const allFilled = cards.length > 0 && cards.every(c => (c.action||'').trim() && (c.owner||'').trim());
-    if (!allFilled) missing.push('Complete all experiment card fields (action + owner required)');
-    if (_boardPatternCount() === 0) missing.push('Place at least 1 pattern on the board');
-    if (_connectionCount() === 0) missing.push('Draw at least 1 Nexus connection');
-    if (_experimentResultCount() === 0) missing.push('Register at least 1 S2F experiment');
-  } else if (phase === 3) { // STABILIZE → DIFFUSE
-    if ((loop.stabilize.norm || '').trim().length < 5) missing.push('Write the Minimum Viable Norm (min 5 chars)');
-    if (!(loop.stabilize.owner || '').trim()) missing.push('Assign an owner for the norm');
-  } else if (phase === 4) { // DIFFUSE → COMPLETE
-    if ((loop.diffuse.changed || '').trim().length < 5) missing.push('Describe what changed');
-    if (!(loop.diffuse.audience || '').trim()) missing.push('Identify the audience for this story');
+    if (s.total < 1) missing.push('This cycle has no experiments yet');
+    else if (s.unresolved > 0) missing.push(s.unresolved + ' experiment' + (s.unresolved > 1 ? 's' : '') + ' still open — resolve every one (adopt / adapt / abandon) before closing the phase');
   }
+  // Phase 0 (Sense→Focus), 3 (Stabilize→Diffuse), 4 (Diffuse→Complete): advance when the facilitator is ready.
 
   return { ready: missing.length === 0, missing };
 };
@@ -122,69 +112,38 @@ window.startLoop = function(anchorId, anchorName, anchorHexKey) {
     window.activeLoop = null;
   }
 
-  // Count existing completed loops for this anchor to determine cycleNum
-  const prevCycles = window.loopSessions.filter(s => s.anchorId === anchorId && s.completedAt).length;
+  // Anchorless cycle — numbered by how many cycles have completed.
+  const prevCycles = window.loopSessions.filter(s => s.completedAt).length;
 
   window.activeLoop = {
     id:           'loop_' + Date.now(),
-    anchorId,
-    anchorName,
-    anchorHexKey,
+    anchorId:     anchorId || null,
+    anchorName:   anchorName || 'Möbius Loop',
+    anchorHexKey: anchorHexKey || null,
     cycleNum:     prevCycles + 1,
     phase:        0,
-    sense:        { signals: [] },
-    focus:        { selected: [], behavior: '' },
-    experiment:   [],
-    stabilize:    { norm: '', owner: '', cadence: '' },
-    diffuse:      { changed: '', surprised: '', audience: '' },
-    completedAt:  null,
-    nextSignal:   ''
+    diffuse:      { nextSignal: '' },
+    completedAt:  null
   };
 
   window.loopDockOpen = true;
-  if (window.renderLoopDock) window.renderLoopDock();
-  if (window.renderBoard)    window.renderBoard();
-  if (window.renderLoopModal) {
-    document.getElementById('loopModal').classList.add('show');
-    window.renderLoopModal();
-  }
+  if (window.renderLoopDock)   window.renderLoopDock();
+  if (window.scheduleAutoSave) window.scheduleAutoSave();
 };
 
 window.advanceLoopPhase = function() {
   const loop = window.activeLoop;
   if (!loop) return;
 
-  const { ready, missing } = window.getLoopReadiness(loop.phase);
+  const { ready } = window.getLoopReadiness(loop.phase);
   if (!ready) {
-    // Show inline — the UI already renders the checklist; just shake the button
     const btn = document.getElementById('loopAdvanceBtn');
     if (btn) { btn.classList.add('shake'); setTimeout(() => btn.classList.remove('shake'), 500); }
     return;
   }
-
-  if (loop.phase === 4) {
-    window.completeLoop();
-    return;
-  }
-
-  // Pre-populate experiment cards when entering phase 2
-  if (loop.phase === 1) {
-    loop.experiment = loop.focus.selected.map((hexId, i) => {
-      const existing = loop.experiment[i];
-      if (existing) return existing;
-      const item = window.allItems ? window.allItems.find(it => it.id === hexId) : null;
-      return { signal: item ? item.name : `Focus item ${i+1}`, action: '', owner: '', by: '', successCriteria: '' };
-    });
-    // If no specific anti-patterns were selected, use behavior description as one card
-    if (!loop.experiment.length) {
-      loop.experiment = [{ signal: loop.focus.behavior, action: '', owner: '', by: '', successCriteria: '' }];
-    }
-  }
-
+  if (loop.phase === 4) { window.completeLoop(); return; }
   loop.phase++;
-  if (window.renderLoopDock)  window.renderLoopDock();
-  if (window.renderLoopModal) window.renderLoopModal();
-  if (window.renderBoard)     window.renderBoard();
+  if (window.renderLoopDock)   window.renderLoopDock();
   if (window.scheduleAutoSave) window.scheduleAutoSave();
 };
 
