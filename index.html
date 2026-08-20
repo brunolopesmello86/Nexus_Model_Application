@@ -688,7 +688,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .fbm-table tr.fbm-zero td { opacity:.35; }
 
 /* ══ CAPABILITIES LIBRARY PAGE ══ */
-.bvt-bar { display:flex; align-items:stretch; padding:0; background:var(--surface); border-bottom:2px solid var(--border); flex-shrink:0; height:58px; }
+.bvt-bar { display:flex; align-items:stretch; padding:0; background:var(--surface); border-bottom:2px solid var(--border); flex-shrink:0; height:40px; }
 .bvt-btn { flex:1; display:flex; align-items:center; justify-content:center; gap:9px; padding:0 10px; font-size:13px; font-weight:600; letter-spacing:1.4px; white-space:nowrap; overflow:hidden; border:none; border-right:1px solid var(--border); background:transparent; color:var(--text-muted); cursor:pointer; transition:all .15s; position:relative; }
 .bvt-btn:last-child { border-right:none; }
 .bvt-btn svg { width:21px; height:21px; flex-shrink:0; color:currentColor; }
@@ -1372,7 +1372,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 /* open field — backlog collapses to a slim drawer (dark only; poster: one open field) */
 #hexBoardArea:not(.bl-open) .cr-backlog { width:0; min-width:0; padding:0; border:none; overflow:hidden; }
 #hexBoardArea:not(.bl-open) .cr-zone-hdr { width:32px; min-width:32px; overflow:hidden; white-space:nowrap; color:var(--accent); }
-#hexBoardArea.bl-open .cr-zone-hdr::after { content:' ✕'; opacity:.6; }
+.cr-arrow::before { content:'▼'; font-size:9px; margin-right:1px; }
+#hexBoardArea.bl-open .cr-arrow::before { content:'▶'; }
 /* left rail = poster CODEX: centered header, AXIS B gradient strip, clean cards */
 .toolbox-title { justify-content:center; text-align:center; letter-spacing:4px; color:var(--text-muted); }
 .codex-divider { height:1px; background:#1E4266; opacity:.7; margin:8px 4px 12px; }
@@ -1501,11 +1502,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .app-header.ptb .ptb-tag { font-size:8px; margin-top:5px; line-height:1.4; }
 .app-header.ptb .ptb-panel { padding:8px 12px; }
 .app-header.ptb .ptb-sec { margin-bottom:5px; }
-.app-header.ptb .ptb-hex { width:34px; height:30px; }
-.app-header.ptb .ptb-hex svg { width:20px; height:20px; }
-.app-header.ptb .ptb-cdesc { font-size:7px; line-height:1.3; margin:2px 0 3px; }
+.app-header.ptb .ptb-card { flex-direction:row !important; align-items:center; text-align:left; padding:8px 10px; gap:10px; }
+.app-header.ptb .ptb-cbody { text-align:left; align-items:flex-start; }
+.app-header.ptb .ptb-cname { text-align:left; letter-spacing:.6px; }
+.app-header.ptb .ptb-hex { width:46px; height:40px; }
+.app-header.ptb .ptb-hex svg { width:28px; height:28px; }
+.app-header.ptb .ptb-cdesc { font-size:7.5px; line-height:1.35; margin:2px 0 0; }
 .app-header.ptb .ptb-supply { display:none; }
-.app-header.ptb .ptb-card { padding:7px 6px 6px; }
+.app-header.ptb .ptb-grid { overflow:hidden; }
 /* hamburger top menu */
 .ptb-menu-wrap { position:relative; }
 .ptb-menu { display:none; position:absolute; top:calc(100% + 6px); right:0; z-index:200; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:8px; flex-direction:column; gap:4px; min-width:172px; box-shadow:0 14px 34px rgba(0,0,0,.32); }
@@ -2057,7 +2061,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
           <div id="hexBoardArea" style="flex:7;display:flex;flex-direction:column;overflow:hidden;">
             <!-- Header row: backlog label + path zone header -->
             <div style="display:flex;flex-shrink:0;">
-              <div class="cr-zone-hdr" onclick="toggleBacklog()" title="Show / hide the Current Reality backlog">◀ Current Reality</div>
+              <div class="cr-zone-hdr" onclick="toggleBacklog()" title="Show / hide the Current Reality backlog"><span class="cr-arrow"></span> Current Reality</div>
               <div class="zone-headers" style="flex:1;">
                 <div class="zh-spacer"></div>
                 <div class="zone-col-header hdr-path" style="flex:1"><span class="zone-tag">⟷ Transformation Path</span></div>
@@ -19921,7 +19925,7 @@ function renderReportPage() {
     </div>
   </div>`;
 
-  const brand = `<img src="${CRE_LOGO}" alt="Creatività Co." style="height:15px;display:block">`;
+  const brand = ``;
 
   // ── Practice Maturity dashboard rows ──
   const pmRows = (typeof pmEngagedIds === 'function' ? pmEngagedIds() : []).map(id => {
@@ -19965,7 +19969,7 @@ function renderReportPage() {
     <div class="rp-hero">
       <div class="rp-hero-row">
         <div>
-          <img src="${CRE_LOGO}" alt="Creatività Co." style="height:24px;display:block;margin-bottom:18px">
+          
           <div class="rp-hero-badge">Cycle ${cycleNumber} Review · Nexus Transformation Board</div>
           <div class="rp-hero-title">Transformation<br>Cycle Report</div>
           <div class="rp-hero-rule"></div>
@@ -20190,7 +20194,7 @@ function renderReportPage() {
 
     <!-- ── Closing ── -->
     <div class="rp-closing">
-      <div style="display:flex;justify-content:center;margin-bottom:16px"><img src="${CRE_LOGO}" alt="Creatività Co." style="height:22px"></div>
+      <div style="display:flex;justify-content:center;margin-bottom:16px"></div>
       <div class="rp-closing-title">Cycle ${cycleNumber} · ${fitTier}</div>
       <div class="rp-closing-sub">Fitness: ${f} / 100 · Phase ${cyclePhase+1} of 5 (${phase.n}) · ${monthYear}</div>
       <div class="rp-closing-rule"></div>
