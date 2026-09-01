@@ -441,6 +441,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 /* Capability hexes are light — force dark text for legibility */
 .board-hex.capability .board-hex-shape, .board-hex.capability .board-hex-shape * { color:#0A1A2F !important; }
 .hex-mini.capability, .hex-mini.capability * { color:#0A1A2F !important; }
+/* Agent hexes — first-class nodes, amber, distinguished by kind icon */
+.board-hex.agent .board-hex-shape { background:#F2C879; }
+.board-hex.agent .board-hex-shape, .board-hex.agent .board-hex-shape * { color:#3A2A08 !important; }
+.board-hex.agent .bh-agent-icon { width:clamp(30px, calc(var(--hex-w, 100px) * 0.34), 48px); height:auto; margin:2px auto 1px; display:flex; align-items:center; justify-content:center; }
+.board-hex.agent .bh-agent-icon svg { width:100%; height:100%; }
 
 /* All content centered symmetrically inside the hex safe zone */
 .bh-text { display:flex; flex-direction:column; justify-content:center; align-items:center; padding:0 18%; }
@@ -1968,17 +1973,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
         <div class="ptb-tag">A living map of how an organization changes —<br>patterns over playbooks, habits over mandates.</div>
       </div>
       <div class="ptb-panel">
-        <div class="ptb-sec"><b>THE AGENTS</b><span>pieces that carry change — placed on any hexagon</span></div>
+        <div class="ptb-sec"><b>THE AGENTS</b><span>their own hex — drag onto an empty cell, then connect via Transition Nexus</span></div>
         <div class="ptb-cards">
-          <div class="ptb-card agent" style="--ac:#F2C879" draggable="true" onclick="selectAgent('human')" ondragstart="startAgentDrag('human',event)" ondragend="draggedAgentType=null" title="Drag to a hex or click to select">
+          <div class="ptb-card agent" style="--ac:#F2C879" draggable="true" onclick="hintPlaceAgent()" ondragstart="startAgentHexDrag('agent_human',event)" ondragend="draggedId=null;dragSource=null" title="Drag onto an empty hex cell to place this Agent">
             <div class="ptb-hex" style="background:#F2C879"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="12" r="4.3" fill="currentColor"/><path d="M9.2 24 a6.8 6.8 0 0 1 13.6 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M9.2 24 v2.4 M22.8 24 v2.4" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></div>
             <div class="ptb-cbody"><div class="ptb-cname">HUMAN AGENT</div><div class="ptb-cdesc">People, teams and roles. Each one carries habits, beliefs — and an immune response to change.</div><div class="ptb-supply">SUPPLY <span>⬡ ⬡ ⬡ ⬡ ⬡</span></div></div>
           </div>
-          <div class="ptb-card agent" style="--ac:#F2C879" draggable="true" onclick="selectAgent('systemic')" ondragstart="startAgentDrag('systemic',event)" ondragend="draggedAgentType=null" title="Drag to a hex or click to select">
+          <div class="ptb-card agent" style="--ac:#F2C879" draggable="true" onclick="hintPlaceAgent()" ondragstart="startAgentHexDrag('agent_systemic',event)" ondragend="draggedId=null;dragSource=null" title="Drag onto an empty hex cell to place this Agent">
             <div class="ptb-hex" style="background:#F2C879"><svg viewBox="0 0 32 32" fill="none"><path d="M16 8 L10.5 18 L21.5 18 Z" stroke="currentColor" stroke-width="1.8"/><circle cx="16" cy="8" r="3" fill="currentColor"/><circle cx="10.5" cy="18" r="3" fill="currentColor"/><circle cx="21.5" cy="18" r="3" fill="currentColor"/><circle cx="16" cy="14.8" r="2" fill="currentColor"/></svg></div>
             <div class="ptb-cbody"><div class="ptb-cname">SYSTEMIC AGENT</div><div class="ptb-cdesc">Processes, tools, incentives and structures. They shape how every other agent behaves.</div><div class="ptb-supply">SUPPLY <span>⬡ ⬡ ⬡ ⬡ ⬡</span></div></div>
           </div>
-          <div class="ptb-card agent" style="--ac:#F2C879" draggable="true" onclick="selectAgent('ai')" ondragstart="startAgentDrag('ai',event)" ondragend="draggedAgentType=null" title="Drag to a hex or click to select">
+          <div class="ptb-card agent" style="--ac:#F2C879" draggable="true" onclick="hintPlaceAgent()" ondragstart="startAgentHexDrag('agent_ai',event)" ondragend="draggedId=null;dragSource=null" title="Drag onto an empty hex cell to place this Agent">
             <div class="ptb-hex" style="background:#F2C879"><svg viewBox="0 0 32 32" fill="none"><path d="M16 11 L20 16 L16 21 L12 16 Z" fill="currentColor"/><g stroke="currentColor" stroke-width="1.6"><line x1="20" y1="16" x2="26" y2="16"/><line x1="12" y1="16" x2="6" y2="16"/><line x1="17.6" y1="12.6" x2="22" y2="8.2"/><line x1="14.4" y1="12.6" x2="10" y2="8.2"/><line x1="17.6" y1="19.4" x2="22" y2="23.8"/><line x1="14.4" y1="19.4" x2="10" y2="23.8"/></g><g fill="currentColor"><circle cx="26" cy="16" r="1.8"/><circle cx="6" cy="16" r="1.8"/><circle cx="22" cy="8.2" r="1.8"/><circle cx="10" cy="8.2" r="1.8"/><circle cx="22" cy="23.8" r="1.8"/><circle cx="10" cy="23.8" r="1.8"/></g></svg></div>
             <div class="ptb-cbody"><div class="ptb-cname">AI AGENT</div><div class="ptb-cdesc">Autonomous capability placed into the system. It amplifies whatever habit it lands on.</div><div class="ptb-supply">SUPPLY <span>⬡ ⬡ ⬡ ⬡ ⬡</span></div></div>
           </div>
@@ -2025,12 +2030,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
         <button class="connect-btn nexus-btn" onclick="toggleConnectMode('nexus')"><span class="cb-icon"></span> Transition Nexus</button>
         <div class="ct-sep"></div>
         <span class="ct-label">⬡ THE AGENTS</span>
-        <div class="ct-agent agent-pal" data-agent="human" draggable="true" onclick="selectAgent('human')" ondragstart="startAgentDrag('human',event)" ondragend="draggedAgentType=null" title="Drag to hex or click to select"><div class="agent-circle human">🧑</div><div class="agent-label">Human</div></div>
-        <div class="ct-agent agent-pal" data-agent="systemic" draggable="true" onclick="selectAgent('systemic')" ondragstart="startAgentDrag('systemic',event)" ondragend="draggedAgentType=null" title="Drag to hex or click to select"><div class="agent-circle systemic">🏛</div><div class="agent-label">Systemic</div></div>
-        <div class="ct-agent agent-pal" data-agent="ai" draggable="true" onclick="selectAgent('ai')" ondragstart="startAgentDrag('ai',event)" ondragend="draggedAgentType=null" title="Drag to hex or click to select"><div class="agent-circle ai">🤖</div><div class="agent-label">AI</div></div>
-        <div class="ct-sep"></div>
-        <span class="ct-label">◈ PLACE</span>
-        <div class="ct-marker marker-pal" data-marker="capability" draggable="true" onclick="selectMarker('capability')" ondragstart="startMarkerDrag('capability',event)" ondragend="draggedMarkerType=null" title="Capability — drag to hex or click then click hex"><div class="marker-circle capability">C</div><div class="marker-label">Capability</div></div>
+        <div class="ct-agent agent-pal" data-agent="human" draggable="true" onclick="hintPlaceAgent()" ondragstart="startAgentHexDrag('agent_human',event)" ondragend="draggedId=null;dragSource=null" title="Drag onto an empty hex cell to place this Agent"><div class="agent-circle human">🧑</div><div class="agent-label">Human</div></div>
+        <div class="ct-agent agent-pal" data-agent="systemic" draggable="true" onclick="hintPlaceAgent()" ondragstart="startAgentHexDrag('agent_systemic',event)" ondragend="draggedId=null;dragSource=null" title="Drag onto an empty hex cell to place this Agent"><div class="agent-circle systemic">🏛</div><div class="agent-label">Systemic</div></div>
+        <div class="ct-agent agent-pal" data-agent="ai" draggable="true" onclick="hintPlaceAgent()" ondragstart="startAgentHexDrag('agent_ai',event)" ondragend="draggedId=null;dragSource=null" title="Drag onto an empty hex cell to place this Agent"><div class="agent-circle ai">🤖</div><div class="agent-label">AI</div></div>
         <div class="ct-sep"></div>
         <button class="add-row-btn" onclick="addBoardRow()" title="Add 2 rows">＋ Rows</button>
         <button class="add-row-btn" onclick="addBoardCol()" title="Add 2 columns">＋ Cols</button>
@@ -2298,7 +2300,14 @@ const PHASES = [{n:'Sense',i:'👁',d:'Observe signals, friction, bottlenecks'},
 // ══════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════
-let allItems = [...PATTERNS,...ANTIPATTERNS,...TRANSITIONS];
+// Agents are first-class board nodes (their own hex), placed in the chain
+// Anti-Pattern → Capability → Agent → Pattern and connected via Transition Nexus.
+const AGENTS = [
+  {id:'agent_human',    type:'agent', agentKind:'human',    name:'Human Agent',    signal:'People, teams and roles',          impact:'Who must act differently', domain:''},
+  {id:'agent_systemic', type:'agent', agentKind:'systemic', name:'Systemic Agent', signal:'Processes, tools and incentives',   impact:'Which structures must shift', domain:''},
+  {id:'agent_ai',       type:'agent', agentKind:'ai',       name:'AI Agent',       signal:'Autonomous capability in the system', impact:'What automation must do', domain:''}
+];
+let allItems = [...PATTERNS,...ANTIPATTERNS,...TRANSITIONS,...AGENTS];
 const ZONES = ['current_strategic','current_operational','path_strategic','path_operational'];
 
 // ── Honeycomb grid config ──
@@ -2819,7 +2828,9 @@ window.loopBoardStats = function(){
     return { cat: expStageCategory(k), filled: !!(e.hypothesis && String(e.hypothesis).trim()) };
   });
   return {
-    agents: (typeof agentAssignments === 'object' && agentAssignments) ? Object.keys(agentAssignments).length : 0,
+    agents: (typeof gridState === 'object' && gridState)
+      ? Object.values(gridState).filter(function(gid){ var it = (typeof resolveItem==='function') ? resolveItem(gid) : null; return it && it.type==='agent'; }).length
+      : 0,
     total: exps.length,
     filled: exps.filter(function(e){ return e.filled; }).length,
     unresolved: exps.filter(function(e){ return e.cat==='pending' || e.cat==='running'; }).length
@@ -17639,12 +17650,12 @@ function openS2FModal(connIdOrHexId) {
   const conn = connections.find(c => c.id === connIdOrHexId);
   let title, capIds = [];
   if (conn) {
-    // Nexus line experiment — practices come from the forward card (conn.to)
+    // Nexus line experiment — practices come from whichever endpoint carries a capability
+    // (Capability hexes register their capability intrinsically, no "C" badge required).
     const fromItem = resolveItem(conn.from);
     const toItem   = resolveItem(conn.to);
     title = `Experiment: ${fromItem?.name || '?'} → ${toItem?.name || '?'}`;
-    const toCapMarker = boardMarkers.find(m => m.hexId === conn.to && m.type === 'capability');
-    capIds = getCapabilityIds(toCapMarker);
+    capIds = [...new Set([...capHexCapIds(conn.to), ...capHexCapIds(conn.from)])];
   } else {
     // Legacy: hex-based experiment
     const item = resolveItem(connIdOrHexId);
@@ -17664,7 +17675,7 @@ function openS2FModal(connIdOrHexId) {
     ? new Set(getConnExpKeys(conn.id).map(k => k.includes('::') ? k.split('::')[1] : null).filter(Boolean))
     : new Set();
   if (pracsByCapId.length === 0) {
-    body.innerHTML = `<p style="font-size:12px;color:var(--text-muted);padding:12px;">No capabilities linked to the connected card.<br><br>Link capabilities to the forward card first to select a practice.</p>`;
+    body.innerHTML = `<p style="font-size:12px;color:var(--text-muted);padding:12px;">Neither hex on this Nexus carries a capability.<br><br>Place a <strong>Capability</strong> hex on one end of this Transition Nexus, then build the experiment against one of its practices.</p>`;
   } else {
     body.innerHTML = pracsByCapId.map(({cap, practices}) => `
       <div style="margin-bottom:10px;">
@@ -17976,7 +17987,7 @@ function renderFitnessPanel() {
         <div class="fdc"><div class="fdc-v">${fbd.expAdopted}</div><div class="fdc-l">PATTERNS STABILIZED</div></div>
         <div class="fdc"><div class="fdc-v">${antiNamed}</div><div class="fdc-l">ANTI-PATTERNS NAMED</div></div>
       </div>
-      <div class="fp-dest-foot">FITNESS IS A LEARNING INSTRUMENT — NOT A VANITY METRIC</div>
+      <div class="fp-dest-foot">FITNESS IS A LEARNING INSTRUMENT</div>
     </div>`;
   panel.innerHTML =
     `<div class="zone-headers" style="position:sticky;top:0;z-index:10;border-bottom:1px solid rgba(255,255,255,.06);">` +
@@ -18305,7 +18316,7 @@ async function enterGame(gameId) {
   document.getElementById('gameSelect').classList.remove('show');
   document.getElementById('mainApp').style.display='';
   // Reset state
-  allItems = [...PATTERNS,...ANTIPATTERNS,...TRANSITIONS];
+  allItems = [...PATTERNS,...ANTIPATTERNS,...TRANSITIONS,...AGENTS];
   gridState = {};
   boardInstances = {};
   agentAssignments = {};
@@ -18528,7 +18539,7 @@ function renderLibrary() {
 
   // Search across all decks (flat results)
   if (q) {
-    const hits = allItems.filter(it => !it._anchorRef && (!activeDomain || it.domain===activeDomain) &&
+    const hits = allItems.filter(it => !it._anchorRef && it.type!=='agent' && (!activeDomain || it.domain===activeDomain) &&
       (it.name.toLowerCase().includes(q) || (it.signal||'').toLowerCase().includes(q) || (it.domain||'').toLowerCase().includes(q)));
     list.innerHTML = `
       <div class="deck-open-hdr"><span class="doh-title">SEARCH · ${hits.length} card${hits.length===1?'':'s'}</span></div>
@@ -18888,20 +18899,21 @@ function renderBoard() {
         el.className = `board-hex ${item.type}${item.foundational?' foundational':''}${dim}${cm}${cs}${domCls}`;
         el.draggable = !connectMode;
         el.setAttribute('data-hex-id', hexId);
-        const agents = (agentAssignments[hexId]||[]).map(a=>`<div class="agent-badge ${a.type}" title="${a.type} agent" onclick="event.stopPropagation();assignAgent('${hexId}','${a.type}')">${agentIconSVG(a.type)}</div>`).join('');
-        const markers = boardMarkers.filter(m=>m.hexId===hexId).map(m=>`<div class="marker-badge ${m.type}" title="${m.type==='s2f'?'S2F':'Capability'}" onclick="event.stopPropagation();toggleMarker('${hexId}','${m.type}')">${m.type==='s2f'?'S2F':'C'}</div>`).join('');
+        // Agents are their own hex now; the "C" capability badge is retired (capability hexes
+        // register their capability intrinsically). Only drivers remain as in-hex chips.
         const drvs = (driverAssignments[hexId]||[]).map(d=>`<div class="driver-badge" title="${d}" onclick="event.stopPropagation();assignDriver('${hexId}','${d}')"><span class="db-bolt">⚡</span>${d}</div>`).join('');
-        const icons = agents + markers;
+        const typeLabel = item.type==='pattern'?'PATTERN':item.type==='antipattern'?'ANTI-PATTERN':item.type==='capability'?'CAPABILITY':item.type==='agent'?'AGENT':'TRANSITION';
+        const agentIcon = item.type==='agent' ? `<div class="bh-agent-icon">${agentIconSVG(item.agentKind)}</div>` : '';
         el.innerHTML = `
           <button class="remove-hex" onclick="event.stopPropagation();removeHex('${hexId}','${key}')">×</button>
           <div class="board-hex-shape">
+            ${agentIcon}
             <div class="bh-text">
-              <div class="bh-type">${item.type==='pattern'?'PATTERN':item.type==='antipattern'?'ANTI-PATTERN':item.type==='capability'?'CAPABILITY':'TRANSITION'}</div>
+              <div class="bh-type">${typeLabel}</div>
               <div class="bh-name" title="${item.name}">${item.name}</div>
-              <div class="bh-signal" title="${item.signal}">${item.signal}</div>
+              ${item.type==='agent' ? '' : `<div class="bh-signal" title="${item.signal}">${item.signal}</div>`}
               ${drvs?'<div class="bh-drivers">'+drvs+'</div>':''}
             </div>
-            ${icons?'<div class="bh-bottom">'+icons+'</div>':''}
           </div>
         `;
         // ── Möbius Loop integration ──
@@ -18980,6 +18992,12 @@ const GUIDANCE = {
     ok:   ['current_strategic','current_operational'],
     label: 'Anywhere on the board',
     tip:   'Capabilities represent maturity areas. Place them where you want to assess and grow practice adoption.'
+  },
+  agent: {
+    best: ['path_strategic','path_operational'],
+    ok:   ['current_strategic','current_operational','desired_strategic','desired_operational'],
+    label: 'On the transformation path',
+    tip:   'Agents are who or what must act. Place them in the chain between a Capability and the Pattern it enables, then connect them with a Transition Nexus.'
   }
 };
 function showZoneGuidance(itemType) {
@@ -19247,8 +19265,7 @@ function renderConnections() {
             ? `S2F: ${er?.practiceId ? (capabilitiesLibrary.flatMap(c=>c.practices).find(p=>p.id===er.practiceId)?.name || stagKey) : stagKey}`
             : `S2F: ${connExpKeys.length} experiments`)
         : 'Click to add S2F experiment';
-      // Legacy S2F path is retired — only show the dot for existing nexus experiments (view/edit), never to create new ones.
-      // New experiments are built from a Capability hex (its C badge → 🧪 Build Experiment).
+      // Stage dot: shown for existing nexus experiments (view/edit their kanban stage).
       if (hasExp) {
         g.appendChild(makeDot(
           sp.x, sp.y,
@@ -19258,6 +19275,32 @@ function renderConnections() {
           () => openS2FModal(conn.id),
           false
         ));
+      }
+
+      // === 🧪 Build-experiment affordance ===
+      // Experiments are built ON the Transition Nexus (no "C" badge required). The flask
+      // appears whenever one end of the nexus carries a capability to draw practices from.
+      const nexusHasCap = capHexCapIds(conn.to).length > 0 || capHexCapIds(conn.from).length > 0;
+      if (nexusHasCap) {
+        const _fsx = fromR.x+fromR.w/2, _fsy = fromR.cy, _tex = toR.x+toR.w/2, _tey = toR.cy;
+        const flaskPt = { x: _fsx + (_tex-_fsx)*0.40, y: _fsy + (_tey-_fsy)*0.40 };
+        const flaskG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        flaskG.setAttribute('style', 'pointer-events:all;cursor:pointer;');
+        flaskG.addEventListener('click', e => { e.stopPropagation(); openS2FModal(conn.id); });
+        const ftitle = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+        ftitle.textContent = hasExp ? 'Experiments on this Nexus — click to build another' : 'Build an experiment on this Nexus';
+        flaskG.appendChild(ftitle);
+        const fcirc = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        fcirc.setAttribute('cx', flaskPt.x); fcirc.setAttribute('cy', flaskPt.y); fcirc.setAttribute('r', '11');
+        fcirc.setAttribute('fill', '#0B1F3A'); fcirc.setAttribute('stroke', '#009AA4'); fcirc.setAttribute('stroke-width', '1.5');
+        flaskG.appendChild(fcirc);
+        const femoji = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        femoji.setAttribute('x', flaskPt.x); femoji.setAttribute('y', flaskPt.y + 4);
+        femoji.setAttribute('text-anchor', 'middle'); femoji.setAttribute('font-size', '12');
+        femoji.setAttribute('style', 'pointer-events:none;');
+        femoji.textContent = '🧪';
+        flaskG.appendChild(femoji);
+        g.appendChild(flaskG);
       }
 
       // Delete button at ~15% of line (near source hex, away from T and S dots)
@@ -19301,6 +19344,16 @@ function renderConnections() {
 let selectedMarker = null;
 let draggedMarkerType = null;
 let draggedAgentType = null;
+// Agents are now placed as their own hex — drag from the palette onto an empty cell.
+function startAgentHexDrag(itemId, e) {
+  draggedId = itemId; dragSource = null;
+  draggedAgentType = null; draggedMarkerType = null;
+  if (e && e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
+  showZoneGuidance('agent');
+}
+function hintPlaceAgent() {
+  if (window.showToast) showToast('Drag an Agent onto an empty hex cell to place it on the board', 'info');
+}
 function startAgentDrag(type, e) {
   draggedAgentType = type;
   e.dataTransfer.effectAllowed = 'copy';
@@ -19488,7 +19541,7 @@ function updateStats(){
   const a=all.filter(id=>resolveItem(id)?.type==='antipattern').length;
   const t=all.filter(id=>resolveItem(id)?.type==='transition').length;
   const c=all.filter(id=>resolveItem(id)?.type==='capability').length;
-  const ag=Object.values(agentAssignments).reduce((s,arr)=>s+arr.length,0);
+  const ag=all.filter(id=>resolveItem(id)?.type==='agent').length;
   document.getElementById('sP').textContent=p;
   document.getElementById('sA').textContent=a;
   document.getElementById('sT').textContent=t;
@@ -19761,12 +19814,12 @@ function renderReportPage() {
   const tCount = boardItems.filter(i => i.type==='transition').length;
   const cCount = boardItems.filter(i => i.type==='capability').length;
 
-  // Agents
-  const agVals = Object.values(agentAssignments);
-  const agTotal = agVals.reduce((s,arr)=>s+arr.length,0);
-  const agHuman = agVals.reduce((s,arr)=>s+arr.filter(a=>a.type==='human').length,0);
-  const agSys   = agVals.reduce((s,arr)=>s+arr.filter(a=>a.type==='systemic').length,0);
-  const agAI    = agVals.reduce((s,arr)=>s+arr.filter(a=>a.type==='ai').length,0);
+  // Agents (now first-class hexes on the board)
+  const agentItems = boardItems.filter(i => i.type==='agent');
+  const agTotal = agentItems.length;
+  const agHuman = agentItems.filter(i => i.agentKind==='human').length;
+  const agSys   = agentItems.filter(i => i.agentKind==='systemic').length;
+  const agAI    = agentItems.filter(i => i.agentKind==='ai').length;
 
   // Drivers
   const drTotal = Object.values(driverAssignments).reduce((s,arr)=>s+arr.length,0);
@@ -20246,7 +20299,7 @@ function generateCyclePDF() {
   const aCount = boardItems.filter(i => i.type==='antipattern').length;
   const tCount = boardItems.filter(i => i.type==='transition').length;
   const cCount = boardItems.filter(i => i.type==='capability').length;
-  const agTotal = Object.values(agentAssignments).reduce((s,a) => s+a.length, 0);
+  const agTotal = boardItems.filter(i => i.type==='agent').length;
   const drTotal = Object.values(driverAssignments).reduce((s,a) => s+a.length, 0);
   const nexusL  = connections.filter(c => c.type==='nexus').length;
 
