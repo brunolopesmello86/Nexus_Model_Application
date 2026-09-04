@@ -454,8 +454,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .board-hex .bh-signal { font-size:clamp(7px, calc(var(--hex-w, 100px) * 0.055), 10px); color:rgba(255,255,255,.5); margin-top:2px; line-height:1.15; display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
 /* Icons row below text */
 .bh-bottom { display:flex; gap:4px; justify-content:center; align-items:center; margin-top:4px; flex-shrink:0; }
-.board-hex .remove-hex { position:absolute; top:5px; right:22%; background:none; border:none; color:rgba(255,255,255,.4); cursor:pointer; font-size:12px; z-index:2; opacity:0; transition:opacity .15s; }
+.board-hex .remove-hex { position:absolute; top:4px; left:26%; width:22px; height:22px; padding:0; display:flex; align-items:center; justify-content:center; background:rgba(11,31,58,.62); border:none; border-radius:50%; color:#fff; cursor:pointer; font-size:14px; line-height:1; z-index:11; opacity:0; transition:opacity .15s, background .15s, transform .1s; }
 .board-hex:hover .remove-hex { opacity:1; }
+.board-hex .remove-hex:hover { background:#D9534F; transform:scale(1.12); }
 
 /* Agent badges */
 .agent-badge { width:23px; height:20px; clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); border-radius:0; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:opacity .15s; color:#050D18; }
