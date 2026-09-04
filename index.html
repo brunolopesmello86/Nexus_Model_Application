@@ -2614,6 +2614,65 @@ function showSave(s) {
   else if (s==='saved') { el.textContent='Saved'; el.className='save-status saved'; setTimeout(()=>{el.textContent='';},2000); }
   else if (s==='error') { el.textContent='Save failed'; el.className='save-status'; }
 }
+// One-time migration: legacy in-hex agent badges (agentAssignments) → first-class Agent hexes.
+// Each badge becomes an Agent hex on the nearest empty cell, linked back to its former host
+// with a Transition Nexus so the relationship (e.g. Capability → Agent) is preserved.
+// Idempotent across reloads: saveGame() PUTs the whole board atomically, so either the migrated
+// state (agentAssignments cleared + hexes added) persists in full, or nothing does — no dupes.
+function migrateLegacyAgents() {
+  if (!agentAssignments || typeof agentAssignments !== 'object') return 0;
+  const entries = Object.entries(agentAssignments).filter(([, arr]) => Array.isArray(arr) && arr.length);
+  if (!entries.length) return 0;
+
+  const KIND_TO_ITEM = { human:'agent_human', systemic:'agent_systemic', ai:'agent_ai' };
+  const posOf = {};                                   // hex instance id -> "row,col"
+  Object.entries(gridState).forEach(([key, id]) => { posOf[id] = key; });
+  const occupied = new Set(Object.keys(gridState));
+
+  // Grow the board if there aren't enough empty cells for the incoming agent hexes.
+  const needed = entries.reduce((s,[,arr]) => s + arr.filter(a => KIND_TO_ITEM[a.type]).length, 0);
+  const emptyCount = () => { let n=0; for (let r=0;r<GRID_ROWS;r++) for (let c=0;c<GRID_COLS;c++) if (!occupied.has(r+','+c)) n++; return n; };
+  let guard = 0;
+  while (emptyCount() < needed && guard++ < 30) GRID_ROWS += 2;
+  computeHexLayout();
+
+  const findEmptyNear = (hr, hc) => {
+    let best = null, bestD = Infinity;
+    for (let r=0;r<GRID_ROWS;r++) for (let c=0;c<GRID_COLS;c++) {
+      const key = r+','+c;
+      if (occupied.has(key)) continue;
+      const d = (hr!=null) ? ((r-hr)*(r-hr) + (c-hc)*(c-hc)) : (r*GRID_COLS + c);
+      if (d < bestD) { bestD = d; best = key; }
+    }
+    return best;
+  };
+
+  let migrated = 0, seq = 0;
+  const stamp = Date.now();
+  entries.forEach(([hostId, arr]) => {
+    const hostKey = posOf[hostId];
+    let hr = null, hc = null;
+    if (hostKey) { const p = hostKey.split(',').map(Number); hr = p[0]; hc = p[1]; }
+    arr.forEach(a => {
+      const itemId = KIND_TO_ITEM[a.type];
+      if (!itemId) return;
+      const key = findEmptyNear(hr, hc);
+      if (!key) return;
+      const placeId = itemId + '_mig' + stamp + '_' + (seq++);
+      boardInstances[placeId] = itemId;
+      gridState[key] = placeId;
+      occupied.add(key);
+      // Link the agent back to its former host as a Transition Nexus (only if the host is still placed).
+      if (hostKey && gridState[hostKey] === hostId) {
+        connections.push({ id:'conn_mig_' + placeId, from: hostId, to: placeId, type:'nexus' });
+      }
+      migrated++;
+    });
+  });
+
+  if (migrated) agentAssignments = {};
+  return migrated;
+}
 async function loadGame(gameId) {
   const g = await api('GET', `/games/${gameId}`);
   currentGameId = g.id;
@@ -2712,10 +2771,16 @@ async function loadGame(gameId) {
       allItems.push(item);
     }
   });
+  const _migAgents = migrateLegacyAgents();
   document.getElementById('gameNameTag').textContent = g.name;
   renderAll();
   if (window.renderLoopDock) window.renderLoopDock();
   addLog('Game loaded: ' + g.name, 'success');
+  if (_migAgents) {
+    addLog(`Migrated ${_migAgents} legacy agent${_migAgents>1?'s':''} to Agent hexes`, 'success');
+    showToast(`Moved ${_migAgents} agent${_migAgents>1?'s':''} onto the board as hexes`, 'success');
+    saveGame();
+  }
   // If this is a fresh game (no anchors, no board activity), prompt the facilitator to map anchors first
   const looksFresh = anchors.length === 0
     && Object.keys(gridState||{}).length === 0
