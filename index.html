@@ -767,6 +767,36 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .exp-mv.primary:hover { opacity:.9; }
 .exp-mv.danger { color:#d94a4a; border-color:rgba(217,74,74,.5); }
 .exp-mv.danger:hover { background:rgba(217,74,74,.12); border-color:#d94a4a; }
+.exp-mv.reopen { color:#e8943a; border-color:rgba(232,148,58,.5); }
+.exp-mv.reopen:hover { background:rgba(232,148,58,.12); border-color:#e8943a; }
+.exp-mv.closepath { color:#2d9d5e; border-color:rgba(45,157,94,.5); }
+.exp-mv.closepath:hover { background:rgba(45,157,94,.12); border-color:#2d9d5e; }
+/* Experiment modal tabs (Details / History) */
+.exp-tabs { display:flex; gap:4px; margin:14px 0 4px; border-bottom:1px solid var(--border); }
+.exp-tab { padding:8px 16px; border:none; background:none; color:var(--text-muted); font-size:12.5px; font-weight:700; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; }
+.exp-tab:hover { color:var(--text); }
+.exp-tab.on { color:var(--text); border-bottom-color:var(--stage-c,var(--accent)); }
+.exp-pane { padding-top:14px; }
+/* Historical attempts list */
+.exp-hist-empty { color:var(--text-muted); font-size:12px; padding:18px; text-align:center; }
+.exp-hist-item { border:1px solid var(--border); border-left:3px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:12px; background:var(--surface2); }
+.exp-hist-item.bad { border-left-color:#d94a4a; }
+.exp-hist-item.ok  { border-left-color:#2d9d5e; }
+.exp-hist-hd { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.exp-hist-n { font-size:11px; font-weight:800; letter-spacing:.4px; color:var(--text); }
+.exp-hist-outcome { font-size:10px; font-weight:800; padding:2px 8px; border-radius:20px; }
+.exp-hist-outcome.bad { color:#d94a4a; background:rgba(217,74,74,.14); }
+.exp-hist-outcome.ok  { color:#2d9d5e; background:rgba(45,157,94,.14); }
+.exp-hist-date { margin-left:auto; font-size:10px; color:var(--text-muted); }
+.exp-hist-row { display:grid; grid-template-columns:130px 1fr; gap:10px; padding:4px 0; font-size:11.5px; }
+.exp-hist-lbl { color:var(--text-muted); font-weight:700; }
+.exp-hist-val { color:var(--text); white-space:pre-wrap; word-break:break-word; }
+/* Kanban card quick actions for finished experiments */
+.kc-act { font-size:9px; font-weight:800; padding:3px 8px; border-radius:20px; border:1px solid transparent; cursor:pointer; background:none; }
+.kc-act.reopen { color:#e8943a; border-color:rgba(232,148,58,.45); }
+.kc-act.reopen:hover { background:rgba(232,148,58,.14); }
+.kc-act.closepath { color:#2d9d5e; border-color:rgba(45,157,94,.45); }
+.kc-act.closepath:hover { background:rgba(45,157,94,.14); }
 .cap-page { display:flex; flex:1; overflow:hidden; min-height:0; }
 .cap-add-form { display:flex; flex-direction:column; gap:6px; background:var(--surface2); border:1px dashed var(--border); border-radius:7px; padding:8px 10px; margin-top:6px; }
 .cap-add-form input, .cap-add-form textarea { width:100%; padding:5px 8px; background:var(--bg); border:1px solid var(--border); border-radius:5px; color:var(--text); font-size:11px; font-family:inherit; }
@@ -3882,6 +3912,8 @@ function renderExperimentsPage() {
             : `<div class="kc-prac muted">No practice linked</div>`}
           <div class="kc-foot">
             <span style="font-size:9px;color:var(--text-muted)">${er.hypothesis ? '✎ hypothesis set' : 'no hypothesis yet'}</span>
+            ${er.stage==='abandoned' ? `<button class="kc-act reopen" onclick="event.stopPropagation();reopenExperiment('${safeKey}')" title="Reopen for a new attempt — keeps this one as history">↻ Reopen</button>` : ''}
+            ${er.stage==='adopted' && connections.find(c=>c.id===expSourceOf(key)) ? `<button class="kc-act closepath" onclick="event.stopPropagation();closeAdoptedPath('${safeKey}')" title="Close path — remove the Transition Nexus">✓ Close path</button>` : ''}
             <span class="kc-pts ${meta.pts?'on':''}" style="${meta.pts?`background:${meta.c}`:''}">${meta.pts?'+':''}${meta.pts} pts</span>
           </div>
         </div>`;
@@ -4009,6 +4041,95 @@ function setExpField(id, field, value) {
   scheduleAutoSave();
 }
 
+// ── Experiment source helper: the "source" segment (connection id or hex id) of a key ──
+function expSourceOf(key){ const i = key.indexOf('::'); return i >= 0 ? key.substring(0, i) : key; }
+function expPracticeOf(key){ const er = experimentResults[key]||{}; return er.practiceId || (key.includes('::') ? key.split('::')[1] : null); }
+function expSnapshot(key){
+  const er = experimentResults[key] || {};
+  return {
+    hypothesis: er.hypothesis||'', result: er.result||'', adoptedSignals: er.adoptedSignals||'',
+    failSignals: er.failSignals||'', adaptationNeeded: er.adaptationNeeded||'', observations: er.observations||'',
+    stage: er.stage || 'abandoned', practiceId: expPracticeOf(key), code: expCodeOf(key),
+    closedAt: new Date().toISOString()
+  };
+}
+
+// ── Reopen an ABANDONED experiment ──────────────────────────────────────────
+// Keeps the abandoned card where it is; spawns a fresh Pending experiment for the
+// SAME practice/source under a new unique key, carrying every prior attempt into its
+// history[] so the new card's History tab shows the full lineage for that practice.
+function reopenExperiment(key){
+  const er = experimentResults[key];
+  if (!er || er.stage !== 'abandoned') { showToast('Only abandoned experiments can be reopened.', 'info'); return; }
+  const src = expSourceOf(key);
+  const pracId = expPracticeOf(key);
+  if (!pracId) { showToast('This experiment has no linked practice to reopen.', 'info'); return; }
+  // Fresh unique key: source::practiceId::rN (parsers split on the first "::", so source/practiceId still resolve)
+  let n = 2, newKey;
+  do { newKey = `${src}::${pracId}::r${n}`; n++; } while (experimentResults[newKey]);
+  const history = [...(er.history || []), expSnapshot(key)];
+  experimentResults[newKey] = { stage:'pending', practiceId: pracId, gated:true, history, reopenedFrom: key };
+  addLog(`Reopened experiment — new attempt created in Pending (${history.length} prior attempt${history.length>1?'s':''} in History)`, 'success');
+  renderExperimentsPage(); renderFitnessPanel(); updateStats(); scheduleAutoSave();
+  _expModalTab = 'details';
+  openExperimentModal(newKey);
+  showToast('New experiment created in Pending — the old data is in its History tab', 'success');
+}
+
+// ── Close the path of an ADOPTED experiment ─────────────────────────────────
+// Removes the Transition Nexus arrow the experiment sat on, but only when no other
+// experiment on that nexus is still open (pending/running/review). The facilitator
+// can draw a new nexus later to build fresh experiments.
+function closeAdoptedPath(key){
+  const er = experimentResults[key];
+  if (!er || er.stage !== 'adopted') { showToast('Only adopted experiments can close their path.', 'info'); return; }
+  const src = expSourceOf(key);
+  const conn = connections.find(c => c.id === src);
+  if (!conn) { showToast('This experiment is not on a Transition Nexus — there is no arrow to remove.', 'info'); return; }
+  const openSiblings = getConnExpKeys(conn.id).filter(k => k !== key && experimentResults[k]).filter(k => {
+    const s = experimentResults[k].stage || 'pending';
+    return s === 'pending' || s === 'running' || s === 'review';
+  });
+  if (openSiblings.length) {
+    showToast(`Can't close this path — ${openSiblings.length} experiment${openSiblings.length>1?'s are':' is'} still open on this nexus. Resolve them first.`, 'warning');
+    return;
+  }
+  const f = resolveItem(conn.from), t = resolveItem(conn.to);
+  if (!confirm(`Close this path? The Transition Nexus "${(f?.name||'?')} → ${(t?.name||'?')}" will be removed. You can draw a new one later to build fresh experiments.`)) return;
+  connections = connections.filter(c => c.id !== conn.id);
+  addLog(`Closed path — removed Transition Nexus "${(f?.name||'?')} → ${(t?.name||'?')}" after adoption`, 'success');
+  closeExperimentModal();
+  renderConnections(); renderExperimentsPage(); renderFitnessPanel(); updateStats(); scheduleAutoSave();
+  showToast('Path closed — nexus removed. Draw a new Transition Nexus when you want to experiment here again.', 'success');
+}
+
+// ── Historical attempts tab ─────────────────────────────────────────────────
+let _expModalTab = 'details';
+function setExpModalTab(tab){ _expModalTab = tab; if (typeof refreshExperimentModal === 'function') refreshExperimentModal(); }
+function expHistoryHtml(er){
+  const hist = er.history || [];
+  if (!hist.length) return `<div class="exp-hist-empty">No prior attempts for this practice.</div>`;
+  const row = (lbl, val) => (val && String(val).trim())
+    ? `<div class="exp-hist-row"><span class="exp-hist-lbl">${lbl}</span><span class="exp-hist-val">${escHtml(val)}</span></div>` : '';
+  return hist.map((h, i) => {
+    const ok = h.stage === 'adopted';
+    const dt = h.closedAt ? new Date(h.closedAt).toLocaleDateString() : '';
+    return `<div class="exp-hist-item ${ok?'ok':'bad'}">
+      <div class="exp-hist-hd">
+        <span class="exp-hist-n">Attempt ${i+1}${h.code?` · ${escHtml(h.code)}`:''}</span>
+        <span class="exp-hist-outcome ${ok?'ok':'bad'}">${ok?'✓ Adopted':'✕ Abandoned'}</span>
+        ${dt?`<span class="exp-hist-date">${dt}</span>`:''}
+      </div>
+      ${row('Hypothesis', h.hypothesis)}
+      ${row('Results', h.result)}
+      ${row('✓ Adopted signals', h.adoptedSignals)}
+      ${row('✕ Fail signals', h.failSignals)}
+      ${row('Adaptation needed', h.adaptationNeeded)}
+      ${row('Observations', h.observations)}
+    </div>`;
+  }).join('');
+}
+
 // ══════════════════════════════════════════
 // EXPERIMENT EDITOR MODAL (click a tracker card to open)
 // ══════════════════════════════════════════
@@ -4060,6 +4181,9 @@ function experimentModalHtml(key) {
   const next = idx >= 0 && idx < KANBAN_STAGES.length-1 ? KANBAN_STAGES[idx+1] : null;
   const clean = lbl => lbl.replace(/^[^\w]+ ?/, '');
   const ta = (field, ph, extra='') => `<textarea placeholder="${escHtml(ph)}" oninput="setExpField('${escHtml(key)}','${field}',this.value)" ${extra}>${escHtml(er[field]||'')}</textarea>`;
+  const history = er.history || [];
+  const hasHistory = history.length > 0;
+  const tab = hasHistory ? (_expModalTab || 'details') : 'details';
   return `
     <button class="exp-close" onclick="closeExperimentModal()" title="Close">✕</button>
     <div class="exp-hd">
@@ -4068,6 +4192,11 @@ function experimentModalHtml(key) {
       <span class="exp-pill" style="background:${meta.c}">${meta.pill}</span>
     </div>
     <div class="exp-title">${m.icon} ${escHtml(m.title)}</div>
+    ${hasHistory ? `<div class="exp-tabs">
+      <button class="exp-tab ${tab==='details'?'on':''}" onclick="setExpModalTab('details')">Details</button>
+      <button class="exp-tab ${tab==='history'?'on':''}" onclick="setExpModalTab('history')">History (${history.length})</button>
+    </div>` : ''}
+    <div class="exp-pane" ${tab!=='details'?'hidden':''}>
     <div class="exp-sub-row">
       <select onchange="setExpField('${escHtml(key)}','practiceId',this.value)">
         <option value="">— Link practice —</option>${expModalPracticeOptions(m.capIds, er.practiceId || '')}
@@ -4082,17 +4211,22 @@ function experimentModalHtml(key) {
       <div class="exp-field full"><label>Results ${canResults ? '' : '<span class="exp-hint">(available from Review)</span>'}</label>${ta('result','What happened? What did we learn?', canResults ? '' : 'disabled')}</div>
       <div class="exp-field full"><label>Observations</label>${ta('observations','Facilitator notes, context, quotes, links...')}</div>
     </div>
+    </div>
+    ${hasHistory ? `<div class="exp-pane" ${tab!=='history'?'hidden':''}>${expHistoryHtml(er)}</div>` : ''}
     <div class="exp-actions">
       ${next && next.id !== 'abandoned' ? `<button class="exp-mv primary" onclick="moveExpStage('${escHtml(key)}','${next.id}')">${clean(next.label)} →</button>` : ''}
       ${(stage==='pending'||stage==='running'||stage==='review') ? `<button class="exp-mv danger" onclick="moveExpStage('${escHtml(key)}','abandoned')">⏸ Abandon</button>` : ''}
       ${stage==='adopted' ? `<span style="font-size:11px;font-weight:700;color:${meta.c}">● ${clean(KANBAN_STAGES[idx].label)}</span>` : ''}
+      ${stage==='adopted' && connections.find(c=>c.id===expSourceOf(key)) ? `<button class="exp-mv closepath" onclick="closeAdoptedPath('${escHtml(key)}')" title="Remove this Transition Nexus so you can build a new experiment here later">✓ Close path (remove nexus)</button>` : ''}
       ${stage==='abandoned' ? `<span style="font-size:11px;font-weight:700;color:${meta.c}">● Abandoned</span>` : ''}
+      ${stage==='abandoned' ? `<button class="exp-mv reopen" onclick="reopenExperiment('${escHtml(key)}')" title="Create a fresh experiment for the same practice; this abandoned attempt stays as history">↻ Reopen for a new attempt</button>` : ''}
       <span class="exp-pts" style="color:${meta.pts?meta.c:'var(--text-muted)'}">${meta.pts?'+':''}${meta.pts} pts</span>
     </div>`;
 }
 function openExperimentModal(key) {
   closeExperimentModal();
   _expModalKey = key;
+  _expModalTab = 'details';
   const meta = expStageMeta(key);
   const div = document.createElement('div');
   div.id = 'expModal'; div.className = 'exp-modal';
