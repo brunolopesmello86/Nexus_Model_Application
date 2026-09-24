@@ -2666,6 +2666,9 @@ const OPS_MERGE = [
   ['Proactive Sys. Health', 'Reliability Engineering'],
   ['Lightweight Change Approval', 'Change Management'],
 ];
+// ⚠️ DESTRUCTIVE — merges then DELETEs the legacy Ops capabilities (cascades their
+// remaining practices). Manual-only via the SA-gated /api/admin/seed-ops endpoint;
+// never call from the boot path.
 async function reconcileOpsCapabilities() {
   try {
     let moved = 0, dropped = 0;
@@ -2694,15 +2697,19 @@ async function reconcileOpsCapabilities() {
 
 // Technology & Architecture: the TA deck fully supersedes the older seeded TA
 // capabilities. Retire any TA capability that isn't one of the 9 deck ones.
+// ⚠️ DESTRUCTIVE — deletes rows (and cascades their practices, orphaning any board
+// data keyed to them). Manual-only via the SA-gated /api/admin/seed-ta endpoint;
+// never call from the boot path.
 const TA_DECK_NAMES = TA_CAPABILITIES.map(c => c.name);
 async function retireSupersededTACapabilities() {
   try {
     const r = await db.query(
       `DELETE FROM capabilities
-        WHERE domain='Technology & Architecture' AND name <> ALL($1::text[])`,
+        WHERE domain='Technology & Architecture' AND name <> ALL($1::text[])
+        RETURNING name`,
       [TA_DECK_NAMES]
     );
-    if (r.rowCount) console.log(`TA reconcile: retired ${r.rowCount} superseded capabilities`);
+    if (r.rowCount) console.log(`TA reconcile: retired ${r.rowCount} superseded capabilities: ${r.rows.map(x => x.name).join(', ')}`);
   } catch (err) {
     console.error('TA reconcile error:', err.message);
   }
@@ -2881,20 +2888,32 @@ app.delete('/api/practices/:id', async (req, res) => {
 });
 
 // ── Start (local dev) or export for Vercel ──
+// Boot runs ONLY additive/idempotent steps (seed-if-empty, domain remap, insert-if-missing).
+// The destructive reconcilers (reconcileOpsCapabilities, retireSupersededTACapabilities)
+// DELETE capability rows and cascade practices — they must NEVER run automatically on a
+// cold start (they would silently destroy user-created capabilities and orphan board
+// practice data). They remain available only via the Super-Admin-gated endpoints
+// /api/admin/seed-ops, /api/admin/seed-ta and /api/admin/seed-capabilities.
 if (process.env.VERCEL) {
-  seedCapabilitiesIfEmpty().then(remapCapabilityDomains).then(ensureAICapabilities).then(ensureOpsCapabilities).then(reconcileOpsCapabilities).then(ensureTACapabilities).then(retireSupersededTACapabilities).then(ensurePDCapabilities);
+  seedCapabilitiesIfEmpty()
+    .then(remapCapabilityDomains)
+    .then(ensureAICapabilities)
+    .then(ensureOpsCapabilities)
+    .then(ensureTACapabilities)
+    .then(ensurePDCapabilities)
+    .catch(err => console.error('Boot seed chain error:', err));
   module.exports = app;
 } else {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, async () => {
     console.log(`Nexus server running on http://localhost:${PORT}`);
-    await seedCapabilitiesIfEmpty();
-    await remapCapabilityDomains();
-    await ensureAICapabilities();
-    await ensureOpsCapabilities();
-    await reconcileOpsCapabilities();
-    await ensureTACapabilities();
-    await retireSupersededTACapabilities();
-    await ensurePDCapabilities();
+    try {
+      await seedCapabilitiesIfEmpty();
+      await remapCapabilityDomains();
+      await ensureAICapabilities();
+      await ensureOpsCapabilities();
+      await ensureTACapabilities();
+      await ensurePDCapabilities();
+    } catch (err) { console.error('Boot seed chain error:', err); }
   });
 }
