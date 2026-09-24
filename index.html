@@ -2601,14 +2601,46 @@ async function api(method, path, body) {
   const r = await fetch('/api' + path, opts);
   // When board access is enforced and the caller isn't signed in, go to sign-in.
   if (r.status === 401) { window.location.href = '/auth'; throw new Error('Not authenticated'); }
-  if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e.error || r.statusText); }
+  if (!r.ok) {
+    const e = await r.json().catch(()=>({}));
+    const err = new Error(e.error || r.statusText);
+    err.status = r.status; err.body = e;
+    throw err;
+  }
   return r.json();
 }
+// Optimistic concurrency: the board revision we loaded. Echoed on every save so a
+// stale tab (or a second facilitator's older snapshot) gets a 409 instead of
+// silently overwriting newer work.
+let boardRev = null;
+let _boardConflict = false;
+function showSaveConflict() {
+  if (document.getElementById('saveConflictOverlay')) return;
+  const div = document.createElement('div');
+  div.id = 'saveConflictOverlay';
+  div.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(2,7,14,.82);display:flex;align-items:center;justify-content:center;padding:24px;';
+  div.innerHTML = `
+    <div style="max-width:480px;background:var(--surface,#0d1b2a);border:1px solid rgba(217,74,74,.6);border-top:5px solid #d94a4a;border-radius:14px;padding:26px 28px;box-shadow:0 24px 70px rgba(0,0,0,.55);">
+      <div style="font-size:15px;font-weight:800;color:var(--text,#e8eef5);margin-bottom:10px;">⚠️ This board changed somewhere else</div>
+      <div style="font-size:12.5px;line-height:1.6;color:var(--text-muted,#8b93a5);margin-bottom:18px;">
+        It was saved from another tab or by another facilitator. To protect their work,
+        your latest changes here were <strong>not saved</strong>. Reload to pick up the
+        newest version and continue from there.
+      </div>
+      <button onclick="location.reload()" style="padding:10px 20px;border-radius:8px;border:none;background:#19A7A1;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">↻ Reload board</button>
+    </div>`;
+  document.body.appendChild(div);
+}
+let _saveInFlight = false, _savePending = false;
 async function saveGame() {
   if (!currentGameId) return;
+  if (_boardConflict) return; // a stale snapshot must never retry over newer work
+  if (_saveInFlight) { _savePending = true; return; } // serialize: overlapping PUTs would self-conflict on the rev
+  _saveInFlight = true;
   showSave('saving');
   try {
-    await api('PUT', `/games/${currentGameId}`, {
+    const saved = await api('PUT', `/games/${currentGameId}`, {
+      expected_rev: boardRev,
       board_state: Object.assign({}, gridState, {__backlog: currentItems}),
       agent_assignments: agentAssignments,
       active_drivers: driverAssignments,
@@ -2631,10 +2663,25 @@ async function saveGame() {
       board_instances: boardInstances,
       anchors: anchors
     });
+    if (saved && saved.board_rev != null) boardRev = Number(saved.board_rev);
     showSave('saved');
-  } catch(e) { showSave('error'); console.error('Save failed:',e); }
+  } catch(e) {
+    if (e && e.status === 409) {
+      _boardConflict = true;
+      if (autoSaveTimer) clearTimeout(autoSaveTimer);
+      showSave('error');
+      showSaveConflict();
+    } else {
+      showSave('error'); console.error('Save failed:',e);
+    }
+  } finally {
+    _saveInFlight = false;
+    if (_savePending && !_boardConflict) { _savePending = false; scheduleAutoSave(); }
+    else _savePending = false;
+  }
 }
 function scheduleAutoSave() {
+  if (_boardConflict) return;
   if (autoSaveTimer) clearTimeout(autoSaveTimer);
   autoSaveTimer = setTimeout(saveGame, 1500);
 }
@@ -2707,6 +2754,8 @@ async function loadGame(gameId) {
   const g = await api('GET', `/games/${gameId}`);
   currentGameId = g.id;
   currentCompanyId = g.company_id;
+  boardRev = (g.board_rev !== undefined && g.board_rev !== null) ? Number(g.board_rev) : null;
+  _boardConflict = false;
   // ── Migration pipeline ──
   const bs = g.board_state || {};
   // Step 1: Determine raw state format and extract backlog

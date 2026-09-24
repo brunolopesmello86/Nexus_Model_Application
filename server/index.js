@@ -224,6 +224,10 @@ app.post('/api/games/:gameId/verify', async (req, res) => {
   }
 });
 
+// Whole-board save with optimistic concurrency: the client echoes the board_rev it
+// loaded (expected_rev). If another tab/facilitator saved in between, the revs no
+// longer match and we answer 409 instead of silently overwriting their work.
+// Clients that don't send expected_rev (older frontends) save unchecked, as before.
 app.put('/api/games/:gameId', async (req, res) => {
   const {
     board_state, agent_assignments, active_drivers,
@@ -232,7 +236,7 @@ app.put('/api/games/:gameId', async (req, res) => {
     connections, board_markers, domain_definitions,
     experiment_results, practice_repetitions, transformation_horizons,
     board_milestones, board_risks, loop_sessions, board_instances, anchors,
-    practice_maturity
+    practice_maturity, expected_rev
   } = req.body;
   try {
     if (ENFORCE() && !(await requireBoard(req, res, req.params.gameId))) return;
@@ -242,6 +246,8 @@ app.put('/api/games/:gameId', async (req, res) => {
     await db.query('ALTER TABLE games ADD COLUMN IF NOT EXISTS board_instances JSONB NOT NULL DEFAULT \'{}\'');
     await db.query('ALTER TABLE games ADD COLUMN IF NOT EXISTS anchors JSONB NOT NULL DEFAULT \'[]\'');
     await db.query('ALTER TABLE games ADD COLUMN IF NOT EXISTS practice_maturity JSONB NOT NULL DEFAULT \'{}\'');
+    await db.query('ALTER TABLE games ADD COLUMN IF NOT EXISTS board_rev INTEGER NOT NULL DEFAULT 0');
+    const rev = (expected_rev === undefined || expected_rev === null) ? null : Number(expected_rev);
     const { rows } = await db.query(`
       UPDATE games SET
         board_state = $1, agent_assignments = $2, active_drivers = $3,
@@ -251,9 +257,11 @@ app.put('/api/games/:gameId', async (req, res) => {
         experiment_results = $13, practice_repetitions = $14,
         transformation_horizons = $15, board_milestones = $16, board_risks = $17,
         loop_sessions = $18, board_instances = $19, anchors = $20,
-        practice_maturity = $21, updated_at = NOW()
+        practice_maturity = $21, updated_at = NOW(),
+        board_rev = COALESCE(board_rev, 0) + 1
       WHERE id = $22
-      RETURNING id, updated_at
+        AND ($23::int IS NULL OR COALESCE(board_rev, 0) = $23::int)
+      RETURNING id, updated_at, board_rev
     `, [
       JSON.stringify(board_state), JSON.stringify(agent_assignments),
       JSON.stringify(active_drivers), cycle_number, cycle_phase,
@@ -268,9 +276,15 @@ app.put('/api/games/:gameId', async (req, res) => {
       JSON.stringify(board_instances || {}),
       JSON.stringify(anchors || []),
       JSON.stringify(practice_maturity || {}),
-      req.params.gameId
+      req.params.gameId,
+      rev
     ]);
-    if (!rows.length) return res.status(404).json({ error: 'Game not found' });
+    if (!rows.length) {
+      // Zero rows: either the game doesn't exist (404) or the rev check failed (409).
+      const cur = await db.query('SELECT board_rev FROM games WHERE id = $1', [req.params.gameId]);
+      if (!cur.rows.length) return res.status(404).json({ error: 'Game not found' });
+      return res.status(409).json({ error: 'conflict', board_rev: cur.rows[0].board_rev });
+    }
     res.json(rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -2894,8 +2908,15 @@ app.delete('/api/practices/:id', async (req, res) => {
 // cold start (they would silently destroy user-created capabilities and orphan board
 // practice data). They remain available only via the Super-Admin-gated endpoints
 // /api/admin/seed-ops, /api/admin/seed-ta and /api/admin/seed-capabilities.
+// Additive column guard: optimistic-concurrency revision counter on games.
+async function ensureGamesBoardRev() {
+  try {
+    await db.query("ALTER TABLE games ADD COLUMN IF NOT EXISTS board_rev INTEGER NOT NULL DEFAULT 0");
+  } catch (err) { console.error('board_rev column guard error:', err.message); }
+}
 if (process.env.VERCEL) {
-  seedCapabilitiesIfEmpty()
+  ensureGamesBoardRev()
+    .then(seedCapabilitiesIfEmpty)
     .then(remapCapabilityDomains)
     .then(ensureAICapabilities)
     .then(ensureOpsCapabilities)
@@ -2908,6 +2929,7 @@ if (process.env.VERCEL) {
   app.listen(PORT, async () => {
     console.log(`Nexus server running on http://localhost:${PORT}`);
     try {
+      await ensureGamesBoardRev();
       await seedCapabilitiesIfEmpty();
       await remapCapabilityDomains();
       await ensureAICapabilities();
