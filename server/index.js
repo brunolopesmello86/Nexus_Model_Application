@@ -42,8 +42,38 @@ app.use('/api', async (req, res, next) => {
   try { await ensureSchema(); next(); } catch (e) { next(); }
 });
 
+// ── Per-IP rate limit on sensitive auth POSTs (login, codes, resets) ──
+// Dependency-free, in-memory. On serverless this is per-instance, so it blunts
+// bursts rather than being a hard global cap — the per-account lockout and the
+// per-user code limits (both DB-backed) remain the primary defenses.
+// GETs (e.g. /api/auth/me, called on every page load) are exempt, and the budget
+// is generous because several facilitators can share one corporate egress IP.
+const _rlBuckets = new Map();
+const RL_WINDOW_MS = 10 * 60 * 1000;  // 10 minutes
+const RL_MAX_POSTS = 60;              // per IP per window
+function authRateLimit(req, res, next) {
+  if (req.method !== 'POST') return next();
+  const ip = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim()
+    || (req.socket && req.socket.remoteAddress) || 'unknown';
+  const now = Date.now();
+  let b = _rlBuckets.get(ip);
+  if (!b || now > b.reset) { b = { n: 0, reset: now + RL_WINDOW_MS }; _rlBuckets.set(ip, b); }
+  b.n++;
+  if (b.n > RL_MAX_POSTS) {
+    res.set('Retry-After', String(Math.ceil((b.reset - now) / 1000)));
+    return res.status(429).json({ error: 'Too many attempts — please wait a few minutes and try again.' });
+  }
+  next();
+}
+// Sweep expired buckets so the map can't grow unbounded on a long-lived instance.
+const _rlSweep = setInterval(() => {
+  const now = Date.now();
+  for (const [k, b] of _rlBuckets) if (now > b.reset) _rlBuckets.delete(k);
+}, 60 * 1000);
+if (_rlSweep.unref) _rlSweep.unref();
+
 // ── Auth: login & access control (signup, verification code, password) ──
-app.use('/api/auth', require('./auth/routes'));
+app.use('/api/auth', authRateLimit, require('./auth/routes'));
 // ── Admin console API (step 5) — Super-Admin only ──
 app.use('/api/console', require('./auth/admin'));
 
@@ -208,10 +238,14 @@ app.patch('/api/games/:gameId/password', async (req, res) => {
   }
 });
 
-// Verify game password before entering
+// Verify game password before entering.
+// Board-gated when enforcement is on: this used to be an open, unthrottled oracle
+// against the legacy board password — now only members (or the Super Admin) of the
+// board can even reach it, matching GET /api/games/:gameId (404 for everyone else).
 app.post('/api/games/:gameId/verify', async (req, res) => {
   const { password } = req.body;
   try {
+    if (ENFORCE() && !(await requireBoard(req, res, req.params.gameId))) return;
     const { rows } = await db.query('SELECT password_hash FROM games WHERE id = $1', [req.params.gameId]);
     if (!rows.length) return res.status(404).json({ error: 'Game not found' });
     const game = rows[0];
@@ -2810,8 +2844,12 @@ app.post('/api/admin/seed-capabilities', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// The capability/practice catalog is Creatività IP — session-gated when
+// enforcement is on (the app only fetches it after a board is opened, which
+// already requires a signed-in member).
 app.get('/api/capabilities', async (req, res) => {
   try {
+    if (ENFORCE() && !(await requireSession(req, res))) return;
     const caps = await db.query('SELECT * FROM capabilities ORDER BY sort_order, name');
     const pracs = await db.query('SELECT * FROM practices ORDER BY capability_id, sort_order, name');
     const result = caps.rows.map(c => ({
