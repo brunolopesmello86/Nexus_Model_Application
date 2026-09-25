@@ -459,10 +459,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .board-hex .remove-hex:hover { background:#D9534F; transform:scale(1.12); }
 
 /* Agent badges */
-.agent-badge { width:23px; height:20px; clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); border-radius:0; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:opacity .15s; color:#050D18; }
-.agent-badge:hover { opacity:.7; }
-.agent-badge svg { width:15px; height:15px; }
-.agent-badge.human, .agent-badge.systemic, .agent-badge.ai { background:#F2C879; }
 
 /* Axis labels — subtle vertical cues */
 .axis-label-left, .axis-label-right { position:absolute; top:50%; writing-mode:vertical-rl; font-size:8px; font-weight:500; letter-spacing:1.5px; text-transform:uppercase; z-index:5; pointer-events:none; opacity:.25; }
@@ -593,9 +589,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .ct-agent.selected .agent-circle { border-color:var(--accent); box-shadow:0 0 8px rgba(25,167,161,.3); }
 .ct-marker { display:flex; flex-direction:column; align-items:center; gap:2px; cursor:pointer; transition:all .15s; }
 .ct-marker:hover { transform:scale(1.08); }
-.ct-marker .marker-circle { width:26px; height:26px; font-size:11px; }
 .ct-marker .marker-label { font-size:8px; color:var(--text-muted); }
-.ct-marker.selected .marker-circle { box-shadow:0 0 8px rgba(25,167,161,.4); border-color:var(--accent); }
 .connect-toolbar .ct-label { font-size:9px; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); margin-right:4px; display:flex; align-items:center; gap:4px; }
 .connect-btn { padding:4px 12px; border-radius:16px; border:1px solid var(--border); background:var(--surface2); color:var(--text-muted); font-size:10px; cursor:pointer; transition:all .15s; display:inline-flex; align-items:center; gap:5px; }
 .connect-btn:hover { border-color:var(--accent); color:var(--text); }
@@ -629,14 +623,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 
 /* ══ MARKERS (S2F / Capabilities) ══ */
 .marker-section { margin-top:12px; }
-.marker-palette { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
-.marker-pal { display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; transition:all .15s; }
-.marker-pal:hover { transform:scale(1.05); }
-.marker-circle { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; border:2px solid var(--border); transition:border-color .15s; color:#fff; }
-.marker-pal.selected .marker-circle { border-color:var(--accent); box-shadow:0 0 12px rgba(25,167,161,.3); }
-.marker-pal .marker-label { font-size:8px; color:var(--text-muted); text-align:center; max-width:55px; }
-.marker-circle.s2f { background:#8b8b8b; }
-.marker-circle.capability { background:var(--cyan); }
 /* Marker badges on board hexes */
 .bh-markers { display:flex; gap:4px; margin-top:4px; }
 .marker-badge { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:#fff; cursor:pointer; }
@@ -858,8 +844,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .cl-prac-detail-name { font-size:12.5px; font-weight:700; flex:1; line-height:1.3; }
 .cl-prac-detail-desc { font-size:11px; color:var(--text-muted); line-height:1.55; margin-bottom:10px; }
 /* Shared modal overlay style */
-#capSelectorModal,#capSimpleModal,#s2fPracticeModal,#transPickerModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:9999; align-items:center; justify-content:center; }
-#capSelectorModal.open,#capSimpleModal.open,#s2fPracticeModal.open,#transPickerModal.open { display:flex; }
+#capSelectorModal,#s2fPracticeModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:9999; align-items:center; justify-content:center; }
+#capSelectorModal.open,#s2fPracticeModal.open { display:flex; }
 .cap-sel-box { background:var(--surface); border:1px solid var(--border); border-radius:12px; width:500px; max-height:80vh; display:flex; flex-direction:column; }
 .cap-sel-hdr { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; }
 .cap-sel-hdr h3 { font-size:13px; font-weight:700; flex:1; margin:0; }
@@ -951,10 +937,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .rp-slide-hdr { background:#235B4E; padding:14px 24px; display:flex; align-items:center; justify-content:space-between; gap:14px; border-bottom:4px solid #f5821f; }
 .rp-slide-title { font-size:16px; font-weight:800; color:#fff; letter-spacing:-.2px; }
 .rp-slide-brand { font-size:8.5px; font-weight:800; letter-spacing:1.4px; color:#6FB3A2; text-transform:uppercase; white-space:nowrap; }
-.rp-ntt { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:800; letter-spacing:1.4px; color:#fff; white-space:nowrap; }
-.rp-ntt::before { content:''; width:10px; height:10px; border-radius:50%; border:2px solid #fff; flex-shrink:0; }
-.rp-ntt.sm { font-size:9.5px; letter-spacing:1px; }
-.rp-ntt.sm::before { width:8px; height:8px; border-width:1.5px; }
 .rp-slide-hdr-btn { background:#f5821f; color:#fff; border:none; padding:6px 14px; border-radius:6px; font-size:10.5px; font-weight:800; cursor:pointer; white-space:nowrap; }
 .rp-slide-body { padding:20px 24px 24px; }
 .rp-slide-sub { font-size:11.5px; font-style:italic; color:#5a6b84; margin-bottom:16px; }
@@ -1492,7 +1474,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .agent-circle { clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); border-radius:0; border:none; }
 .agent-circle.human, .agent-circle.systemic, .agent-circle.ai { background:#F2C879; }
 .agent-circle svg { width:60%; height:60%; color:#050D18; }
-.marker-circle { clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); border-radius:0; }
 :root:not([data-theme="light"]) .connect-toolbar { background:#07182A; border-bottom:1px solid #1E4266; padding:8px 14px; }
 :root:not([data-theme="light"]) .connect-toolbar .ct-label { font-weight:800; letter-spacing:1.8px; color:var(--text-muted); }
 :root:not([data-theme="light"]) .ct-agent .agent-label, :root:not([data-theme="light"]) .marker-label { letter-spacing:.5px; }
@@ -1779,22 +1760,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
   <div class="modal" style="max-width:620px;">
     <h2>How to Play the Nexus Game</h2>
     <p>A <strong>strategic sensemaking game</strong> where participants navigate organizational transformation by mapping patterns, replacing anti-patterns, and guiding the system toward adaptive fitness.</p>
-    <h3>The Board — 3 Zones × 2 Lanes</h3>
+    <h3>The Board</h3>
     <div class="htp-cards">
       <div class="htp-card red">
         <div class="htp-icon">◀</div>
         <div class="htp-label">Current Reality</div>
-        <div class="htp-desc">Where anti-patterns live. Constraints, inertia, legacy habits that block progress.</div>
+        <div class="htp-desc">The backlog drawer on the left. Anti-patterns and signals you've sensed, waiting to be worked.</div>
       </div>
       <div class="htp-card orange">
-        <div class="htp-icon">⟷</div>
+        <div class="htp-icon">⬡</div>
         <div class="htp-label">Transformation Path</div>
-        <div class="htp-desc">Transitional space for experiments, bridges, and safe-to-fail learning.</div>
+        <div class="htp-desc">The hex grid itself. Map the chain Anti-Pattern → Capability → Agent → Pattern and run experiments along it.</div>
       </div>
       <div class="htp-card green">
-        <div class="htp-icon">▶</div>
+        <div class="htp-icon">📈</div>
         <div class="htp-label">Improved Fitness</div>
-        <div class="htp-desc">Enabling patterns and adaptive capacity. The direction of travel.</div>
+        <div class="htp-desc">The metrics panel on the right. Practice fitness, OKR horizons and experiment outcomes — the direction of travel.</div>
       </div>
     </div>
     <div class="htp-cards">
@@ -1826,23 +1807,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
         <div class="htp-label" style="color:var(--gray)">Transitions</div>
         <div class="htp-desc">Safe bridges between states. Place in Transformation Path and confirm when successful.</div>
       </div>
+      <div class="htp-card cyan">
+        <div class="htp-icon">⬡</div>
+        <div class="htp-label">Capabilities</div>
+        <div class="htp-desc">Maturity areas from the Capabilities Library, each carrying its practices. Experiments are built against their practices.</div>
+      </div>
     </div>
-    <h3>Connections & Markers</h3>
+    <h3>Connections & Experiments</h3>
     <div class="htp-cards">
       <div class="htp-card" style="border-color:rgba(25,167,161,.3);background:rgba(25,167,161,.06);">
         <div class="htp-icon">🔗</div>
-        <div class="htp-label" style="color:var(--accent)">Links</div>
-        <div class="htp-desc">Draw <em>Transition Nexus</em> arrows between hexes. Click the button → source hexagon → target hexagon.</div>
+        <div class="htp-label" style="color:var(--accent)">Transition Nexus</div>
+        <div class="htp-desc">Draw nexus arrows between hexes. Click the button → source hexagon → target hexagon.</div>
       </div>
-      <div class="htp-card" style="border-color:rgba(139,148,158,.25);background:rgba(139,148,158,.05);">
-        <div class="htp-icon">S2F</div>
-        <div class="htp-label" style="color:var(--gray)">S2F Marker</div>
-        <div class="htp-desc">Safe-to-Fail Experiment. Small, contained probe with a clear hypothesis. +2 pts when run, +3 if passed.</div>
-      </div>
-      <div class="htp-card cyan">
-        <div class="htp-icon">C</div>
-        <div class="htp-label">Capability</div>
-        <div class="htp-desc">Mark organizational capabilities that need to be developed or leveraged. +5 pts each.</div>
+      <div class="htp-card" style="border-color:rgba(232,148,58,.3);background:rgba(232,148,58,.06);">
+        <div class="htp-icon">🧪</div>
+        <div class="htp-label" style="color:var(--orange)">Experiments</div>
+        <div class="htp-desc">Built on a Transition Nexus: click the 🧪 on any line touching a Capability hex, pick a practice, then track it on the Experiments tab — safe-to-fail probes with a clear hypothesis.</div>
       </div>
     </div>
     <h3>The Mobius Cycle</h3>
@@ -1853,7 +1834,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
       <div class="htp-phase"><div class="htp-icon">🔒</div><div class="htp-label">Stabilize</div><div class="htp-desc">Lock gains, codify</div></div>
       <div class="htp-phase"><div class="htp-icon">🌊</div><div class="htp-label">Diffuse</div><div class="htp-desc">Storytelling & adoption</div></div>
     </div>
-    <h3>Agents of Change</h3>
+    <h3>Agents of Change — placed as their own hexes</h3>
     <div class="htp-cards">
       <div class="htp-card" style="border-color:rgba(200,200,200,.2);background:rgba(200,200,200,.04);">
         <div class="htp-icon">🧑</div>
@@ -1876,7 +1857,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
       <div class="htp-card" style="border-color:rgba(25,167,161,.3);background:rgba(25,167,161,.06);">
         <div class="htp-icon">📈</div>
         <div class="htp-label" style="color:var(--accent)">Rising Fitness</div>
-        <div class="htp-desc">Patterns in path zones +3. Capabilities +5. S2F experiments +2/+3. Transitions +1. Agents & drivers add bonuses.</div>
+        <div class="htp-desc">Organizational Fitness is the average of every board practice's Fitness Score — habit maturity gated by repetition, +6 per adopted experiment, −1 per abandoned one.</div>
       </div>
       <div class="htp-card" style="border-color:rgba(56,178,160,.25);background:rgba(56,178,160,.05);">
         <div class="htp-icon">♾️</div>
@@ -1912,24 +1893,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 </div>
 
 
-<!-- Simple Capability Modal (drag C → hex) -->
-<div id="capSimpleModal">
-  <div class="cap-sel-box" style="max-width:420px;">
-    <div class="cap-sel-hdr">
-      <h3 id="capSimpleTitle">Link Capabilities</h3>
-      <button onclick="closeCapSimple()">✕</button>
-    </div>
-    <div class="cap-sel-body" id="capSimpleBody"></div>
-    <div class="cap-sel-footer">
-      <button class="btn" style="color:var(--red);border-color:var(--red);margin-right:auto;" onclick="removeCapSimple()">✕ Remove</button>
-      <button class="btn" style="color:var(--cyan);border-color:var(--cyan);" onclick="buildCapExperiment()">🧪 Build Experiment</button>
-      <button class="btn" onclick="closeCapSimple()">Cancel</button>
-      <button class="btn btn-primary" onclick="saveCapSimple()">Link</button>
-    </div>
-  </div>
-</div>
-
-<!-- S2F Practice Picker Modal (drag S2F → hex with capabilities) -->
+<!-- Experiment Practice Picker Modal (🧪 on a Transition Nexus) -->
 <div id="s2fPracticeModal">
   <div class="cap-sel-box" style="max-width:420px;">
     <div class="cap-sel-hdr">
@@ -1943,28 +1907,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
   </div>
 </div>
 
-<!-- Transition Picker Modal (click nexus badge) -->
-<div id="transPickerModal">
-  <div class="cap-sel-box" style="max-width:440px;">
-    <div class="cap-sel-hdr">
-      <h3>Assign Transition to Nexus</h3>
-      <button onclick="closeTransPicker()">✕</button>
-    </div>
-    <div style="padding:10px 14px;border-bottom:1px solid var(--border);">
-      <input id="transSearchInput" type="text" placeholder="Search or create transition…"
-        style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:12px;outline:none;"
-        oninput="filterTransPicker(this.value)" autocomplete="off">
-    </div>
-    <div class="cap-sel-body" id="transPickerBody"></div>
-    <div class="cap-sel-footer">
-      <button class="btn" style="color:var(--red);border-color:var(--red);margin-right:auto;" onclick="removeTransFromConn()">✕ Remove</button>
-      <button class="btn" onclick="closeTransPicker()">Cancel</button>
-      <button class="btn btn-primary" onclick="saveTransition()">Assign</button>
-    </div>
-  </div>
-</div>
 
-<!-- Capability Selector Modal (edit existing C badge) -->
+<!-- Capability Selector Modal (edit a hex's capability links, opened from the fitness panel) -->
 <div id="capSelectorModal">
   <div class="cap-sel-box">
     <div class="cap-sel-hdr">
@@ -2394,7 +2338,6 @@ let gridState = {}; // {"row,col": instanceId}
 let boardInstances = {}; // {instanceId: itemId} — allows same item on multiple hexes
 let driverAssignments = {};
 let selectedDriver = null;
-let currentFilter = 'all';
 let searchQuery = '';
 let cyclePhase = 0, cycleNumber = 1;
 let completedPhases = new Set();
@@ -2415,7 +2358,7 @@ let selectedDomainColor = null;
 let experimentResults = {}; // {key: {stage, practiceId, hypothesis, result}}
 // Key format: connId::pracId (nexus+practice), connId (nexus no-practice), hexId (legacy)
 // ══════════════════════════════════════════
-// CODEX CARD DETAILS — NTT-DATA-Nexus-Codex-Patterns-Deck v1.2.5
+// CODEX CARD DETAILS — Nexus-Codex-Patterns-Deck v1.2.5
 // {n: card number in deck, e: essence, s: observable signals, i: system impact, note: nexus note/warning}
 // The CLASS chip shown on cards comes from the item's own class (item.domain).
 // Items without an entry fall back to their short signal/impact.
@@ -3914,7 +3857,7 @@ function renderExperimentsPage() {
     html += `<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--text-muted);">
       <div style="font-size:36px;">🧪</div>
       <div style="font-size:13px;font-weight:600;">No experiments yet</div>
-      <div style="font-size:11px;">Place a <strong>Capability</strong> hex on the board, click its <strong>C</strong> badge, then <strong>🧪 Build Experiment</strong> against one of its practices</div>
+      <div style="font-size:11px;">Place a <strong>Capability</strong> hex on the board, draw a <strong>Transition Nexus</strong> to it, then click the <strong>🧪</strong> on the line to build an experiment against one of its practices</div>
     </div>`;
     page.innerHTML = html;
     return;
@@ -4034,7 +3977,7 @@ function showReadinessModal(key) {
     <button class="codex-close" onclick="closeCardModal()">✕</button>
     <div class="cd-title" style="font-size:16px">🧪 Experiment Readiness ${r.ready?'— ready to run':'— not ready yet'}</div>
     <div class="rdy-list">
-      ${row(r.capOnBoard, 'Capability on the board', 'The capability this practice belongs to must be placed on the board (capability hex or C-marker).')}
+      ${row(r.capOnBoard, 'Capability on the board', 'The capability this practice belongs to must be placed on the board as a Capability hex.')}
       ${row(r.practiceSelected, 'One practice assigned', 'This experiment must have exactly one practice linked to it.')}
       ${r.isCapExp ? '' : row(r.nexusLink, 'Transition Nexus link', 'The experiment must sit on a live Transition Nexus line between hexes.')}
       ${row(r.habits3, 'Practice evaluated — ≥3 good habits', `Score at least 3 good habits for this practice in the Practices tab (currently ${habitsN}).`)}
@@ -17832,70 +17775,7 @@ function getCapabilityIds(marker) {
   return [];
 }
 
-// ── Simple Capability Selector (drag C → hex) ──
-let _capSimpleHexId = null;
-function openCapSimple(hexId) {
-  _capSimpleHexId = hexId;
-  const item = resolveItem(hexId);
-  document.getElementById('capSimpleTitle').textContent = 'Link Capabilities — ' + (item?.name || hexId);
-  const existing = boardMarkers.find(m=>m.hexId===hexId&&m.type==='capability');
-  const selIds = new Set(getCapabilityIds(existing));
-  const body = document.getElementById('capSimpleBody');
-  if (!body) return;
-  if (capabilitiesLibrary.length === 0) {
-    body.innerHTML = `<p style="font-size:12px;color:var(--text-muted);padding:12px;">No capabilities defined. Go to the <strong>◈ Capabilities Library</strong> tab to add some.</p>`;
-  } else {
-    body.innerHTML = capabilitiesLibrary.map(cap => `
-      <div class="cap-sel-item${selIds.has(cap.id)?' selected':''}" id="csi2_${cap.id}" onclick="toggleCapSimpleCheck('${cap.id}')">
-        <div class="cap-sel-cap" style="padding:10px 12px;">
-          <input type="checkbox" id="cscc_${cap.id}" ${selIds.has(cap.id)?'checked':''} style="pointer-events:none;">
-          <div>
-            <div class="cap-sel-cap-name">${escHtml(cap.name)}</div>
-            ${cap.description?`<div class="cap-sel-cap-desc">${escHtml(cap.description)}</div>`:''}
-            <div style="font-size:9px;color:var(--text-muted);margin-top:2px;">${cap.practices.length} practices</div>
-          </div>
-        </div>
-      </div>`).join('');
-  }
-  document.getElementById('capSimpleModal').classList.add('open');
-}
-function toggleCapSimpleCheck(capId) {
-  const item = document.getElementById('csi2_' + capId);
-  const cb = document.getElementById('cscc_' + capId);
-  if (!item || !cb) return;
-  const newState = !item.classList.contains('selected');
-  item.classList.toggle('selected', newState);
-  cb.checked = newState;
-}
-function closeCapSimple() {
-  _capSimpleHexId = null;
-  document.getElementById('capSimpleModal').classList.remove('open');
-}
-function removeCapSimple() {
-  const hexId = _capSimpleHexId;
-  if (!hexId) return;
-  boardMarkers = boardMarkers.filter(m=>!(m.hexId===hexId&&m.type==='capability'));
-  addLog(`Removed capability from "${resolveItem(hexId)?.name||hexId}"`, 'warning');
-  closeCapSimple();
-  renderAllZones(); renderFitnessPanel(); updateStats(); scheduleAutoSave();
-}
-function saveCapSimple() {
-  const hexId = _capSimpleHexId;
-  if (!hexId) return;
-  const capabilityIds = capabilitiesLibrary
-    .filter(cap => document.getElementById('cscc_' + cap.id)?.checked)
-    .map(cap => cap.id);
-  boardMarkers = boardMarkers.filter(m=>!(m.hexId===hexId&&m.type==='capability'));
-  if (capabilityIds.length > 0) {
-    boardMarkers.push({id:'mk_'+Date.now(), hexId, type:'capability', capabilityIds});
-    const names = capabilityIds.map(id=>capabilitiesLibrary.find(c=>c.id===id)?.name).filter(Boolean).join(', ');
-    addLog(`Linked capabilities "${names}" to "${resolveItem(hexId)?.name}"`, 'success');
-  }
-  closeCapSimple();
-  renderAllZones(); renderFitnessPanel(); updateStats(); scheduleAutoSave();
-}
-
-// ── S2F Practice Picker (drag S2F → hex with capabilities) ──
+// ── Experiment Practice Picker (🧪 on a Transition Nexus) ──
 // _s2fKey: connection id (nexus line experiment) or hex id (legacy)
 let _s2fKey = null;
 function openS2FModal(connIdOrHexId) {
@@ -17949,12 +17829,9 @@ function openS2FModal(connIdOrHexId) {
 }
 function closeS2FModal() {
   _s2fKey = null;
-  _capExpHexId = null;
   document.getElementById('s2fPracticeModal').classList.remove('open');
 }
-// ── Build Experiment directly from a capability hex (no S2F marker / no nexus line) ──
-// Each experiment = 1 capability hex + 1 practice (key `hexId::practiceId`).
-let _capExpHexId = null;
+// Capabilities carried by a hex: its intrinsic _capRef plus any legacy capability marker.
 function capHexCapIds(hexId) {
   const item = resolveItem(hexId);
   const mk = boardMarkers.find(m => m.hexId === hexId && m.type === 'capability');
@@ -17962,62 +17839,7 @@ function capHexCapIds(hexId) {
   if (item && item.type === 'capability' && item._capRef && !ids.includes(item._capRef)) ids.push(item._capRef);
   return ids;
 }
-function buildCapExperiment(hexId) {
-  hexId = hexId || _capSimpleHexId || _capSelHexId;
-  if (!hexId) return;
-  closeCapSimple();
-  _capExpHexId = hexId;
-  _s2fKey = null;
-  const item = resolveItem(hexId);
-  const capIds = capHexCapIds(hexId);
-  const pracsByCap = capIds.map(cid => {
-    const cap = capabilitiesLibrary.find(c => c.id === cid);
-    return cap ? { cap, practices: cap.practices } : null;
-  }).filter(Boolean);
-  document.getElementById('s2fModalTitle').textContent = 'Build Experiment — ' + (item?.name || hexId);
-  const existing = new Set(Object.keys(experimentResults)
-    .filter(k => k.startsWith(hexId + '::')).map(k => k.split('::')[1]));
-  const body = document.getElementById('s2fModalBody');
-  if (pracsByCap.length === 0) {
-    body.innerHTML = `<p style="font-size:12px;color:var(--text-muted);padding:12px;">No capability linked to this hex yet.<br><br>Link a capability first (the <strong>C</strong> badge), then build an experiment against one of its practices.</p>`;
-  } else {
-    body.innerHTML = pracsByCap.map(({cap, practices}) => `
-      <div style="margin-bottom:10px;">
-        <div style="font-size:10px;font-weight:700;color:var(--cyan);padding:6px 12px;background:var(--surface2);border-radius:4px;margin-bottom:4px;">◈ ${escHtml(cap.name)}</div>
-        ${practices.length === 0 ? `<div style="font-size:11px;color:var(--text-muted);padding:6px 12px;">No practices defined for this capability.</div>` : practices.map(p => {
-          const already = existing.has(p.id);
-          const h = pmHabits(p.id).length;
-          const ok3 = h >= 3;
-          return `
-          <label class="cap-sel-prac-row" style="padding:8px 12px;display:flex;gap:8px;align-items:flex-start;cursor:pointer;border-radius:6px;margin-bottom:2px;" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background=''">
-            <input type="checkbox" name="capexp_prac" id="capexp_${p.id}" value="${p.id}" ${already?'checked disabled':''} style="margin-top:2px;flex-shrink:0;">
-            <div>
-              <div class="cap-sel-prac-name">${escHtml(p.name)}${already?' <span style="font-size:9px;color:var(--cyan);">✓ experiment exists</span>':''}</div>
-              ${p.description?`<div class="cap-sel-prac-desc">${escHtml(p.description)}</div>`:''}
-              <div style="font-size:9px;margin-top:2px;color:${ok3?'#2d9d5e':'#E2801E'};">${ok3?`✓ ${h} good habits evaluated`:`⚠ ${h}/3 good habits — needs ≥3 before it can leave Pending`}</div>
-            </div>
-          </label>`;}).join('')}
-      </div>`).join('');
-  }
-  document.getElementById('s2fPracticeModal').classList.add('open');
-}
-function saveCapExperiment() {
-  const hexId = _capExpHexId;
-  if (!hexId) return;
-  const checked = [...document.querySelectorAll('input[name="capexp_prac"]:checked:not([disabled])')].map(i => i.value);
-  if (checked.length === 0) { showToast('Select at least one practice to build an experiment', 'info'); return; }
-  checked.forEach(pracId => {
-    const expKey = hexId + '::' + pracId;
-    if (!experimentResults[expKey]) experimentResults[expKey] = { stage: 'pending', practiceId: pracId, gated: true, capExp: true };
-  });
-  const item = resolveItem(hexId);
-  addLog(`Built experiment on "${item?.name || hexId}" (${checked.length} practice${checked.length>1?'s':''})`, 'success');
-  closeS2FModal();
-  renderAllZones(); renderExperimentsPage(); renderFitnessPanel(); updateStats(); scheduleAutoSave();
-  showToast(`Experiment${checked.length>1?'s':''} added to the tracker — open the 🧪 Experiments tab`, 'success');
-}
 function saveS2FExperiment() {
-  if (_capExpHexId) { saveCapExperiment(); return; }
   const key = _s2fKey;
   if (!key) return;
   const conn = connections.find(c => c.id === key);
@@ -18045,73 +17867,6 @@ function saveS2FExperiment() {
   }
   closeS2FModal();
   renderConnections(); renderAllZones(); renderExperimentsPage(); renderFitnessPanel(); updateStats(); scheduleAutoSave();
-}
-
-// ── Transition Picker (click nexus badge) ──
-let _transConnId = null;
-function openTransPicker(connId) {
-  _transConnId = connId;
-  const inp = document.getElementById('transSearchInput');
-  if (inp) inp.value = '';
-  filterTransPicker('');
-  document.getElementById('transPickerModal').classList.add('open');
-  setTimeout(() => inp?.focus(), 50);
-}
-function filterTransPicker(q) {
-  const conn = connections.find(c=>c.id===_transConnId);
-  const current = conn?.transitionId || '';
-  const body = document.getElementById('transPickerBody');
-  if (!body) return;
-  const ql = q.toLowerCase().trim();
-  const all = allItems.filter(i=>i.type==='transition');
-  const matched = ql ? all.filter(t=>t.name.toLowerCase().includes(ql)||t.signal.toLowerCase().includes(ql)) : all;
-  const exactMatch = all.some(t=>t.name.toLowerCase()===ql);
-  let html = matched.map(t => `
-    <label class="cap-sel-prac-row" style="padding:8px 12px;display:flex;gap:8px;align-items:flex-start;cursor:pointer;border-radius:6px;margin-bottom:2px;" onmouseover="this.style.background='rgba(255,255,255,.04)'" onmouseout="this.style.background=''">
-      <input type="radio" name="trans_pick" value="${t.id}" ${current===t.id?'checked':''} style="margin-top:2px;flex-shrink:0;">
-      <div>
-        <div style="font-size:11px;font-weight:600;">${escHtml(t.name)}</div>
-        ${t.signal?`<div style="font-size:9px;color:var(--text-muted);">${escHtml(t.signal)}</div>`:''}
-      </div>
-    </label>`).join('');
-  if (matched.length === 0 && !ql) {
-    html = `<p style="font-size:12px;color:var(--text-muted);padding:12px;">No transitions yet. Type a name above to create one.</p>`;
-  }
-  if (ql && !exactMatch) {
-    html += `<div style="padding:8px 12px;margin-top:4px;border-top:1px solid var(--border);">
-      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="createAndAssignTransition('${escHtml(q).replace(/'/g,"\\'")}')">
-        ＋ Create &amp; assign "${escHtml(q)}"
-      </button>
-    </div>`;
-  }
-  body.innerHTML = html;
-}
-function createAndAssignTransition(name) {
-  const newT = {id:'t_'+Date.now(), type:'transition', name:name.trim(), signal:'', impact:'', domain:DEFAULT_CLASS};
-  allItems.push(newT);
-  const conn = connections.find(c=>c.id===_transConnId);
-  if (conn) { conn.transitionId = newT.id; addLog(`Created & assigned transition "${newT.name}"`, 'success'); }
-  closeTransPicker(); renderConnections(); scheduleAutoSave();
-}
-function closeTransPicker() {
-  _transConnId = null;
-  document.getElementById('transPickerModal').classList.remove('open');
-}
-function removeTransFromConn() {
-  const conn = connections.find(c=>c.id===_transConnId);
-  if (conn) { conn.transitionId = null; addLog('Removed transition from Nexus line', 'warning'); }
-  closeTransPicker(); renderConnections(); scheduleAutoSave();
-}
-function saveTransition() {
-  const conn = connections.find(c=>c.id===_transConnId);
-  if (!conn) return;
-  const sel = document.querySelector('input[name="trans_pick"]:checked');
-  if (sel) {
-    conn.transitionId = sel.value;
-    const t = allItems.find(i=>i.id===sel.value);
-    addLog(`Assigned transition "${t?.name}" to Nexus line`, 'success');
-  }
-  closeTransPicker(); renderConnections(); scheduleAutoSave();
 }
 
 function saveCapabilityLink() {
@@ -18259,7 +18014,7 @@ function renderFitnessPanel() {
         `<div class="fp-sum-item"><div class="fp-sum-val" style="color:var(--green)">${totalReps}</div><div class="fp-sum-lbl">Total Reps</div></div>` +
       `</div>` +
       `<div class="fp-section"><h3>Capabilities Being Experimented</h3>` +
-        (capIds.length===0 ? `<div class="fp-empty">Drag C marker to a hex to link capabilities</div>` : (() => {
+        (capIds.length===0 ? `<div class="fp-empty">Place a Capability hex on the board to link capabilities</div>` : (() => {
           // Group capabilities across all marked hexes — support both new (capabilityIds) and old (capabilityLinks) formats
           const byCapId = {};
           capIds.forEach(hexId => {
@@ -18303,14 +18058,14 @@ function renderFitnessPanel() {
               `<button class="btn btn-sm" style="font-size:9px;padding:2px 7px;margin-top:4px;" onclick="openCapSelector('${hexId}')">Link capability</button>` +
             `</div>`;
           });
-          if (!html) html = `<div class="fp-empty">No capabilities linked yet — click "Edit Link" on a hex</div>`;
+          if (!html) html = `<div class="fp-empty">No capabilities linked yet — place a Capability hex on the board</div>`;
           // Add Edit link button
           html += `<button class="btn btn-sm" style="width:100%;margin-top:6px;font-size:10px;" onclick="openCapSelector('${capIds[0]}')">+ Edit Capability Links</button>`;
           return html;
         })()) +
       `</div>` +
       `<div class="fp-section"><h3>Experiments (${expCount})</h3>` +
-        (allExpKeys.length===0 ? `<div class="fp-empty">Build an experiment from a Capability hex (its C badge → 🧪 Build Experiment)</div>` :
+        (allExpKeys.length===0 ? `<div class="fp-empty">Draw a Transition Nexus to a Capability hex, then click the 🧪 on the line to build an experiment</div>` :
           allExpKeys.map(id=>{
             const er=experimentResults[id]||{};
             const st=er.status||'';
@@ -18477,7 +18232,7 @@ async function renderNewGameFlow() {
     <div class="gs-form">
       <div class="gs-form-title">🏢 New Organization</div>
       <input id="newCompName" placeholder="Organization name (e.g., Acme Corp)" autofocus>
-      <input id="newCompSlug" placeholder="Slug (e.g., ntt-data-dsa)" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'')">
+      <input id="newCompSlug" placeholder="Slug (e.g., acme-co)" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'')">
       <button class="btn btn-primary" onclick="createCompAndGame()">Create &amp; Continue →</button>
     </div>
   `;
@@ -18830,7 +18585,6 @@ function renderLibrary() {
   }).join('');
 }
 function filterLibrary(v){searchQuery=v;renderLibrary();}
-function setFilter(f,el){currentFilter=f;renderLibrary();}
 function toggleBacklog(){ const e=document.getElementById('hexBoardArea'); if(e) e.classList.toggle('bl-open'); }
 
 // ── Codex card modal ──
@@ -19086,27 +18840,11 @@ function renderBoard() {
       cell.setAttribute('data-parity', (row * 2 + col) % 3);
       { const tag = document.createElement('span'); tag.className = 'cell-tag'; tag.textContent = String.fromCharCode(65 + (col % 26)) + (row + 1); cell.appendChild(tag); }
       // Drag-drop
-      cell.addEventListener('dragover', e=>{e.preventDefault();e.dataTransfer.dropEffect=(draggedMarkerType||draggedAgentType)?'copy':'move';cell.classList.add('drag-over');});
+      cell.addEventListener('dragover', e=>{e.preventDefault();e.dataTransfer.dropEffect='move';cell.classList.add('drag-over');});
       cell.addEventListener('dragleave', ()=>cell.classList.remove('drag-over'));
       cell.addEventListener('drop', e=>{
         e.preventDefault();e.stopPropagation();cell.classList.remove('drag-over');
         clearZoneGuidance();
-        // Handle agent drag-and-drop
-        if(draggedAgentType) {
-          const hId = gridState[key];
-          const aType = draggedAgentType; draggedAgentType = null;
-          if(!hId){showToast('Place a card on this hex first','warning');return;}
-          assignAgent(hId, aType); return;
-        }
-        // Handle marker drag-and-drop
-        if(draggedMarkerType) {
-          const hId = gridState[key];
-          if(!hId){showToast('Place a card on this hex first','warning');draggedMarkerType=null;return;}
-          const mType = draggedMarkerType; draggedMarkerType=null;
-          if(mType==='capability'){openCapSimple(hId);return;}
-          if(mType==='s2f'){showToast('Drag S2F onto a Nexus line (the arrow connecting hexes)','info');return;}
-          return;
-        }
         if(!draggedId) return;
         const zone = getZoneFromCoords(row,col);
         const itemObj = resolveItem(draggedId);
@@ -19185,10 +18923,8 @@ function renderBoard() {
           if(connectMode){handleConnectClick(hexId);return;}
           if(selectedDomainId){toggleHexDomain(hexId);return;}
           if(selectedDriver){assignDriver(hexId,selectedDriver);selectedDriver=null;renderDrivers();return;}
-          if(selectedMarker){toggleMarker(hexId,selectedMarker);selectedMarker=null;document.querySelectorAll('.marker-pal').forEach(m=>m.classList.remove('selected'));return;}
-          if(selectedAgent){assignAgent(hexId,selectedAgent);selectedAgent=null;document.querySelectorAll('.agent-pal').forEach(a=>a.classList.remove('selected'));}
         });
-        el.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect=(draggedMarkerType||draggedAgentType)?'copy':'move';});
+        el.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';});
         el.addEventListener('dragstart',e=>{
           if(connectMode){e.preventDefault();return;}
           draggedId=hexId;dragSource=key;e.dataTransfer.effectAllowed='move';
@@ -19275,31 +19011,6 @@ function showToast(msg, type='warning') {
   if (_toastTimer) clearTimeout(_toastTimer);
   _toastTimer = setTimeout(()=>{ el.classList.remove('show'); }, 3500);
 }
-function checkPlacement(itemId, zone) {
-  const item = allItems.find(i=>i.id===itemId);
-  if (!item) return;
-  const guide = GUIDANCE[item.type];
-  if (!guide) return;
-  const allOk = [...guide.best, ...guide.ok];
-  if (!allOk.includes(zone)) {
-    showToast(`💡 ${guide.tip}`,'warning');
-  } else if (guide.best.includes(zone)) {
-    // Perfect placement — no toast needed
-  }
-}
-// 4.4 Agents: highlight hexes ON THE PATH (not destination)
-function showAgentHint() {
-  document.querySelectorAll('.board-hex.agent-hint').forEach(h=>h.classList.remove('agent-hint'));
-  if (!selectedAgent) return;
-  for(const[key,hexId]of Object.entries(gridState)){
-    const[r,c]=key.split(',').map(Number);
-    if(getZoneFromCoords(r,c).startsWith('path_')){
-      const el=document.querySelector(`[data-hex-id="${hexId}"]`);
-      if(el) el.classList.add('agent-hint');
-    }
-  }
-}
-
 // ══════════════════════════════════════════
 // DRAG & DROP (cell-level drops handled in renderZone)
 // ══════════════════════════════════════════
@@ -19317,33 +19028,6 @@ function removeHex(id,coordKey){
   domainDefinitions.forEach(d=>{d.hexIds=d.hexIds.filter(h=>h!==id);});
   const item=resolveItem(id);
   addLog(`Removed "${item?.name}"`,'warning');
-  renderAllZones();scheduleAutoSave();
-}
-
-// ══════════════════════════════════════════
-// AGENTS
-// ══════════════════════════════════════════
-function selectAgent(type){
-  if(selectedAgent===type){selectedAgent=null;document.querySelectorAll('.agent-pal').forEach(a=>a.classList.remove('selected'));showAgentHint();return;}
-  selectedAgent=type;
-  // Deselect markers and drivers when selecting agent
-  selectedMarker=null; document.querySelectorAll('.marker-pal').forEach(m=>m.classList.remove('selected'));
-  selectedDriver=null; renderDrivers();
-  document.querySelectorAll('.agent-pal').forEach(a=>a.classList.remove('selected'));
-  document.querySelector(`.agent-pal[data-agent="${type}"]`).classList.add('selected');
-  showAgentHint();
-  showToast('💡 Agents are placed ON THE PATH — they represent who can activate movement, not owners','hint');
-}
-function assignAgent(hexId,type){
-  if(!agentAssignments[hexId])agentAssignments[hexId]=[];
-  if(agentAssignments[hexId].some(a=>a.type===type)){
-    agentAssignments[hexId]=agentAssignments[hexId].filter(a=>a.type!==type);
-    addLog(`Removed ${type} agent from "${resolveItem(hexId)?.name}"`,'warning');
-  } else {
-    agentAssignments[hexId].push({type});
-    addLog(`Assigned ${type} agent to "${resolveItem(hexId)?.name}"`,'success');
-  }
-  showAgentHint();
   renderAllZones();scheduleAutoSave();
 }
 
@@ -19469,17 +19153,6 @@ function renderConnections() {
     // Midpoint interaction
     const mp = route.midPt;
     if (conn.type === 'nexus') {
-      // Hit path accepts S2F drag-drop
-      hit.addEventListener('dragover', e => {
-        if (draggedMarkerType === 's2f') { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; }
-      });
-      hit.addEventListener('drop', e => {
-        if (draggedMarkerType !== 's2f') return;
-        e.preventDefault(); e.stopPropagation();
-        draggedMarkerType = null;
-        openS2FModal(conn.id);
-      });
-
       // Helper: draw a small circular dot icon on the nexus line
       const makeDot = (cx, cy, fillColor, strokeColor, letter, tooltip, onClick, dashed) => {
         const R = 9;
@@ -19517,7 +19190,7 @@ function renderConnections() {
         ? (connExpKeys.length === 1
             ? `S2F: ${er?.practiceId ? (capabilitiesLibrary.flatMap(c=>c.practices).find(p=>p.id===er.practiceId)?.name || stagKey) : stagKey}`
             : `S2F: ${connExpKeys.length} experiments`)
-        : 'Click to add S2F experiment';
+        : 'Experiment stage';
       // Stage dot: shown for existing nexus experiments (view/edit their kanban stage).
       if (hasExp) {
         g.appendChild(makeDot(
@@ -19607,42 +19280,6 @@ function startAgentHexDrag(itemId, e) {
 function hintPlaceAgent() {
   if (window.showToast) showToast('Drag an Agent onto an empty hex cell to place it on the board', 'info');
 }
-function startAgentDrag(type, e) {
-  draggedAgentType = type;
-  e.dataTransfer.effectAllowed = 'copy';
-  e.dataTransfer.setData('text/plain', type);
-}
-function startMarkerDrag(type, e) {
-  draggedMarkerType = type;
-  draggedId = null; // Clear hex card drag to avoid conflicts
-  e.dataTransfer.effectAllowed = 'copy';
-  e.dataTransfer.setData('text/plain', 'marker:' + type);
-}
-function selectMarker(type) {
-  if (selectedMarker===type) { selectedMarker=null; document.querySelectorAll('.marker-pal').forEach(m=>m.classList.remove('selected')); return; }
-  selectedMarker=type;
-  // Deselect agents and drivers when selecting marker
-  selectedAgent=null; document.querySelectorAll('.agent-pal').forEach(a=>a.classList.remove('selected'));
-  selectedDriver=null; renderDrivers();
-  document.querySelectorAll('.marker-pal').forEach(m=>m.classList.remove('selected'));
-  document.querySelector(`.marker-pal[data-marker="${type}"]`).classList.add('selected');
-}
-function toggleMarker(hexId, type) {
-  if (type === 'capability') {
-    openCapSimple(hexId); // use simple selector (click on existing badge to edit)
-    return;
-  }
-  const idx = boardMarkers.findIndex(m=>m.hexId===hexId && m.type===type);
-  if (idx>=0) {
-    boardMarkers.splice(idx,1);
-    addLog(`Removed S2F Experiment from "${resolveItem(hexId)?.name}"`,'warning');
-  } else {
-    boardMarkers.push({id:'mk_'+Date.now(), hexId, type});
-    addLog(`Added S2F Experiment to "${resolveItem(hexId)?.name}"`,'success');
-  }
-  renderAllZones(); renderFitnessPanel(); scheduleAutoSave();
-}
-
 // ══════════════════════════════════════════
 // CATEGORIES & DRIVERS
 // ══════════════════════════════════════════
@@ -20044,7 +19681,6 @@ function deleteRisk(id) {
 }
 
 // ══════════════════════════════════════════
-const CRE_LOGO = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAzMDAgNTYnPjxnIGZpbGw9J25vbmUnIHN0cm9rZT0nI2ZmZmZmZicgc3Ryb2tlLXdpZHRoPSc0LjUnPjxjaXJjbGUgY3g9JzI2JyBjeT0nMjgnIHI9JzE3Jy8+PGxpbmUgeDE9JzE0JyB5MT0nNDAnIHgyPSczOCcgeTI9JzE2JyBzdHJva2UtbGluZWNhcD0ncm91bmQnLz48L2c+PHRleHQgeD0nNTInIHk9JzM4JyBmb250LWZhbWlseT0nU2Vnb2UgVUksSGVsdmV0aWNhLEFyaWFsLHNhbnMtc2VyaWYnIGZvbnQtc2l6ZT0nMzAnIGZvbnQtd2VpZ2h0PSc3MDAnIGZpbGw9JyNmZmZmZmYnPkNyZWF0aXZpdCYjMjI0Ozx0c3BhbiBmaWxsPScjZTA4YTJiJz4uY288L3RzcGFuPjwvdGV4dD48L3N2Zz4="; // Creatività Co. white wordmark (1549x318)
 function renderReportPage() {
   const page = document.getElementById('reportPage');
   if (!page) return;
@@ -20376,7 +20012,7 @@ function renderReportPage() {
               {label:'Experiments Adopted',    detail:`${bd.pracAdopted} validated (+${bd.pracAdopted*6})`, score:bd.pracAdopted, max:Math.max(1,bd.practiceCount)},
               {label:'Failed Experiments',     detail:`${bd.pracFailed} failed (−${bd.pracFailed})`, score:bd.pracFailed, max:Math.max(1,bd.practiceCount), penalty:true},
             ] : [
-              {label:'S2F Experiments Run',   detail:`${bd.expRan} experiments × 5 pts`,  score:bd.expRan*5,      max:40},
+              {label:'Experiments Run',   detail:`${bd.expRan} experiments × 5 pts`,  score:bd.expRan*5,      max:40},
               {label:'Experiments Adopted',   detail:`${bd.expAdopted} adopted × 10 pts`, score:bd.expAdopted*10, max:50},
               {label:'Practice Repetitions',  detail:`${bd.totalReps} reps × 2 pts`,      score:bd.repScore,      max:30},
             ]).map(r=>`
@@ -20468,7 +20104,7 @@ function renderReportPage() {
       <div class="rp-slide-body">
         <div class="rp-slide-sub">All active S2F experiments this cycle — hypothesis, status, and fitness impact</div>
         ${expEntries.length === 0
-          ? `<div class="rp-empty">No experiments registered yet. Add S2F markers to patterns on the board.</div>`
+          ? `<div class="rp-empty">No experiments registered yet. Draw a Transition Nexus to a Capability hex and click the 🧪 on the line.</div>`
           : `<div class="rp-exp-grid">${expEntries.map(([k,e],i)=>expCardHtml(k,e,i)).join('')}</div>
              <div class="rp-navy-strip">${expPassed} PASSED (<strong>+${expPassed*10} pts</strong>) · ${expRunning} RUNNING (<strong>+${expRunning*5} pts</strong>) · ${expPending} PENDING · Total experiment score: <strong>${bd.expScore} pts</strong></div>`
         }
@@ -20592,20 +20228,11 @@ function generateCyclePDF() {
   const pill = (x,y,w,h,c,label,fs) => { F(c); doc.roundedRect(x,y,w,h,h/2,h/2,'F'); doc.setFont('helvetica','bold'); doc.setFontSize(fs||7); C('#ffffff'); doc.text(label, x+w/2, y+h/2+(fs||7)*0.155, { align:'center' }); };
   const track = (x,y,w,h,pct,c) => { F(TRACK); doc.roundedRect(x,y,w,h,h/2,h/2,'F'); if(pct>0){ F(c); doc.roundedRect(x,y,Math.max(h,w*Math.min(1,pct/100)),h,h/2,h/2,'F'); } };
   const footer = () => { doc.setFont('helvetica','normal'); doc.setFontSize(8); C(SUB); doc.text('Nexus Transformation Board — Org Fitness Model · Confidential', W/2, H-5, { align:'center' }); };
-  // Creatività Co. wordmark (white) — small ring + text, right-aligned ending at xRight
-  // Creatività Co. white logo — aspect ratio 1549:318 (≈4.871). Draws right-aligned ending at xRight.
-  const NTT_AR = 1549 / 318;
-  // No logo in the PDF (removed per request). No-ops keep the layout calls harmless.
-  const nttImgRight = () => {};
-  const nttImgLeft  = () => {};
-  const nttImgCenter= () => {};
-
-  // Content page header — navy strip with orange rule (deck style)
+  // Content page header — navy strip with orange rule (deck style). No logos in the PDF.
   function hdr(title, sub) {
     BG();
     F(NAVY); doc.rect(0, 0, W, 20, 'F');
     doc.setFont('helvetica','bold'); doc.setFontSize(15); C('#ffffff'); doc.text(title, 12, 13);
-    nttImgRight(W-12, 5.6, 4.6);
     F(ORANGE); doc.rect(0, 20, W, 1.8, 'F');
     doc.setFont('helvetica','italic'); doc.setFontSize(9); C(MUT); doc.text(sub, 12, 29.5);
     doc.setFont('helvetica','normal'); doc.setFontSize(8); C(SUB);
@@ -20617,8 +20244,6 @@ function generateCyclePDF() {
   // PAGE 1 — COVER (deck slide 1 style)
   // ══════════════════════════════════════════════════════════════════════
   NAVYBG();
-  // Creatività Co. wordmark top-left (white)
-  nttImgLeft(24, 18, 7.5);
   const badge = 'CYCLE ' + cycleNumber + ' REVIEW  ·  NEXUS TRANSFORMATION BOARD';
   doc.setFont('helvetica','bold'); doc.setFontSize(8);
   const bw = doc.getTextWidth(badge) + 16;
@@ -20697,7 +20322,7 @@ function generateCyclePDF() {
     { l:'Experiments Adopted',   d:bd.pracAdopted + ' validated (+' + (bd.pracAdopted*6) + ')', s:bd.pracAdopted, max:Math.max(1,bd.practiceCount), neg:false },
     { l:'Failed Experiments',    d:bd.pracFailed + ' failed (−' + bd.pracFailed + ')',        s:bd.pracFailed, max:Math.max(1,bd.practiceCount), neg:true },
   ] : [
-    { l:'S2F Experiments Run',  d:bd.expRan + ' experiments × 5 pts',  s:bd.expRan*5,      max:40, neg:false },
+    { l:'Experiments Run',  d:bd.expRan + ' experiments × 5 pts',  s:bd.expRan*5,      max:40, neg:false },
     { l:'Experiments Adopted',  d:bd.expAdopted + ' adopted × 10 pts', s:bd.expAdopted*10, max:50, neg:false },
     { l:'Practice Repetitions', d:bd.totalReps + ' reps × 2 pts',      s:bd.repScore,      max:30, neg:false },
   ];
@@ -20951,8 +20576,6 @@ function generateCyclePDF() {
   doc.addPage();
   NAVYBG();
   F(ORANGE); doc.rect(0, 0, 3, H, 'F');
-  // Creatività Co. white logo, top-center
-  nttImgCenter(W/2, 28, 6.5);
   doc.setFont('helvetica','bold'); doc.setFontSize(8.5); C('#63b3ff'); doc.text('NEXUS TRANSFORMATION BOARD', W/2, 58, { align:'center' });
   doc.setFont('helvetica','bold'); doc.setFontSize(30); C('#ffffff');
   doc.text('Cycle ' + cycleNumber + ' · ' + fitTier, W/2, 82, { align:'center' });

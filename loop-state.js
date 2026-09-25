@@ -94,7 +94,7 @@ window.getLoopReadiness = function(phase) {
 
   if (phase === 1) {        // FOCUS → EXPERIMENT
     if (s.agents < 1) missing.push('Place at least 1 Agent on the board — nothing moves without one');
-    if (s.filled  < 1) missing.push('Build at least 1 experiment card (fully filled) from a capability hex');
+    if (s.filled  < 1) missing.push('Build at least 1 experiment card (fully filled) on a Transition Nexus');
   } else if (phase === 2) { // EXPERIMENT → STABILIZE
     if (s.total < 1) missing.push('This cycle has no experiments yet');
     else if (s.unresolved > 0) missing.push(s.unresolved + ' experiment' + (s.unresolved > 1 ? 's' : '') + ' still open — resolve every one (adopt / adapt / abandon) before closing the phase');

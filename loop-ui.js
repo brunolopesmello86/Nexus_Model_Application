@@ -300,7 +300,7 @@ function renderExperimentPhase(loop, ph) {
   return `
     <div class="loop-section">
       <div class="loop-section-title">Experiment cards <span class="loop-section-badge">${cards.length} card${cards.length!==1?'s':''}</span></div>
-      <div class="loop-exp-tip">Go to the board and place a Pattern tile + draw a Nexus connection + register an S2F experiment to enable advancing.</div>
+      <div class="loop-exp-tip">Go to the board, draw a Transition Nexus to a Capability hex, then click the 🧪 on the line to build an experiment.</div>
       ${cardsHtml}
     </div>`;
 }
