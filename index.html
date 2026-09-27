@@ -18966,12 +18966,16 @@ function addBoardCol(){GRID_COLS+=2;computeHexLayout();renderAllZones();}
 // 4.2 Patterns: center-right (rarely far right). Proven moves, not guarantees
 // 4.3 Transitions: diagonally between anti-patterns & patterns. Safe moves
 // 4.4 Agents: ON THE PATH, not at the destination. Forces, not owners
+// Zone guidance. The grid only has two real zones — path_strategic (upper lane)
+// and path_operational (lower lane); Current Reality is the backlog drawer, not
+// a grid zone. best = green highlight, ok = neutral; a type whose best+ok cover
+// both lanes never triggers the placement warning.
 const GUIDANCE = {
   antipattern: {
-    best: ['current_operational'],
-    ok:   ['current_strategic'],
-    label: 'Current Reality (bottom-left)',
-    tip:   'Anti-Patterns always start left. They cluster near bottom-left — habits, inertia, operational constraints.'
+    best: ['path_operational'],
+    ok:   ['path_strategic'],
+    label: 'Operational lane (start left)',
+    tip:   'Anti-Patterns start in the Current Reality backlog; on the grid they cluster left and low — habits, inertia, operational constraints.'
   },
   pattern: {
     best: ['path_strategic'],
@@ -18981,19 +18985,19 @@ const GUIDANCE = {
   },
   transition: {
     best: ['path_strategic','path_operational'],
-    ok:   ['current_strategic','desired_operational'],
+    ok:   [],
     label: 'Transformation Path (diagonally)',
     tip:   'Transitions sit between anti-patterns and patterns. Place diagonally — they are safe bridges.'
   },
   capability: {
     best: ['path_strategic','path_operational'],
-    ok:   ['current_strategic','current_operational'],
+    ok:   [],
     label: 'Anywhere on the board',
     tip:   'Capabilities represent maturity areas. Place them where you want to assess and grow practice adoption.'
   },
   agent: {
     best: ['path_strategic','path_operational'],
-    ok:   ['current_strategic','current_operational','desired_strategic','desired_operational'],
+    ok:   [],
     label: 'On the transformation path',
     tip:   'Agents are who or what must act. Place them in the chain between a Capability and the Pattern it enables, then connect them with a Transition Nexus.'
   }
@@ -19072,13 +19076,13 @@ function handleConnectClick(hexId) {
   }
   const fromItem=resolveItem(connectFrom);
   const toItem=resolveItem(hexId);
-  // Nexus endpoint validation — a Transition Nexus should run:
-  // anti-pattern → pattern, capability → pattern, or anti-pattern → capability
+  // Nexus endpoint validation — a Transition Nexus runs along the chain
+  // Anti-Pattern → Capability → Agent → Pattern (plus the direct shortcuts).
   if (connectMode === 'nexus' && fromItem && toItem) {
     const pair = fromItem.type + '→' + toItem.type;
-    const validPairs = ['antipattern→pattern','capability→pattern','antipattern→capability'];
+    const validPairs = ['antipattern→pattern','capability→pattern','antipattern→capability','capability→agent','agent→pattern'];
     if (!validPairs.includes(pair)) {
-      showToast(`⚠️ Unusual nexus: ${fromItem.type} → ${toItem.type}. Recommended: Anti-Pattern → Pattern, Capability → Pattern, or Anti-Pattern → Capability.`,'warning');
+      showToast(`⚠️ Unusual nexus: ${fromItem.type} → ${toItem.type}. Recommended chain: Anti-Pattern → Capability → Agent → Pattern.`,'warning');
     }
   }
   connections.push({id:'conn_'+Date.now(), from:connectFrom, to:hexId, type:connectMode});
