@@ -18105,9 +18105,8 @@ function renderFitnessPanel() {
               `<select class="exp-status-select" onchange="setExperimentStatus('${id}',this.value)">` +
                 `<option value=""${st===''?' selected':''}>— Status —</option>` +
                 `<option value="running"${st==='running'?' selected':''}>🔄 Running</option>` +
-                `<option value="passed"${st==='passed'?' selected':''}>✅ Passed</option>` +
-                `<option value="failed"${st==='failed'?' selected':''}>❌ Failed</option>` +
-                `<option value="abandoned"${st==='abandoned'?' selected':''}>⏸ Abandoned</option>` +
+                `<option value="passed"${st==='passed'?' selected':''}>✅ Adopted</option>` +
+                `<option value="abandoned"${st==='abandoned'||st==='failed'?' selected':''}>⏸ Abandoned</option>` +
               `</select>` +
               `<select class="exp-status-select" onchange="setExperimentPractice('${id}',this.value)" style="margin-top:3px;">` +
                 `<option value="">— Link practice (optional) —</option>` +
@@ -18133,19 +18132,19 @@ function setExperimentResult(hexId, value) {
   experimentResults[hexId].result = value;
   scheduleAutoSave();
 }
-function setExperimentStatus(hexId, status) {
-  if (!experimentResults[hexId]) experimentResults[hexId]={};
-  experimentResults[hexId].status = status;
-  // Sync kanban stage when status changes
-  if (status === 'running') experimentResults[hexId].stage = 'running';
-  else if (status === 'passed') experimentResults[hexId].stage = 'adopted';
-  else if (status === 'abandoned') experimentResults[hexId].stage = 'abandoned';
-  else if (status === 'failed') experimentResults[hexId].stage = 'review';
-  updateStats(); scheduleAutoSave();
+function setExperimentStatus(key, status) {
+  // Delegate to moveExpStage so the panel obeys the same rulebook as the kanban
+  // (readiness gate to leave Pending, hypothesis before Running, forward-only,
+  // Abandon as the only exception). No more side-door stage jumps.
+  const target = { running:'running', passed:'adopted', failed:'abandoned', abandoned:'abandoned' }[status];
+  if (target) moveExpStage(key, target);
+  // Re-render so the select snaps back to the real state if the move was refused.
+  renderFitnessPanel();
 }
 function setExperimentPractice(hexId, practiceId) {
   if (!experimentResults[hexId]) experimentResults[hexId]={ gated:true };
   experimentResults[hexId].practiceId = practiceId;
+  renderFitnessPanel(); renderExperimentsPage();
   scheduleAutoSave();
 }
 function adjustReps(hexId, delta) {
