@@ -2901,7 +2901,10 @@ function onBoardExperimentKeys(){
   const nexusExpKeys  = connections.filter(c => c.type === 'nexus').flatMap(c => getConnExpKeys(c.id).filter(k => experimentResults[k]));
   const capExpKeys    = Object.keys(experimentResults).filter(k => k.includes('::') && onBoardSet.has(k.split('::')[0]));
   const legacyExpKeys = boardMarkers.filter(m => m.type === 's2f' && allOnBoard.includes(m.hexId)).map(m => m.hexId);
-  return [...new Set([...capExpKeys, ...nexusExpKeys, ...legacyExpKeys])];
+  // Experiments whose nexus was deliberately closed after adoption stay counted:
+  // the validated win (and any resolved siblings) remain part of the record.
+  const closedPathKeys = Object.keys(experimentResults).filter(k => experimentResults[k] && experimentResults[k].closedPath);
+  return [...new Set([...capExpKeys, ...nexusExpKeys, ...legacyExpKeys, ...closedPathKeys])];
 }
 // Mutually-exclusive stage bucket for an experiment (review folds into running).
 function expStageCategory(key){
@@ -3586,7 +3589,10 @@ function pmRadarPNG() {
 // Practice ids "in play" for this game
 function pmEngagedIds() {
   const ids = new Set();
-  Object.entries(experimentResults).forEach(([key, er]) => {
+  // Only experiments actually in play — orphaned records from deleted hexes or
+  // connections must not keep a practice "engaged" and drag the org average down.
+  onBoardExperimentKeys().forEach(key => {
+    const er = experimentResults[key];
     if (er && er.practiceId) ids.add(er.practiceId);
     else if (key.includes('::')) ids.add(key.split('::')[1]);
   });
@@ -3810,14 +3816,8 @@ function renderExperimentsPage() {
   const page = document.getElementById('expTrackerPage');
   if (!page) return;
 
-  // Gather all experiment keys: capability-hex experiments (new) + nexus connections + legacy boardMarker s2f
-  const nexusExpKeys  = connections.filter(c => c.type === 'nexus').flatMap(c => getConnExpKeys(c.id).filter(k => experimentResults[k]));
-  const allOnBoard    = Object.values(gridState);
-  const onBoardSet    = new Set(allOnBoard);
-  // Capability-hex experiments: key `hexId::pracId` where hexId is a placed board instance (not a connection id)
-  const capExpKeys    = Object.keys(experimentResults).filter(k => k.includes('::') && onBoardSet.has(k.split('::')[0]));
-  const legacyExpKeys = boardMarkers.filter(m => m.type === 's2f' && allOnBoard.includes(m.hexId)).map(m => m.hexId);
-  const allExpKeys    = [...new Set([...capExpKeys, ...nexusExpKeys, ...legacyExpKeys])];
+  // Single source of truth for which experiments are in play (incl. closed-path records)
+  const allExpKeys = onBoardExperimentKeys();
   _expKeyOrder = allExpKeys.slice().sort();  // stable EXP-NN numbering
 
   // Helper: get display title and capIds for a key (handles connId::pracId format)
@@ -3835,13 +3835,15 @@ function renderExperimentsPage() {
       if (capIds.length === 0) capIds = getCapabilityIds(fromCap);
       return { title, icon: '🔗', capIds, isNexus: true };
     } else {
-      // Capability-hex experiment (`hexId::pracId`) or legacy hex key
+      // Capability-hex experiment (`hexId::pracId`), legacy hex key, or a closed-path
+      // record whose connection no longer exists (title kept via er.pathLabel).
       const hexId = key.includes('::') ? key.split('::')[0] : key;
       const item = resolveItem(hexId);
+      const erX = experimentResults[key] || {};
       const capMk = boardMarkers.find(m => m.hexId === hexId && m.type === 'capability');
       let capIds = getCapabilityIds(capMk);
       if (item && item.type === 'capability' && item._capRef && !capIds.includes(item._capRef)) capIds = [...capIds, item._capRef];
-      return { title: item?.name || hexId, icon: '⬡', capIds, isNexus: false };
+      return { title: item?.name || erX.pathLabel || hexId, icon: item ? '⬡' : (erX.pathLabel ? '🔗' : '⬡'), capIds, isNexus: false };
     }
   }
 
@@ -3904,8 +3906,9 @@ function renderExperimentsPage() {
             : `<div class="kc-prac muted">No practice linked</div>`}
           <div class="kc-foot">
             <span style="font-size:9px;color:var(--text-muted)">${er.hypothesis ? '✎ hypothesis set' : 'no hypothesis yet'}</span>
-            ${er.stage==='abandoned' ? `<button class="kc-act reopen" onclick="event.stopPropagation();reopenExperiment('${safeKey}')" title="Reopen for a new attempt — keeps this one as history">↻ Reopen</button>` : ''}
+            ${er.stage==='abandoned' && !er.closedPath ? `<button class="kc-act reopen" onclick="event.stopPropagation();reopenExperiment('${safeKey}')" title="Reopen for a new attempt — keeps this one as history">↻ Reopen</button>` : ''}
             ${er.stage==='adopted' && connections.find(c=>c.id===expSourceOf(key)) ? `<button class="kc-act closepath" onclick="event.stopPropagation();closeAdoptedPath('${safeKey}')" title="Close path — remove the Transition Nexus">✓ Close path</button>` : ''}
+            ${er.closedPath ? `<span class="kc-act closepath" style="cursor:default;border-style:dashed;" title="This path was closed — the record and its fitness impact are preserved">✓ path closed</span>` : ''}
             <span class="kc-pts ${meta.pts?'on':''}" style="${meta.pts?`background:${meta.c}`:''}">${meta.pts?'+':''}${meta.pts} pts</span>
           </div>
         </div>`;
@@ -4053,6 +4056,7 @@ function expSnapshot(key){
 function reopenExperiment(key){
   const er = experimentResults[key];
   if (!er || er.stage !== 'abandoned') { showToast('Only abandoned experiments can be reopened.', 'info'); return; }
+  if (er.closedPath) { showToast('This path was closed — draw a new Transition Nexus to experiment on this practice again.', 'info'); return; }
   const src = expSourceOf(key);
   const pracId = expPracticeOf(key);
   if (!pracId) { showToast('This experiment has no linked practice to reopen.', 'info'); return; }
@@ -4088,8 +4092,14 @@ function closeAdoptedPath(key){
   }
   const f = resolveItem(conn.from), t = resolveItem(conn.to);
   if (!confirm(`Close this path? The Transition Nexus "${(f?.name||'?')} → ${(t?.name||'?')}" will be removed. You can draw a new one later to build fresh experiments.`)) return;
+  // Keep the record: every (resolved) experiment on this nexus stays counted —
+  // the adopted win keeps its fitness bonus, an abandoned attempt keeps its penalty.
+  const pathLabel = `${f?.name || '?'} → ${t?.name || '?'}`;
+  getConnExpKeys(conn.id).forEach(k => {
+    if (experimentResults[k]) { experimentResults[k].closedPath = true; experimentResults[k].pathLabel = pathLabel; }
+  });
   connections = connections.filter(c => c.id !== conn.id);
-  addLog(`Closed path — removed Transition Nexus "${(f?.name||'?')} → ${(t?.name||'?')}" after adoption`, 'success');
+  addLog(`Closed path — removed Transition Nexus "${pathLabel}" after adoption`, 'success');
   closeExperimentModal();
   renderConnections(); renderExperimentsPage(); renderFitnessPanel(); updateStats(); scheduleAutoSave();
   showToast('Path closed — nexus removed. Draw a new Transition Nexus when you want to experiment here again.', 'success');
@@ -4140,7 +4150,10 @@ function expModalMeta(key) {
     domain = (t || f)?.domain || '—';
   } else {
     const hexId = key.includes('::') ? key.split('::')[0] : key;
-    const item = resolveItem(hexId); title = item?.name || hexId; domain = item?.domain || '—';
+    const item = resolveItem(hexId);
+    const erX = experimentResults[key] || {};
+    title = item?.name || erX.pathLabel || hexId; domain = item?.domain || '—';
+    if (!item && erX.pathLabel) icon = '🔗';
     const capMk = boardMarkers.find(m => m.hexId === hexId && m.type === 'capability');
     capIds = getCapabilityIds(capMk);
     if (item && item.type === 'capability' && item._capRef && !capIds.includes(item._capRef)) capIds = [...capIds, item._capRef];
@@ -4210,8 +4223,9 @@ function experimentModalHtml(key) {
       ${(stage==='pending'||stage==='running'||stage==='review') ? `<button class="exp-mv danger" onclick="moveExpStage('${escHtml(key)}','abandoned')">⏸ Abandon</button>` : ''}
       ${stage==='adopted' ? `<span style="font-size:11px;font-weight:700;color:${meta.c}">● ${clean(KANBAN_STAGES[idx].label)}</span>` : ''}
       ${stage==='adopted' && connections.find(c=>c.id===expSourceOf(key)) ? `<button class="exp-mv closepath" onclick="closeAdoptedPath('${escHtml(key)}')" title="Remove this Transition Nexus so you can build a new experiment here later">✓ Close path (remove nexus)</button>` : ''}
+      ${er.closedPath ? `<span style="font-size:11px;font-weight:700;color:#2d9d5e;" title="The record and its fitness impact are preserved">✓ Path closed</span>` : ''}
       ${stage==='abandoned' ? `<span style="font-size:11px;font-weight:700;color:${meta.c}">● Abandoned</span>` : ''}
-      ${stage==='abandoned' ? `<button class="exp-mv reopen" onclick="reopenExperiment('${escHtml(key)}')" title="Create a fresh experiment for the same practice; this abandoned attempt stays as history">↻ Reopen for a new attempt</button>` : ''}
+      ${stage==='abandoned' && !er.closedPath ? `<button class="exp-mv reopen" onclick="reopenExperiment('${escHtml(key)}')" title="Create a fresh experiment for the same practice; this abandoned attempt stays as history">↻ Reopen for a new attempt</button>` : ''}
       <span class="exp-pts" style="color:${meta.pts?meta.c:'var(--text-muted)'}">${meta.pts?'+':''}${meta.pts} pts</span>
     </div>`;
 }
@@ -17937,14 +17951,9 @@ function renderFitnessPanel() {
   const panel = document.getElementById('fitnessPanel');
   if (!panel) return;
   const allOnBoard = Object.values(gridState);
-  const onBoardSet = new Set(allOnBoard);
   const capIds = boardMarkers.filter(m=>m.type==='capability').map(m=>m.hexId).filter(id=>allOnBoard.includes(id));
-  const legacyS2fIds = boardMarkers.filter(m=>m.type==='s2f').map(m=>m.hexId).filter(id=>allOnBoard.includes(id));
-  // Unified experiment keys across every type: capability-hex (hexId::pracId),
-  // nexus line (connId::pracId), and legacy S2F markers.
-  const nexusExpKeys = connections.filter(c => c.type === 'nexus').flatMap(c => getConnExpKeys(c.id).filter(k => experimentResults[k]));
-  const capExpKeys   = Object.keys(experimentResults).filter(k => k.includes('::') && onBoardSet.has(k.split('::')[0]));
-  const allExpKeys   = [...new Set([...capExpKeys, ...nexusExpKeys, ...legacyS2fIds])];
+  // Unified experiment keys — same single source of truth as the tracker/report.
+  const allExpKeys   = onBoardExperimentKeys();
   const expCount     = allExpKeys.length;
   // Collect unique practices across all experiment types
   const allLinkedPracs = (() => {
