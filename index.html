@@ -1703,7 +1703,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
       <div class="htp-card" style="border-color:rgba(25,167,161,.3);background:rgba(25,167,161,.06);">
         <div class="htp-icon">🔗</div>
         <div class="htp-label" style="color:var(--accent)">Transition Nexus</div>
-        <div class="htp-desc">Draw nexus arrows between hexes. Click the button → source hexagon → target hexagon.</div>
+        <div class="htp-desc">Draw the habit-replacement path: click the button, then click each hex in order — as many as the story needs — and press Done. Every nexus needs at least a <b>Capability</b> and an <b>Agent</b>; add anti-patterns and patterns as you discover them via the <b>＋</b> handles at either end.</div>
       </div>
       <div class="htp-card" style="border-color:rgba(232,148,58,.3);background:rgba(232,148,58,.06);">
         <div class="htp-icon">🧪</div>
@@ -1864,7 +1864,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
           <div class="ptb-card legend nexus" style="--ac:#19A7A1" onclick="toggleConnectMode('nexus');this.classList.toggle('on')" title="Toggle Transition Nexus linking">
             <div class="ptb-ic"><svg viewBox="0 0 120 26" fill="none"><path d="M18 6 H60 V13" stroke="currentColor" stroke-width="3" fill="none"/><path d="M18 20 H60 V13" stroke="currentColor" stroke-width="3" fill="none"/><line x1="60" y1="13" x2="98" y2="13" stroke="currentColor" stroke-width="3"/><path d="M108 13 l-14 7 v-14 z" fill="currentColor"/></svg></div>
             <div class="ptb-cname">TRANSITION NEXUS</div>
-            <div class="ptb-cdesc">Solid L-arrow. Where transitions converge or diverge — the leverage points.</div>
+            <div class="ptb-cdesc">The habit-replacement path. Click hexes in order — Capability and Agent required, anti-patterns and patterns optional.</div>
           </div>
           <div class="ptb-card legend cmap" style="--ac:#E2801E" onclick="startCounterMapping()" title="Counter-Mapping — enclose hexes to scope an organizational area (max 3 per board)">
             <div class="ptb-ic"><svg viewBox="0 0 120 26" fill="none"><path d="M96 7 C60 -3 44 15 26 8" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M26 8 l12 -5 l-2 12 z" fill="currentColor"/><path d="M26 20 C62 30 78 12 96 19" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.65"/><path d="M96 19 l-12 5 l2 -12 z" fill="currentColor"/></svg></div>
@@ -2233,7 +2233,52 @@ let draggedId = null, dragSource = null; // dragSource is now "row,col" string o
 let activeDomain = null;
 let connections = [];
 let connectMode = null;
-let connectFrom = null;
+let connectFrom = null;          // legacy single-source (path drafts use connectPath)
+let connectPath = [];            // hexes clicked so far while drawing a multi-hex nexus
+let extendConnId = null;         // id of the nexus currently being extended (null = drawing new)
+let extendEnd = 'end';           // 'start' | 'end' — which end an extension grows from
+
+// ── Multi-hex Transition Nexus ──────────────────────────────────────────
+// A nexus is an ordered PATH of hexes (the habit-replacement journey), stored in
+// conn.nodes. Legacy 2-point connections have no nodes[] — connNodes() derives
+// [from,to] for them, so every consumer reads paths the same way and old boards
+// keep working untouched. from/to are always kept in sync as first/last for any
+// code (and saved data) that still reads them.
+function connNodes(conn) {
+  if (!conn) return [];
+  if (Array.isArray(conn.nodes) && conn.nodes.length) return conn.nodes;
+  return [conn.from, conn.to].filter(Boolean);
+}
+// Human-readable path label: "Anti-P → Capability → Agent → Pattern".
+// Long paths elide the middle so titles stay readable in cards and reports.
+function connPathLabel(conn, max) {
+  const names = connNodes(conn).map(id => resolveItem(id)?.name || '?');
+  if (!names.length) return '?';
+  const lim = max || 4;
+  if (names.length <= lim) return names.join(' → ');
+  return `${names[0]} → … (${names.length - 2} more) … → ${names[names.length-1]}`;
+}
+function connSetNodes(conn, nodes) {
+  conn.nodes = nodes.slice();
+  conn.from = nodes[0];
+  conn.to = nodes[nodes.length - 1];
+  return conn;
+}
+// Every nexus needs at least one Capability and one Agent. Anti-patterns and
+// patterns are encouraged but optional — a brand-new capability (e.g. AI) often
+// has no known anti-pattern yet.
+function pathTypeCounts(nodes) {
+  const c = { capability:0, agent:0, antipattern:0, pattern:0, transition:0 };
+  nodes.forEach(id => { const it = resolveItem(id); if (it && c[it.type] !== undefined) c[it.type]++; });
+  return c;
+}
+function pathMissing(nodes) {
+  const c = pathTypeCounts(nodes), missing = [];
+  if (!c.capability) missing.push('a Capability');
+  if (!c.agent) missing.push('an Agent');
+  return missing;
+}
+function pathIsValid(nodes) { return nodes.length >= 2 && pathMissing(nodes).length === 0; }
 let boardMarkers = [];
 // Organizational domains
 let domainDefinitions = []; // [{id, name, color, hexIds:[]}]
@@ -2569,7 +2614,7 @@ function migrateLegacyAgents() {
       occupied.add(key);
       // Link the agent back to its former host as a Transition Nexus (only if the host is still placed).
       if (hostKey && gridState[hostKey] === hostId) {
-        connections.push({ id:'conn_mig_' + placeId, from: hostId, to: placeId, type:'nexus' });
+        connections.push(connSetNodes({ id:'conn_mig_' + placeId, type:'nexus' }, [hostId, placeId]));
       }
       migrated++;
     });
@@ -3711,13 +3756,8 @@ function renderExperimentsPage() {
     const connId = colonIdx >= 0 ? key.substring(0, colonIdx) : key;
     const conn = connections.find(c => c.id === connId);
     if (conn) {
-      const fromItem = resolveItem(conn.from);
-      const toItem   = resolveItem(conn.to);
-      const title = `${fromItem?.name || '?'} → ${toItem?.name || '?'}`;
-      const toCap   = boardMarkers.find(m => m.hexId === conn.to   && m.type === 'capability');
-      const fromCap = boardMarkers.find(m => m.hexId === conn.from && m.type === 'capability');
-      let capIds = getCapabilityIds(toCap);
-      if (capIds.length === 0) capIds = getCapabilityIds(fromCap);
+      const title = connPathLabel(conn);
+      let capIds = [...new Set(connNodes(conn).flatMap(id => capHexCapIds(id)))];
       return { title, icon: '🔗', capIds, isNexus: true };
     } else {
       // Capability-hex experiment (`hexId::pracId`), legacy hex key, or a closed-path
@@ -3823,7 +3863,7 @@ function expReadiness(key) {
   const practiceSelected = !!pracId;
   const conn = connections.find(c => c.id === connId);
   const nexusLink = conn ? conn.type === 'nexus'
-    : connections.some(c => c.type === 'nexus' && (c.from === key || c.to === key));
+    : connections.some(c => c.type === 'nexus' && connNodes(c).includes(key));
   let capOnBoard = false;
   if (pracId) {
     const cap = capabilitiesLibrary.find(c => (c.practices||[]).some(p => p.id === pracId));
@@ -3975,11 +4015,10 @@ function closeAdoptedPath(key){
     showToast(`Can't close this path — ${openSiblings.length} experiment${openSiblings.length>1?'s are':' is'} still open on this nexus. Resolve them first.`, 'warning');
     return;
   }
-  const f = resolveItem(conn.from), t = resolveItem(conn.to);
-  if (!confirm(`Close this path? The Transition Nexus "${(f?.name||'?')} → ${(t?.name||'?')}" will be removed. You can draw a new one later to build fresh experiments.`)) return;
+  const pathLabel = connPathLabel(conn);
+  if (!confirm(`Close this path? The Transition Nexus "${pathLabel}" will be removed. You can draw a new one later to build fresh experiments.`)) return;
   // Keep the record: every (resolved) experiment on this nexus stays counted —
   // the adopted win keeps its fitness bonus, an abandoned attempt keeps its penalty.
-  const pathLabel = `${f?.name || '?'} → ${t?.name || '?'}`;
   getConnExpKeys(conn.id).forEach(k => {
     if (experimentResults[k]) { experimentResults[k].closedPath = true; experimentResults[k].pathLabel = pathLabel; }
   });
@@ -4027,12 +4066,10 @@ function expModalMeta(key) {
   const conn = connections.find(c => c.id === connId);
   let title, capIds = [], domain = '—', icon = '⬡';
   if (conn) {
-    const f = resolveItem(conn.from), t = resolveItem(conn.to);
-    title = `${f?.name || '?'} → ${t?.name || '?'}`; icon = '🔗';
-    const toCap = boardMarkers.find(m => m.hexId === conn.to && m.type === 'capability');
-    const fromCap = boardMarkers.find(m => m.hexId === conn.from && m.type === 'capability');
-    capIds = getCapabilityIds(toCap); if (!capIds.length) capIds = getCapabilityIds(fromCap);
-    domain = (t || f)?.domain || '—';
+    title = connPathLabel(conn); icon = '🔗';
+    capIds = [...new Set(connNodes(conn).flatMap(id => capHexCapIds(id)))];
+    const _nodes = connNodes(conn).map(id => resolveItem(id)).filter(Boolean);
+    domain = (_nodes.find(n => n.type === 'capability') || _nodes[_nodes.length-1] || {}).domain || '—';
   } else {
     const hexId = key.includes('::') ? key.split('::')[0] : key;
     const item = resolveItem(hexId);
@@ -17684,10 +17721,9 @@ function openS2FModal(connIdOrHexId) {
   if (conn) {
     // Nexus line experiment — practices come from whichever endpoint carries a capability
     // (Capability hexes register their capability intrinsically, no "C" badge required).
-    const fromItem = resolveItem(conn.from);
-    const toItem   = resolveItem(conn.to);
-    title = `Experiment: ${fromItem?.name || '?'} → ${toItem?.name || '?'}`;
-    capIds = [...new Set([...capHexCapIds(conn.to), ...capHexCapIds(conn.from)])];
+    title = `Experiment: ${connPathLabel(conn)}`;
+    // Practices come from every Capability hex on the path.
+    capIds = [...new Set(connNodes(conn).flatMap(id => capHexCapIds(id)))];
   } else {
     // Legacy: hex-based experiment
     const item = resolveItem(connIdOrHexId);
@@ -17750,9 +17786,7 @@ function saveS2FExperiment() {
       const expKey = key + '::' + pracId;
       if (!experimentResults[expKey]) experimentResults[expKey] = { stage: 'pending', practiceId: pracId, gated: true };
     });
-    const fromItem = resolveItem(conn.from);
-    const toItem   = resolveItem(conn.to);
-    addLog(`S2F Experiment added: ${fromItem?.name||'?'} → ${toItem?.name||'?'} (${checked.length} practice${checked.length>1?'s':''})`, 'success');
+    addLog(`Experiment added on nexus: ${connPathLabel(conn)} (${checked.length} practice${checked.length>1?'s':''})`, 'success');
   } else {
     // Legacy: hex-based experiment (single practice)
     const practiceId = document.querySelector('input[name="s2f_prac"]:checked')?.value || '';
@@ -17968,7 +18002,7 @@ function renderFitnessPanel() {
             const baseId = id.includes('::') ? id.split('::')[0] : id;
             const _conn = connections.find(c=>c.id===baseId);
             const cardName = _conn
-              ? `${resolveItem(_conn.from)?.name||'?'} → ${resolveItem(_conn.to)?.name||'?'}`
+              ? connPathLabel(_conn)
               : (resolveItem(baseId)?.name || baseId);
             // Build practice options: show board-linked practices first, then divider + all others
             const boardPracIds = new Set(allLinkedPracs.map(p=>p.id));
@@ -18778,7 +18812,7 @@ function renderBoard() {
         // (capabilities have their own domain taxonomy from the library; agents have none).
         const dim = activeDomain && item.type!=='capability' && item.type!=='agent' && item.domain!==activeDomain ? ' domain-dimmed':'';
         const cm = connectMode ? ' connect-mode':'';
-        const cs = connectFrom===hexId ? ' connect-source':'';
+        const cs = (connectFrom===hexId || connectPath.includes(hexId)) ? ' connect-source':'';
         // Domain outline
         const hexDomain = domainDefinitions.find(d=>d.hexIds.includes(hexId));
         const domCls = hexDomain ? ' has-domain':'';
@@ -18924,7 +18958,15 @@ function removeHex(id,coordKey){
   delete agentAssignments[id];
   delete driverAssignments[id];
   boardMarkers=boardMarkers.filter(m=>m.hexId!==id);
-  connections=connections.filter(c=>c.from!==id&&c.to!==id);
+  // Splice the hex out of every path it sits on. The nexus survives if it still has
+  // ≥2 hexes AND still satisfies the Capability+Agent rule; otherwise it's removed.
+  connections = connections.reduce((keep, c) => {
+    const nodes = connNodes(c);
+    if (!nodes.includes(id)) { keep.push(c); return keep; }
+    const left = nodes.filter(n => n !== id);
+    if (c.type === 'nexus' ? pathIsValid(left) : left.length >= 2) keep.push(connSetNodes(c, left));
+    return keep;
+  }, []);
   domainDefinitions.forEach(d=>{d.hexIds=d.hexIds.filter(h=>h!==id);});
   const item=resolveItem(id);
   addLog(`Removed "${item?.name}"`,'warning');
@@ -18935,9 +18977,52 @@ function removeHex(id,coordKey){
 // CONNECTIONS
 // ══════════════════════════════════════════
 function toggleConnectMode(type) {
-  if (connectMode === type) { connectMode=null; connectFrom=null; } else { connectMode=type; connectFrom=null; }
+  if (connectMode === type) { cancelConnectDraft(); } else { cancelConnectDraft(); connectMode=type; }
   document.querySelectorAll('.connect-btn').forEach(b=>b.classList.remove('active'));
   if (connectMode) document.querySelector(`.connect-btn.${connectMode==='path'?'path':'nexus'}-btn`).classList.add('active');
+  updateConnectStatus();
+  renderAllZones();
+}
+function cancelConnectDraft() {
+  connectMode=null; connectFrom=null; connectPath=[]; extendConnId=null;
+}
+// Finish the nexus currently being drawn / extended (hard gate: Capability + Agent).
+function finishConnectPath() {
+  if (connectMode !== 'nexus') return;
+  const nodes = connectPath.slice();
+  if (nodes.length < 2) { showToast('A Transition Nexus needs at least 2 hexes.', 'info'); return; }
+  if (extendConnId) {
+    const conn = connections.find(c => c.id === extendConnId);
+    if (!conn) { cancelConnectDraft(); updateConnectStatus(); renderAllZones(); return; }
+    const missing = pathMissing(nodes);
+    if (missing.length) { showToast(`⛔ This nexus still needs ${missing.join(' and ')} — add it to complete the path.`, 'warning'); return; }
+    connSetNodes(conn, nodes);
+    addLog(`Extended Transition Nexus — ${nodes.length} hexes on the path`, 'success');
+  } else {
+    const missing = pathMissing(nodes);
+    if (missing.length) { showToast(`⛔ A Transition Nexus needs at least one Capability and one Agent — add ${missing.join(' and ')} to complete the path.`, 'warning'); return; }
+    const conn = connSetNodes({ id:'conn_'+Date.now(), type:'nexus' }, nodes);
+    connections.push(conn);
+    addLog(`Transition Nexus created — ${nodes.map(id=>resolveItem(id)?.name||'?').join(' → ')}`, 'success');
+  }
+  cancelConnectDraft();
+  updateConnectStatus();
+  renderAllZones();
+  scheduleAutoSave();
+}
+// Start extending an existing nexus from one of its ends.
+function startExtendNexus(connId, end) {
+  const conn = connections.find(c => c.id === connId);
+  if (!conn) return;
+  const nodes = connNodes(conn);
+  connectMode = 'nexus';
+  extendConnId = connId;
+  extendEnd = end;
+  // Draft always reads start→end; a 'start' extension prepends as the user clicks.
+  connectPath = nodes.slice();
+  document.querySelectorAll('.connect-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.connect-btn.nexus-btn')?.classList.add('active');
+  showToast(`Extending this nexus — click hexes to add them to the ${end === 'start' ? 'start' : 'end'} of the path, then press Done.`, 'info');
   updateConnectStatus();
   renderAllZones();
 }
@@ -18945,39 +19030,63 @@ function updateConnectStatus() {
   const el=document.getElementById('connectStatus');
   if (!connectMode) { el.style.display='none'; return; }
   el.style.display='inline';
-  if (!connectFrom) el.textContent=`Click a source hexagon to start a Transition Nexus`;
-  else { const item=resolveItem(connectFrom); el.textContent=`"${item?.name}" selected — now click the target hexagon`; }
+  if (connectMode === 'path') {
+    el.innerHTML = connectFrom
+      ? `"${escHtml(resolveItem(connectFrom)?.name||'')}" selected — now click the target hexagon`
+      : `Click a source hexagon to start a Transition Path`;
+    return;
+  }
+  // Nexus: multi-hex path builder
+  if (!connectPath.length) {
+    el.innerHTML = `Click hexes to build the nexus path — it needs at least a <b>Capability</b> and an <b>Agent</b>`;
+    return;
+  }
+  const names = connectPath.map(id => escHtml(resolveItem(id)?.name || '?')).join(' → ');
+  const missing = pathMissing(connectPath);
+  const ready = connectPath.length >= 2 && !missing.length;
+  const need = missing.length ? ` · still needs ${missing.join(' and ')}` : '';
+  el.innerHTML =
+    `${extendConnId ? 'Extending: ' : ''}${names}${need} ` +
+    `<button onclick="finishConnectPath()" style="margin-left:8px;padding:2px 10px;border-radius:5px;border:1px solid ${ready?'#19A7A1':'var(--border)'};background:${ready?'#19A7A1':'var(--surface2)'};color:${ready?'#fff':'var(--text-muted)'};font-size:10px;font-weight:700;cursor:pointer;">✓ Done</button> ` +
+    `<button onclick="undoConnectStep()" style="margin-left:4px;padding:2px 8px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:10px;cursor:pointer;">↶ Undo</button> ` +
+    `<button onclick="cancelConnectDraft();updateConnectStatus();renderAllZones();" style="margin-left:4px;padding:2px 8px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:#d94a4a;font-size:10px;cursor:pointer;">✕</button>`;
+}
+function undoConnectStep() {
+  if (!connectPath.length) return;
+  // While extending, never shrink past the nexus's original nodes.
+  const floor = extendConnId ? connNodes(connections.find(c=>c.id===extendConnId)).length : 0;
+  if (connectPath.length <= floor) { showToast('Nothing left to undo — cancel to leave the path unchanged.', 'info'); return; }
+  if (extendConnId && extendEnd === 'start') connectPath.shift(); else connectPath.pop();
+  updateConnectStatus(); renderAllZones();
 }
 function handleConnectClick(hexId) {
   if (!connectMode) return;
-  if (!connectFrom) {
-    connectFrom = hexId;
-    updateConnectStatus();
-    renderAllZones();
+  // ── Transition Path (unchanged 2-point behaviour) ──
+  if (connectMode === 'path') {
+    if (!connectFrom) { connectFrom = hexId; updateConnectStatus(); renderAllZones(); return; }
+    if (connectFrom === hexId) { connectFrom=null; updateConnectStatus(); renderAllZones(); return; }
+    if (connections.some(c=>c.from===connectFrom && c.to===hexId && c.type==='path')) {
+      connectFrom=null; updateConnectStatus(); renderAllZones(); return;
+    }
+    const fromItem=resolveItem(connectFrom), toItem=resolveItem(hexId);
+    connections.push(connSetNodes({id:'conn_'+Date.now(), type:'path'}, [connectFrom, hexId]));
+    addLog(`Connected "${fromItem?.name}" → "${toItem?.name}" (Transition Path)`,'success');
+    connectFrom=null; updateConnectStatus(); renderAllZones(); scheduleAutoSave();
     return;
   }
-  if (connectFrom === hexId) { connectFrom=null; updateConnectStatus(); renderAllZones(); return; }
-  // Check duplicate
-  if (connections.some(c=>c.from===connectFrom && c.to===hexId && c.type===connectMode)) {
-    connectFrom=null; updateConnectStatus(); renderAllZones(); return;
+  // ── Transition Nexus: build an ordered multi-hex path ──
+  const idx = connectPath.indexOf(hexId);
+  if (idx >= 0) {
+    // Clicking the last-added hex removes it (quick undo); any other repeat is ignored.
+    const removable = (extendConnId && extendEnd === 'start') ? connectPath[0] : connectPath[connectPath.length-1];
+    if (hexId === removable) { undoConnectStep(); }
+    else showToast('That hex is already on this path.', 'info');
+    return;
   }
-  const fromItem=resolveItem(connectFrom);
-  const toItem=resolveItem(hexId);
-  // Nexus endpoint validation — a Transition Nexus runs along the chain
-  // Anti-Pattern → Capability → Agent → Pattern (plus the direct shortcuts).
-  if (connectMode === 'nexus' && fromItem && toItem) {
-    const pair = fromItem.type + '→' + toItem.type;
-    const validPairs = ['antipattern→pattern','capability→pattern','antipattern→capability','capability→agent','agent→pattern'];
-    if (!validPairs.includes(pair)) {
-      showToast(`⚠️ Unusual nexus: ${fromItem.type} → ${toItem.type}. Recommended chain: Anti-Pattern → Capability → Agent → Pattern.`,'warning');
-    }
-  }
-  connections.push({id:'conn_'+Date.now(), from:connectFrom, to:hexId, type:connectMode});
-  addLog(`Connected "${fromItem?.name}" → "${toItem?.name}" (Transition Nexus)`,'success');
-  connectFrom=null;
+  if (extendConnId && extendEnd === 'start') connectPath.unshift(hexId);
+  else connectPath.push(hexId);
   updateConnectStatus();
   renderAllZones();
-  scheduleAutoSave();
 }
 function deleteConnection(connId) {
   connections = connections.filter(c=>c.id!==connId);
@@ -19034,22 +19143,52 @@ function renderConnections() {
     svg.style.height = grid.scrollHeight + 'px';
   }
   connections.forEach(conn => {
-    const fromR = getHexRect(conn.from);
-    const toR = getHexRect(conn.to);
-    if (!fromR || !toR) return;
-    const route = buildRoute(fromR, toR);
+    // A nexus is an ordered path of hexes; legacy 2-point connections derive [from,to].
+    const nodeIds = connNodes(conn);
+    const rects = nodeIds.map(id => getHexRect(id));
+    if (rects.length < 2 || rects.some(r => !r)) return;
+    const pts = rects.map(r => ({ x: r.x + r.w/2, y: r.cy }));
+    const fromR = rects[0], toR = rects[rects.length-1];
+    const dAll = pts.map((pt,i) => (i ? 'L' : 'M') + pt.x + ',' + pt.y).join(' ');
+    // Controls sit on the FINAL segment so they never collide with mid-path hexes.
+    const segA = pts[pts.length-2], segB = pts[pts.length-1];
+    const lerpSeg = t => ({ x: segA.x + (segB.x-segA.x)*t, y: segA.y + (segB.y-segA.y)*t });
+    const route = { d: dAll, s2fPt: lerpSeg(0.62), midPt: lerpSeg(0.5) };
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     // Wider invisible hit area
     const hit = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    hit.setAttribute('d', route.d);
+    hit.setAttribute('d', dAll);
     hit.setAttribute('class', 'conn-hit');
+    hit.setAttribute('fill', 'none');
     g.appendChild(hit);
-    // Visible path
-    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    p.setAttribute('d', route.d);
-    p.setAttribute('class', conn.type === 'path' ? 'conn-path' : 'conn-nexus');
-    p.setAttribute('marker-end', conn.type === 'path' ? 'url(#arrowPath)' : 'url(#arrowNexus)');
-    g.appendChild(p);
+    // Visible polyline — one path, with an arrowhead on every segment so the
+    // direction of the habit-replacement journey reads at a glance.
+    pts.slice(0, -1).forEach((a, i) => {
+      const b = pts[i+1];
+      const seg = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      seg.setAttribute('d', `M${a.x},${a.y} L${b.x},${b.y}`);
+      seg.setAttribute('class', conn.type === 'path' ? 'conn-path' : 'conn-nexus');
+      seg.setAttribute('fill', 'none');
+      seg.setAttribute('marker-end', conn.type === 'path' ? 'url(#arrowPath)' : 'url(#arrowNexus)');
+      g.appendChild(seg);
+    });
+    // Node ordinals — show the sequence on multi-hex paths (1,2,3…)
+    if (conn.type === 'nexus' && pts.length > 2) {
+      pts.forEach((pt, i) => {
+        const bg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        bg.setAttribute('cx', pt.x); bg.setAttribute('cy', pt.y); bg.setAttribute('r', '8');
+        bg.setAttribute('fill', '#0B1F3A'); bg.setAttribute('stroke', '#3C6EB4'); bg.setAttribute('stroke-width', '1.25');
+        bg.setAttribute('style', 'pointer-events:none;opacity:.92');
+        g.appendChild(bg);
+        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        t.setAttribute('x', pt.x); t.setAttribute('y', pt.y + 3);
+        t.setAttribute('text-anchor', 'middle'); t.setAttribute('font-size', '8.5');
+        t.setAttribute('font-weight', '700'); t.setAttribute('fill', '#7FE3DD');
+        t.setAttribute('style', 'pointer-events:none');
+        t.textContent = String(i+1);
+        g.appendChild(t);
+      });
+    }
     // Midpoint interaction
     const mp = route.midPt;
     if (conn.type === 'nexus') {
@@ -19104,12 +19243,11 @@ function renderConnections() {
       }
 
       // === 🧪 Build-experiment affordance ===
-      // Experiments are built ON the Transition Nexus (no "C" badge required). The flask
-      // appears whenever one end of the nexus carries a capability to draw practices from.
-      const nexusHasCap = capHexCapIds(conn.to).length > 0 || capHexCapIds(conn.from).length > 0;
+      // Experiments are built ON the Transition Nexus. The flask appears whenever ANY
+      // hex on the path carries a capability to draw practices from.
+      const nexusHasCap = nodeIds.some(id => capHexCapIds(id).length > 0);
       if (nexusHasCap) {
-        const _fsx = fromR.x+fromR.w/2, _fsy = fromR.cy, _tex = toR.x+toR.w/2, _tey = toR.cy;
-        const flaskPt = { x: _fsx + (_tex-_fsx)*0.40, y: _fsy + (_tey-_fsy)*0.40 };
+        const flaskPt = lerpSeg(0.40);
         const flaskG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         flaskG.setAttribute('style', 'pointer-events:all;cursor:pointer;');
         flaskG.addEventListener('click', e => { e.stopPropagation(); openS2FModal(conn.id); });
@@ -19129,9 +19267,8 @@ function renderConnections() {
         g.appendChild(flaskG);
       }
 
-      // Delete button at ~15% of line (near source hex, away from T and S dots)
-      const fsx = fromR.x+fromR.w/2, fsy = fromR.cy, tex = toR.x+toR.w/2, tey = toR.cy;
-      const delPt = { x: fsx + (tex - fsx)*0.15, y: fsy + (tey - fsy)*0.15 };
+      // Delete button at ~15% of the FINAL segment (clear of mid-path hexes)
+      const delPt = lerpSeg(0.15);
       const delCx = delPt.x;
       const del = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       del.setAttribute('cx', delCx); del.setAttribute('cy', delPt.y);
@@ -19145,6 +19282,34 @@ function renderConnections() {
       delX.setAttribute('style', 'pointer-events:none');
       delX.textContent = '×';
       g.appendChild(delX);
+
+      // === ＋ Extend handles at both ends ===
+      // Anti-patterns and patterns are often discovered in a later cycle — these let a
+      // facilitator grow an existing path from its start or its end.
+      const addHandle = (px, py, end, tip) => {
+        const hg = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        hg.setAttribute('style', 'pointer-events:all;cursor:pointer;');
+        hg.addEventListener('click', e => { e.stopPropagation(); startExtendNexus(conn.id, end); });
+        const ti = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+        ti.textContent = tip; hg.appendChild(ti);
+        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute('cx', px); c.setAttribute('cy', py); c.setAttribute('r', '7.5');
+        c.setAttribute('fill', '#0B1F3A'); c.setAttribute('stroke', '#3C6EB4'); c.setAttribute('stroke-width', '1.25');
+        hg.appendChild(c);
+        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        t.setAttribute('x', px); t.setAttribute('y', py + 3.5);
+        t.setAttribute('text-anchor', 'middle'); t.setAttribute('font-size', '11');
+        t.setAttribute('font-weight', '700'); t.setAttribute('fill', '#7FE3DD');
+        t.setAttribute('style', 'pointer-events:none');
+        t.textContent = '+';
+        hg.appendChild(t);
+        return hg;
+      };
+      const a0 = pts[0], a1 = pts[1], z0 = pts[pts.length-1], z1 = pts[pts.length-2];
+      const out = (p, q, d) => { const dx=p.x-q.x, dy=p.y-q.y, L=Math.hypot(dx,dy)||1; return { x:p.x+dx/L*d, y:p.y+dy/L*d }; };
+      const sH = out(a0, a1, 22), eH = out(z0, z1, 22);
+      g.appendChild(addHandle(sH.x, sH.y, 'start', 'Extend this nexus — add hexes before the start (e.g. an anti-pattern found later)'));
+      g.appendChild(addHandle(eH.x, eH.y, 'end',   'Extend this nexus — add hexes after the end (e.g. the pattern you are reaching for)'));
     } else {
       // Path connection: plain delete button
       const del = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -19162,6 +19327,40 @@ function renderConnections() {
     }
     svg.appendChild(g);
   });
+
+  // ── Live draft preview while building / extending a nexus path ──
+  if (connectMode === 'nexus' && connectPath.length) {
+    const dr = connectPath.map(id => getHexRect(id)).filter(Boolean);
+    if (dr.length) {
+      const dpts = dr.map(r => ({ x: r.x + r.w/2, y: r.cy }));
+      const dg = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      if (dpts.length > 1) {
+        const dp = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        dp.setAttribute('d', dpts.map((p,i)=>(i?'L':'M')+p.x+','+p.y).join(' '));
+        dp.setAttribute('fill', 'none');
+        dp.setAttribute('stroke', '#19A7A1');
+        dp.setAttribute('stroke-width', '2.5');
+        dp.setAttribute('stroke-dasharray', '7,5');
+        dp.setAttribute('style', 'pointer-events:none;opacity:.95');
+        dg.appendChild(dp);
+      }
+      dpts.forEach((pt, i) => {
+        const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute('cx', pt.x); c.setAttribute('cy', pt.y); c.setAttribute('r', '9');
+        c.setAttribute('fill', '#19A7A1'); c.setAttribute('stroke', '#fff'); c.setAttribute('stroke-width', '1.5');
+        c.setAttribute('style', 'pointer-events:none');
+        dg.appendChild(c);
+        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        t.setAttribute('x', pt.x); t.setAttribute('y', pt.y + 3.5);
+        t.setAttribute('text-anchor', 'middle'); t.setAttribute('font-size', '9');
+        t.setAttribute('font-weight', '700'); t.setAttribute('fill', '#fff');
+        t.setAttribute('style', 'pointer-events:none');
+        t.textContent = String(i+1);
+        dg.appendChild(t);
+      });
+      svg.appendChild(dg);
+    }
+  }
 }
 
 // ══════════════════════════════════════════
