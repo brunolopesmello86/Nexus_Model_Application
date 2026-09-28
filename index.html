@@ -942,7 +942,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .rp-slide-sub { font-size:11.5px; font-style:italic; color:#5a6b84; margin-bottom:16px; }
 /* Pills (shared) */
 .rp-pill { display:inline-flex; align-items:center; justify-content:center; gap:5px; font-size:9.5px; font-weight:800; letter-spacing:.6px; padding:4px 12px; border-radius:999px; width:fit-content; color:#fff; white-space:nowrap; }
-.rp-pill-green { background:#2e9e4f; } .rp-pill-orange { background:#f5821f; } .rp-pill-gray { background:#7c8aa5; }
+.rp-pill-green { background:#2e9e4f; } .rp-pill-orange { background:#f5821f; } .rp-pill-gray { background:#7c8aa5; } .rp-pill-red { background:#d94a4a; }
 .rp-pill-blue { background:#2E8B76; } .rp-pill-navy { background:#235B4E; }
 .rp-pill-soft { background:#DCEFE7; color:#24705E; }
 /* At a glance */
@@ -2838,7 +2838,7 @@ function syncCapabilitiesToItems() {
       name: cap.name,
       signal: cap.description || 'Organizational capability',
       impact: (cap.practices||[]).length + ' practices defined',
-      domain: DEFAULT_CLASS,
+      domain: cap.domain || DEFAULT_CLASS, // the capability's real library domain (informational — class filter treats capabilities as cross-cutting)
       _capRef: cap.id
     });
   });
@@ -18523,7 +18523,8 @@ const DECK_META = [
   {type:'capability',  label:'CAPABILITIES', sub:'stabilized habits',      color:'#C9D6E6', letter:'C'},
 ];
 function deckItems(type){
-  return allItems.filter(it => !it._anchorRef && it.type===type && (!activeDomain || it.domain===activeDomain));
+  // Capabilities are cross-cutting: the class filter never hides them from their deck.
+  return allItems.filter(it => !it._anchorRef && it.type===type && (!activeDomain || it.type==='capability' || it.domain===activeDomain));
 }
 function openDeckView(type){ openDeck = type; renderLibrary(); }
 function closeDeckView(){ openDeck = null; renderLibrary(); }
@@ -18555,7 +18556,7 @@ function renderLibrary() {
 
   // Search across all decks (flat results)
   if (q) {
-    const hits = allItems.filter(it => !it._anchorRef && it.type!=='agent' && (!activeDomain || it.domain===activeDomain) &&
+    const hits = allItems.filter(it => !it._anchorRef && it.type!=='agent' && (!activeDomain || it.type==='capability' || it.domain===activeDomain) &&
       (it.name.toLowerCase().includes(q) || (it.signal||'').toLowerCase().includes(q) || (it.domain||'').toLowerCase().includes(q)));
     list.innerHTML = `
       <div class="deck-open-hdr"><span class="doh-title">SEARCH · ${hits.length} card${hits.length===1?'':'s'}</span></div>
@@ -18888,7 +18889,9 @@ function renderBoard() {
       if(hexId){
         const item = resolveItem(hexId);
         if(!item){container.appendChild(cell);continue;}
-        const dim = activeDomain && item.domain!==activeDomain ? ' domain-dimmed':'';
+        // Capabilities and Agents are cross-cutting — the pattern-class filter never dims them
+        // (capabilities have their own domain taxonomy from the library; agents have none).
+        const dim = activeDomain && item.type!=='capability' && item.type!=='agent' && item.domain!==activeDomain ? ' domain-dimmed':'';
         const cm = connectMode ? ' connect-mode':'';
         const cs = connectFrom===hexId ? ' connect-source':'';
         // Domain outline
@@ -19791,15 +19794,16 @@ function renderReportPage() {
   // Experiment cards — 2-col grid (deck style)
   function expCardHtml(key, er, idx) {
     const hexItem = resolveItem(key.split('::')[0]);
-    const stage = er.stage || er.status || 'pending';
-    const isPassed  = stage==='adopted'||stage==='passed';
-    const isRunning = stage==='running'||stage==='testing';
+    // Same mutually-exclusive buckets as the tracker (review folds into running).
+    const cat = expStageCategory(key);
+    const isPassed = cat==='passed', isRunning = cat==='running', isAband = cat==='abandoned';
     const pill = isPassed ? `<span class="rp-pill rp-pill-green">✓ PASSED</span>`
       : isRunning ? `<span class="rp-pill rp-pill-blue">▶ RUNNING</span>`
+      : isAband ? `<span class="rp-pill rp-pill-red">⏸ ABANDONED</span>`
       : `<span class="rp-pill rp-pill-gray">○ PENDING</span>`;
     const pts = isPassed?'+10 pts':isRunning?'+5 pts':'0 pts';
     const ptsCls = isPassed ? 'rp-pts-chip' : 'rp-pts-chip soft';
-    const note = isPassed?'Confirmed — pattern locked for adoption.':isRunning?'Running — mid-cycle check pending.':'Pending — awaiting kickoff.';
+    const note = isPassed?'Confirmed — pattern locked for adoption.':isRunning?'Running — mid-cycle check pending.':isAband?'Abandoned — learning captured.':'Pending — awaiting kickoff.';
     const hyp = er.hypothesis || er.notes || (hexItem ? hexItem.signal : '—');
     const domain = hexItem?.domain || '—';
     return `<div class="rp-exp-card">
@@ -20118,7 +20122,7 @@ function renderReportPage() {
         ${expEntries.length === 0
           ? `<div class="rp-empty">No experiments registered yet. Draw a Transition Nexus to a Capability hex and click the 🧪 on the line.</div>`
           : `<div class="rp-exp-grid">${expEntries.map(([k,e],i)=>expCardHtml(k,e,i)).join('')}</div>
-             <div class="rp-navy-strip">${expPassed} PASSED (<strong>+${expPassed*10} pts</strong>) · ${expRunning} RUNNING (<strong>+${expRunning*5} pts</strong>) · ${expPending} PENDING · Total experiment score: <strong>${bd.expScore} pts</strong></div>`
+             <div class="rp-navy-strip">${expPassed} PASSED (<strong>+${expPassed*10} pts</strong>) · ${expRunning} RUNNING (<strong>+${expRunning*5} pts</strong>) · ${expPending} PENDING · ${expAbandoned} ABANDONED · Total experiment score: <strong>${bd.expScore} pts</strong></div>`
         }
       </div>
     </div>
@@ -20208,6 +20212,7 @@ function generateCyclePDF() {
   const expPassed  = expE.filter(([k]) => expStageCategory(k)==='passed').length;
   const expRunning = expE.filter(([k]) => expStageCategory(k)==='running').length;
   const expPending = expE.filter(([k]) => expStageCategory(k)==='pending').length;
+  const expAband   = expE.filter(([k]) => expStageCategory(k)==='abandoned').length;
 
   const STD = [
     {name:'Foundational / Systemic Transformation'},
@@ -20444,18 +20449,19 @@ function generateCyclePDF() {
       const x = 10 + col*(eW+8), y = CY+2 + row*(eH+4);
       card(x, y, eW, eH);
       const hi = resolveItem(k.split('::')[0]);
-      const st = e.stage||e.status||'pending';
-      const iP = st==='adopted'||st==='passed', iR = st==='running'||st==='testing';
+      // Same mutually-exclusive buckets as the tracker (review folds into running).
+      const cat = expStageCategory(k);
+      const iP = cat==='passed', iR = cat==='running', iA = cat==='abandoned';
       doc.setFont('helvetica','bold'); doc.setFontSize(9); C(NAVY3); doc.text('EXP-' + String(i+1).padStart(2,'0'), x+6, y+8.5);
       doc.setFont('helvetica','normal'); doc.setFontSize(7.5); C(MUT); doc.text(String(hi?.domain||'—').substring(0,30), x+27, y+8.5);
-      const stp = iP?{c:GREEN,t:'PASSED'}:iR?{c:BLUE,t:'RUNNING'}:{c:GRAY,t:'PENDING'};
-      pill(x+eW-29, y+3.5, 24, 7.5, stp.c, stp.t, 6);
+      const stp = iP?{c:GREEN,t:'PASSED',w:24}:iR?{c:BLUE,t:'RUNNING',w:24}:iA?{c:'#d94a4a',t:'ABANDONED',w:30}:{c:GRAY,t:'PENDING',w:24};
+      pill(x+eW-5-stp.w, y+3.5, stp.w, 7.5, stp.c, stp.t, 6);
       P(TRACK); doc.setLineWidth(0.4); doc.line(x+6, y+12, x+eW-6, y+12);
       const hyp = String(e.hypothesis||e.notes||hi?.signal||'—');
       doc.setFont('helvetica','normal'); doc.setFontSize(8); C(DARK);
       doc.splitTextToSize(hyp, eW-14).slice(0,2).forEach((ln,li)=>doc.text(ln, x+6, y+17.5+li*4.8));
       doc.setFont('helvetica','italic'); doc.setFontSize(7); C(SUB);
-      doc.text(iP?'Confirmed — pattern locked.':iR?'Running — check pending.':'Pending — awaiting kickoff.', x+6, y+27.5);
+      doc.text(iP?'Confirmed — pattern locked.':iR?'Running — check pending.':iA?'Abandoned — learning captured.':'Pending — awaiting kickoff.', x+6, y+27.5);
       const pts = iP?'+10 pts':iR?'+5 pts':'0 pts';
       F(iP?NAVY:'#e2eefb'); doc.roundedRect(x+eW-25, y+22, 20, 6.5, 3.25, 3.25, 'F');
       doc.setFont('helvetica','bold'); doc.setFontSize(6.5); C(iP?'#ffffff':NAVY3); doc.text(pts, x+eW-15, y+26.3, { align:'center' });
@@ -20465,7 +20471,7 @@ function generateCyclePDF() {
     F(NAVY); doc.roundedRect(10, stripY, W-20, 13, 2.5, 2.5, 'F');
     doc.setFont('helvetica','bold'); doc.setFontSize(9); C('#ffffff');
     const moreTxt = expE.length>maxCards ? ' · showing ' + maxCards + '/' + expE.length : '';
-    doc.text(expPassed + ' PASSED (+' + (expPassed*10) + ' pts) · ' + expRunning + ' RUNNING (+' + (expRunning*5) + ' pts) · ' + expPending + ' PENDING · Total: ' + bd.expScore + ' pts' + moreTxt, W/2, stripY+8.5, { align:'center' });
+    doc.text(expPassed + ' PASSED (+' + (expPassed*10) + ' pts) · ' + expRunning + ' RUNNING (+' + (expRunning*5) + ' pts) · ' + expPending + ' PENDING · ' + expAband + ' ABANDONED · Total: ' + bd.expScore + ' pts' + moreTxt, W/2, stripY+8.5, { align:'center' });
   }
 
   // ══════════════════════════════════════════════════════════════════════
