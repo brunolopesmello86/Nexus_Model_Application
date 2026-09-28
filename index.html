@@ -1092,9 +1092,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 body.present .app-header,
 body.present .toolbox,
 body.present .dashboard,
-body.present .board-tabs,
+body.present .bvt-bar,
 body.present .zone-headers,
 body.present .loop-dock { display:none !important; }
+body.present #hexBoardArea::after { display:none !important; }
 body.present .main-layout { height:100vh !important; grid-template-columns:1fr !important; }
 /* auto (not hidden): a very dense board can still be panned rather than clipped */
 body.present #hexScrollArea { margin:0; border:none; border-radius:0; overflow:auto; }
@@ -2254,11 +2255,14 @@ function computeHexLayout() {
     // Presentation mode: fit the USED area to the screen (both axes), so the whole
     // map is visible with no scrolling. No CSS transform — hex geometry stays exact,
     // which keeps the connection-arrow overlay pixel-correct.
+    // NOTE: the normal-mode 120px floor must NOT apply here — it would force the
+    // board taller than the screen and silently hide everything below the fold
+    // (which looked like "only anti-patterns exist"). Fit wins; zoom is opt-in.
     const ext = usedGridExtent();
     const ah = wrapper.clientHeight || 600;
     const byW = (aw - GRID_PAD_LEFT - 8) / (0.75 * ext.cols + 0.25);
     const byH = (ah - 8) / (0.866 * (ext.rows + 0.5));
-    HEX_W = Math.max(120, Math.floor(Math.min(byW, byH)));
+    HEX_W = Math.max(44, Math.floor(Math.min(byW, byH) * (presentZoom || 1)));
   } else {
     const hexFromWidth = (aw - GRID_PAD_LEFT) / (0.75 * GRID_COLS + 0.25);
     HEX_W = Math.max(120, Math.floor(hexFromWidth));
@@ -19139,12 +19143,22 @@ function updateConnectStatus() {
 // ══════════════════════════════════════════
 // Hides the surrounding chrome and re-fits the board to the USED area, so the
 // whole map fills the screen. Fully interactive: facilitators edit live.
+// 1 = fit everything on screen; >1 zooms in (board then pans) so a facilitator
+// can zoom in to read detail — the "fit to window / 100%" pair from a slide tool.
+let presentZoom = 1;
 function relayoutBoard() {
   computeHexLayout();
   if (typeof renderBoard === 'function') renderBoard();
+  const lbl = document.getElementById('presentZoomLabel');
+  if (lbl) lbl.textContent = Math.round((presentZoom || 1) * 100) + '%';
+}
+function setPresentZoom(z) {
+  presentZoom = Math.min(4, Math.max(1, +(z).toFixed(2)));
+  relayoutBoard();
 }
 function enterPresent() {
   if (document.body.classList.contains('present')) return;
+  presentZoom = 1;
   document.body.classList.add('present');
   const el = document.documentElement;
   if (el.requestFullscreen) el.requestFullscreen().catch(()=>{}); // browser may refuse; CSS mode still applies
@@ -20967,6 +20981,9 @@ initDomainColorPicker();
 
 <!-- Presentation-mode exit control (only visible while presenting) -->
 <div id="presentExit">
+  <button onclick="setPresentZoom(presentZoom-0.25)" title="Zoom out">−</button>
+  <button onclick="setPresentZoom(1)" title="Fit the whole board on screen"><span id="presentZoomLabel">100%</span> · Fit</button>
+  <button onclick="setPresentZoom(presentZoom+0.25)" title="Zoom in to read detail">＋</button>
   <button onclick="exitPresent()" title="Exit presentation mode (Esc)">✕ Exit presenting</button>
 </div>
 
