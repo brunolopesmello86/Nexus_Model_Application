@@ -1861,7 +1861,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
             <div class="ptb-cname">TRANSITION PATH</div>
             <div class="ptb-cdesc">Dashed arrow. The intended journey: anti-pattern → transition → pattern.</div>
           </div>
-          <div class="ptb-card legend nexus" style="--ac:#19A7A1" onclick="toggleConnectMode('nexus');this.classList.toggle('on')" title="Toggle Transition Nexus linking">
+          <div class="ptb-card legend nexus" style="--ac:#19A7A1" onclick="toggleConnectMode('nexus')" title="Toggle Transition Nexus linking">
             <div class="ptb-ic"><svg viewBox="0 0 120 26" fill="none"><path d="M18 6 H60 V13" stroke="currentColor" stroke-width="3" fill="none"/><path d="M18 20 H60 V13" stroke="currentColor" stroke-width="3" fill="none"/><line x1="60" y1="13" x2="98" y2="13" stroke="currentColor" stroke-width="3"/><path d="M108 13 l-14 7 v-14 z" fill="currentColor"/></svg></div>
             <div class="ptb-cname">TRANSITION NEXUS</div>
             <div class="ptb-cdesc">The habit-replacement path. Click hexes in order — Capability and Agent required, anti-patterns and patterns optional.</div>
@@ -18979,7 +18979,8 @@ function removeHex(id,coordKey){
 function toggleConnectMode(type) {
   if (connectMode === type) { cancelConnectDraft(); } else { cancelConnectDraft(); connectMode=type; }
   document.querySelectorAll('.connect-btn').forEach(b=>b.classList.remove('active'));
-  if (connectMode) document.querySelector(`.connect-btn.${connectMode==='path'?'path':'nexus'}-btn`).classList.add('active');
+  if (connectMode) document.querySelector(`.connect-btn.${connectMode==='path'?'path':'nexus'}-btn`)?.classList.add('active');
+  syncNexusCard();
   updateConnectStatus();
   renderAllZones();
 }
@@ -18993,7 +18994,7 @@ function finishConnectPath() {
   if (nodes.length < 2) { showToast('A Transition Nexus needs at least 2 hexes.', 'info'); return; }
   if (extendConnId) {
     const conn = connections.find(c => c.id === extendConnId);
-    if (!conn) { cancelConnectDraft(); updateConnectStatus(); renderAllZones(); return; }
+    if (!conn) { cancelConnectDraft(); syncNexusCard(); updateConnectStatus(); renderAllZones(); return; }
     const missing = pathMissing(nodes);
     if (missing.length) { showToast(`⛔ This nexus still needs ${missing.join(' and ')} — add it to complete the path.`, 'warning'); return; }
     connSetNodes(conn, nodes);
@@ -19006,6 +19007,7 @@ function finishConnectPath() {
     addLog(`Transition Nexus created — ${nodes.map(id=>resolveItem(id)?.name||'?').join(' → ')}`, 'success');
   }
   cancelConnectDraft();
+  syncNexusCard();
   updateConnectStatus();
   renderAllZones();
   scheduleAutoSave();
@@ -19022,6 +19024,7 @@ function startExtendNexus(connId, end) {
   connectPath = nodes.slice();
   document.querySelectorAll('.connect-btn').forEach(b=>b.classList.remove('active'));
   document.querySelector('.connect-btn.nexus-btn')?.classList.add('active');
+  syncNexusCard();
   showToast(`Extending this nexus — click hexes to add them to the ${end === 'start' ? 'start' : 'end'} of the path, then press Done.`, 'info');
   updateConnectStatus();
   renderAllZones();
@@ -19049,7 +19052,7 @@ function updateConnectStatus() {
     `${extendConnId ? 'Extending: ' : ''}${names}${need} ` +
     `<button onclick="finishConnectPath()" style="margin-left:8px;padding:2px 10px;border-radius:5px;border:1px solid ${ready?'#19A7A1':'var(--border)'};background:${ready?'#19A7A1':'var(--surface2)'};color:${ready?'#fff':'var(--text-muted)'};font-size:10px;font-weight:700;cursor:pointer;">✓ Done</button> ` +
     `<button onclick="undoConnectStep()" style="margin-left:4px;padding:2px 8px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:10px;cursor:pointer;">↶ Undo</button> ` +
-    `<button onclick="cancelConnectDraft();updateConnectStatus();renderAllZones();" style="margin-left:4px;padding:2px 8px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:#d94a4a;font-size:10px;cursor:pointer;">✕</button>`;
+    `<button onclick="cancelConnectDraft();syncNexusCard();updateConnectStatus();renderAllZones();" style="margin-left:4px;padding:2px 8px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:#d94a4a;font-size:10px;cursor:pointer;">✕</button>`;
 }
 function undoConnectStep() {
   if (!connectPath.length) return;
@@ -19625,6 +19628,13 @@ function renderDomainList(){
 function syncCounterMappingCard(){
   const card=document.querySelector('.ptb-card.legend.cmap');
   if(card) card.classList.toggle('arming', !!selectedDomainId);
+}
+// Highlight the Transition Nexus card only while the mode is actually in use.
+// Derived from state (never a blind toggle) so it can't desync when the mode is
+// cleared programmatically — e.g. after finishing or cancelling a path.
+function syncNexusCard(){
+  const card=document.querySelector('.ptb-card.legend.nexus');
+  if(card) card.classList.toggle('on', connectMode==='nexus');
 }
 function selectDomainForAssignment(domId){
   if(selectedDomainId===domId){selectedDomainId=null;}
