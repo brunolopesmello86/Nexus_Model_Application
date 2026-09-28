@@ -1089,18 +1089,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 }
 
 /* ── Presentation mode (⛶) — clean full-screen canvas for workshops ────────── */
-body.present .app-header,
+/* The poster header stays: it holds the Agents palette and the Transition Nexus
+   button, which facilitators use live while presenting. */
 body.present .toolbox,
 body.present .dashboard,
 body.present .bvt-bar,
 body.present .zone-headers,
 body.present .loop-dock { display:none !important; }
 body.present #hexBoardArea::after { display:none !important; }
-body.present .main-layout { height:100vh !important; grid-template-columns:1fr !important; }
+body.present .main-layout { grid-template-columns:1fr !important; }
 /* auto (not hidden): a very dense board can still be panned rather than clipped */
 body.present #hexScrollArea { margin:0; border:none; border-radius:0; overflow:auto; }
 /* Present-mode exit control */
-#presentExit { display:none; position:fixed; top:14px; right:16px; z-index:1300; gap:8px; align-items:center; }
+/* bottom-right: clear of the poster header's own action buttons (top-right) */
+#presentExit { display:none; position:fixed; bottom:16px; right:16px; z-index:1300; gap:8px; align-items:center; }
 body.present #presentExit { display:flex; }
 #presentExit button { padding:7px 14px; border-radius:8px; border:1px solid var(--border);
   background:rgba(11,31,58,.86); color:#DCEBF7; font-size:11.5px; font-weight:700; cursor:pointer;
@@ -2235,15 +2237,24 @@ function getColsForRow(row) {
 // origin). Used by presentation mode to fit the real map to the screen instead
 // of reserving space for the whole empty 20x20 grid.
 function usedGridExtent() {
-  let maxC = 0, maxR = 0, any = false;
+  let maxC = -1, maxR = -1, minC = 1e9, minR = 1e9, any = false;
   Object.keys(gridState || {}).forEach(k => {
     const [r, c] = k.split(',').map(Number);
-    if (Number.isFinite(r) && Number.isFinite(c)) { any = true; if (c > maxC) maxC = c; if (r > maxR) maxR = r; }
+    if (!Number.isFinite(r) || !Number.isFinite(c)) return;
+    if (!resolveItem(gridState[k])) return;   // ignore unresolvable ghosts
+    any = true;
+    if (c > maxC) maxC = c; if (c < minC) minC = c;
+    if (r > maxR) maxR = r; if (r < minR) minR = r;
   });
-  // +1 to convert index->count, +1 spare column/row so the edge hex isn't flush
-  return any ? { cols: Math.min(GRID_COLS, maxC + 2), rows: Math.min(GRID_ROWS, maxR + 2) }
-             : { cols: GRID_COLS, rows: GRID_ROWS };
+  if (!any) return { minRow:0, minCol:0, rows: GRID_ROWS, cols: GRID_COLS };
+  // One spare ring around the content so edge hexes aren't flush to the border.
+  minR = Math.max(0, minR - 1); minC = Math.max(0, minC - 1);
+  maxR = Math.min(GRID_ROWS - 1, maxR + 1); maxC = Math.min(GRID_COLS - 1, maxC + 1);
+  return { minRow:minR, minCol:minC, rows: maxR - minR + 1, cols: maxC - minC + 1 };
 }
+// Render-origin offsets. Zero in normal mode; in presentation mode the board is
+// cropped to the content's bounding box so empty lanes don't shrink the hexes.
+let RENDER_ROW0 = 0, RENDER_COL0 = 0;
 function computeHexLayout() {
   const scroll = document.getElementById('hexScrollArea');
   const wrapper = scroll || document.getElementById('honeycombGrid')?.parentElement?.parentElement;
@@ -2276,8 +2287,8 @@ function computeHexLayout() {
 // Flat-top hexagon column-stagger: odd cols shift down by HEX_H/2
 function hexPixelPosition(row, col) {
   return {
-    x: GRID_PAD_LEFT + col * COL_W,
-    y: row * ROW_H + (col % 2 === 1 ? Math.round(HEX_H / 2) : 0)
+    x: GRID_PAD_LEFT + (col - RENDER_COL0) * COL_W,
+    y: (row - RENDER_ROW0) * ROW_H + (col % 2 === 1 ? Math.round(HEX_H / 2) : 0)
   };
 }
 function getZoneFromCoords(row, col) {
@@ -18726,11 +18737,15 @@ function renderBoard() {
   // Compute grid size (col-stagger: odd cols shift down by HEX_H/2).
   // Presentation mode renders only the USED extent so the map fits the screen.
   const present = document.body.classList.contains('present');
-  const ext = present ? usedGridExtent() : { cols: GRID_COLS, rows: GRID_ROWS };
+  const ext = present ? usedGridExtent() : { minRow:0, minCol:0, cols: GRID_COLS, rows: GRID_ROWS };
+  RENDER_ROW0 = ext.minRow; RENDER_COL0 = ext.minCol;
+  const rowStart = ext.minRow, colStart = ext.minCol;
+  const rowEnd = ext.minRow + ext.rows, colEnd = ext.minCol + ext.cols;
   const renderCols = ext.cols, renderRows = ext.rows;
   const laneRows = GRID_ROWS / 2;
   const hexGridW = GRID_PAD_LEFT + (renderCols - 1) * COL_W + HEX_W;
-  const strategicH = laneRows * ROW_H;
+  // Lane boundary in rendered coordinates (may sit off-canvas when cropped to one lane)
+  const strategicH = Math.max(0, (laneRows - rowStart)) * ROW_H;
   const totalH = renderRows * ROW_H + Math.round(HEX_H * 0.5) + 4; // +HEX_H/2 for staggered odd cols
   // Expand to fill full scroll area so no dark empty strip to the right
   const scrollArea = document.getElementById('hexScrollArea');
@@ -18741,22 +18756,29 @@ function renderBoard() {
 
   // Zone background overlay — single Transformation Path zone, full width
   const gridWidth = totalW - GRID_PAD_LEFT;
-  [0,1].forEach(li=>{
+  const laneBands = [
+    { top: 0,           height: Math.min(strategicH, totalH) },
+    { top: strategicH,  height: totalH - strategicH }
+  ];
+  laneBands.forEach(b=>{
+    if (b.height <= 0) return;   // lane entirely outside the cropped view
     const div = document.createElement('div');
     div.className = 'zone-bg';
     div.style.left = GRID_PAD_LEFT + 'px';
-    div.style.top = (li * strategicH) + 'px';
+    div.style.top = b.top + 'px';
     div.style.width = gridWidth + 'px';
-    div.style.height = (li === 0 ? strategicH : totalH - strategicH) + 'px';
+    div.style.height = b.height + 'px';
     div.style.borderRight = 'none';
     container.appendChild(div);
   });
 
-  // Lane divider
-  const divider = document.createElement('div');
-  divider.className = 'lane-divider';
-  divider.style.top = Math.round(strategicH) + 'px';
-  container.appendChild(divider);
+  // Lane divider — only when the boundary is actually inside the view
+  if (strategicH > 0 && strategicH < totalH) {
+    const divider = document.createElement('div');
+    divider.className = 'lane-divider';
+    divider.style.top = Math.round(strategicH) + 'px';
+    container.appendChild(divider);
+  }
 
   // ── Poster field decoration (visual only): glow blobs, mycelium flow lines, glow dots, deco hexes ──
   const decor = document.createElementNS('http://www.w3.org/2000/svg','svg');
@@ -18825,8 +18847,8 @@ function renderBoard() {
   });
 
   // Render hex cells (odd rows: 2 per zone for symmetric honeycomb)
-  for (let row = 0; row < renderRows; row++) {
-    const validCols = getColsForRow(row).filter(c => c < renderCols);
+  for (let row = rowStart; row < rowEnd; row++) {
+    const validCols = getColsForRow(row).filter(c => c >= colStart && c < colEnd);
     for (const col of validCols) {
       const key = `${row},${col}`;
       const hexId = gridState[key] || null;
