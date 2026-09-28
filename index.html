@@ -1088,6 +1088,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
   .rp-risk-mit { grid-column:2; border-top:2px solid #eef2f8; }
 }
 
+/* ── Transition Nexus draft bar (floating; the legacy connect toolbar is hidden) ── */
+#nexusDraftBar { display:none; position:fixed; left:50%; transform:translateX(-50%); bottom:22px; z-index:1200;
+  background:var(--surface); border:1.5px solid var(--accent); border-radius:12px; padding:10px 14px;
+  box-shadow:0 10px 34px rgba(0,0,0,.5); max-width:min(760px,92vw); }
+#nexusDraftBar.show { display:block; }
+.ndb-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.ndb-chain { font-size:11.5px; font-weight:700; color:var(--text); max-width:420px; overflow:hidden;
+  text-overflow:ellipsis; white-space:nowrap; }
+.ndb-hint { font-size:10px; color:var(--text-muted); margin-top:4px; }
+.ndb-need { color:#E2801E; font-weight:700; }
+.ndb-btn { padding:5px 12px; border-radius:6px; border:1px solid var(--border); background:var(--surface2);
+  color:var(--text); font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.ndb-btn:hover { background:rgba(255,255,255,.08); }
+.ndb-btn.go { background:var(--accent); border-color:var(--accent); color:#fff; }
+.ndb-btn.go:disabled { opacity:.45; cursor:not-allowed; }
+.ndb-btn.x { color:#d94a4a; border-color:rgba(217,74,74,.45); }
+
 /* ── Möbius Loop Layer ────────────────────────────────────────────── */
 /* Dock */
 .loop-dock { position:fixed; bottom:20px; right:20px; z-index:1100; background:var(--surface); border:1px solid var(--border); border-radius:12px; min-width:52px; max-width:230px; box-shadow:0 4px 20px rgba(0,0,0,.5); overflow:hidden; transition:max-width .25s, box-shadow .25s; }
@@ -19030,30 +19047,51 @@ function startExtendNexus(connId, end) {
   renderAllZones();
 }
 function updateConnectStatus() {
+  // Legacy inline status (lives in the hidden connect toolbar — kept in sync, not relied on).
   const el=document.getElementById('connectStatus');
-  if (!connectMode) { el.style.display='none'; return; }
-  el.style.display='inline';
-  if (connectMode === 'path') {
-    el.innerHTML = connectFrom
-      ? `"${escHtml(resolveItem(connectFrom)?.name||'')}" selected — now click the target hexagon`
-      : `Click a source hexagon to start a Transition Path`;
-    return;
+  if (el) {
+    el.style.display = connectMode ? 'inline' : 'none';
+    if (connectMode === 'path') {
+      el.innerHTML = connectFrom
+        ? `"${escHtml(resolveItem(connectFrom)?.name||'')}" selected — now click the target hexagon`
+        : `Click a source hexagon to start a Transition Path`;
+    }
   }
-  // Nexus: multi-hex path builder
-  if (!connectPath.length) {
-    el.innerHTML = `Click hexes to build the nexus path — it needs at least a <b>Capability</b> and an <b>Agent</b>`;
-    return;
-  }
-  const names = connectPath.map(id => escHtml(resolveItem(id)?.name || '?')).join(' → ');
+  // Floating draft bar — the visible, clickable controls for building a nexus path.
+  const bar = document.getElementById('nexusDraftBar');
+  const inner = document.getElementById('nexusDraftInner');
+  if (!bar || !inner) return;
+  if (connectMode !== 'nexus') { bar.classList.remove('show'); return; }
+  bar.classList.add('show');
   const missing = pathMissing(connectPath);
   const ready = connectPath.length >= 2 && !missing.length;
-  const need = missing.length ? ` · still needs ${missing.join(' and ')}` : '';
-  el.innerHTML =
-    `${extendConnId ? 'Extending: ' : ''}${names}${need} ` +
-    `<button onclick="finishConnectPath()" style="margin-left:8px;padding:2px 10px;border-radius:5px;border:1px solid ${ready?'#19A7A1':'var(--border)'};background:${ready?'#19A7A1':'var(--surface2)'};color:${ready?'#fff':'var(--text-muted)'};font-size:10px;font-weight:700;cursor:pointer;">✓ Done</button> ` +
-    `<button onclick="undoConnectStep()" style="margin-left:4px;padding:2px 8px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:10px;cursor:pointer;">↶ Undo</button> ` +
-    `<button onclick="cancelConnectDraft();syncNexusCard();updateConnectStatus();renderAllZones();" style="margin-left:4px;padding:2px 8px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:#d94a4a;font-size:10px;cursor:pointer;">✕</button>`;
+  const names = connectPath.map(id => escHtml(resolveItem(id)?.name || '?')).join(' → ');
+  const chain = connectPath.length
+    ? `${extendConnId ? '✎ Extending: ' : ''}${names}`
+    : 'Click hexes in order to build the nexus path';
+  const hint = connectPath.length
+    ? (missing.length
+        ? `<span class="ndb-need">Still needs ${missing.join(' and ')}</span> — every nexus needs at least a Capability and an Agent.`
+        : `Ready — press Done to save this path. (Enter = Done · Esc = Cancel)`)
+    : `A nexus needs at least a <b>Capability</b> and an <b>Agent</b>. Anti-patterns and patterns are optional.`;
+  inner.innerHTML =
+    `<div class="ndb-row">
+       <span class="ndb-chain" title="${escHtml(connectPath.map(id=>resolveItem(id)?.name||'?').join(' → '))}">${chain}</span>
+       <span style="flex:1"></span>
+       <button class="ndb-btn go" onclick="finishConnectPath()" ${ready?'':'disabled'}>✓ Done</button>
+       <button class="ndb-btn" onclick="undoConnectStep()">↶ Undo</button>
+       <button class="ndb-btn x" onclick="cancelConnectDraft();syncNexusCard();updateConnectStatus();renderAllZones();">✕ Cancel</button>
+     </div>
+     <div class="ndb-hint">${hint}</div>`;
 }
+// Keyboard shortcuts while drafting a nexus path: Enter commits, Esc cancels.
+document.addEventListener('keydown', e => {
+  if (connectMode !== 'nexus') return;
+  const t = e.target;
+  if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+  if (e.key === 'Enter') { e.preventDefault(); finishConnectPath(); }
+  else if (e.key === 'Escape') { e.preventDefault(); cancelConnectDraft(); syncNexusCard(); updateConnectStatus(); renderAllZones(); }
+});
 function undoConnectStep() {
   if (!connectPath.length) return;
   // While extending, never shrink past the nexus's original nodes.
@@ -20831,6 +20869,10 @@ initDomainColorPicker();
 })();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Transition Nexus draft bar — floating so it is visible regardless of the
+     (hidden) legacy connect toolbar. This is where a path is committed. -->
+<div id="nexusDraftBar"><div id="nexusDraftInner"></div></div>
 
 <!-- Möbius Loop Layer -->
 <div id="loopDock" class="loop-dock">
