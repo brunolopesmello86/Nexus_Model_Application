@@ -152,7 +152,6 @@ window.backLoopPhase = function() {
   if (!loop || loop.phase === 0) return;
   loop.phase--;
   if (window.renderLoopDock)  window.renderLoopDock();
-  if (window.renderLoopModal) window.renderLoopModal();
 };
 
 window.completeLoop = function() {
@@ -163,7 +162,6 @@ window.completeLoop = function() {
   window.loopSessions.push({ ...loop });
   window.activeLoop = null;
 
-  document.getElementById('loopModal').classList.remove('show');
   if (window.renderLoopDock) window.renderLoopDock();
   if (window.renderBoard)    window.renderBoard();
   if (window.scheduleAutoSave) window.scheduleAutoSave();
@@ -184,7 +182,6 @@ window.cancelLoop = function() {
     if (!confirm('Cancel this loop session? Unsaved progress will be lost.')) return;
     window.activeLoop = null;
   }
-  document.getElementById('loopModal').classList.remove('show');
   if (window.renderLoopDock) window.renderLoopDock();
   if (window.renderBoard)    window.renderBoard();
 };
@@ -194,13 +191,5 @@ window.toggleLoopDock = function() {
   if (window.renderLoopDock) window.renderLoopDock();
 };
 
-window.openLoopModal = function() {
-  if (!window.activeLoop) return;
-  document.getElementById('loopModal').classList.add('show');
-  if (window.renderLoopModal) window.renderLoopModal();
-};
-
-window.openLoopLog = function() {
-  document.getElementById('loopModal').classList.add('show');
-  if (window.renderLoopModal) window.renderLoopModal('log');
-};
+// The 5-phase modal was removed (unreachable v1 dead code); the dock stepper is
+// the loop UI. Full phase forms return with the persisted-loop upgrade.
