@@ -1088,6 +1088,27 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
   .rp-risk-mit { grid-column:2; border-top:2px solid #eef2f8; }
 }
 
+/* ── Presentation mode (⛶) — clean full-screen canvas for workshops ────────── */
+body.present .app-header,
+body.present .toolbox,
+body.present .dashboard,
+body.present .board-tabs,
+body.present .zone-headers,
+body.present .loop-dock { display:none !important; }
+body.present .main-layout { height:100vh !important; grid-template-columns:1fr !important; }
+/* auto (not hidden): a very dense board can still be panned rather than clipped */
+body.present #hexScrollArea { margin:0; border:none; border-radius:0; overflow:auto; }
+/* Present-mode exit control */
+#presentExit { display:none; position:fixed; top:14px; right:16px; z-index:1300; gap:8px; align-items:center; }
+body.present #presentExit { display:flex; }
+#presentExit button { padding:7px 14px; border-radius:8px; border:1px solid var(--border);
+  background:rgba(11,31,58,.86); color:#DCEBF7; font-size:11.5px; font-weight:700; cursor:pointer;
+  backdrop-filter:blur(4px); }
+#presentExit button:hover { border-color:var(--accent); color:#fff; }
+.present-btn { padding:5px 11px; border-radius:7px; border:1px solid var(--border); background:var(--surface2);
+  color:var(--text); font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap; }
+.present-btn:hover { border-color:var(--accent); color:var(--accent); }
+
 /* ── Transition Nexus draft bar (floating; the legacy connect toolbar is hidden) ── */
 #nexusDraftBar { display:none; position:fixed; left:50%; transform:translateX(-50%); bottom:22px; z-index:1200;
   background:var(--surface); border:1.5px solid var(--accent); border-radius:12px; padding:10px 14px;
@@ -1836,6 +1857,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
       <div class="ptb-menu-wrap">
         <button class="btn btn-sm ptb-burger" onclick="toggleTopMenu(event)" aria-label="Menu" title="Menu">☰ Menu</button>
         <div class="ptb-menu" id="ptbMenu">
+          <button class="btn btn-sm" onclick="toggleTopMenu();togglePresent()" title="Present full screen (F) — clean canvas for workshops">⛶ Present</button>
           <button class="btn btn-sm" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark theme">☀ Light</button>
           <button class="btn btn-sm" onclick="showModal('howToPlayModal')">? Help</button>
           <button class="btn btn-sm" onclick="showModal('addPatternModal')">＋ Pattern</button>
@@ -2208,6 +2230,19 @@ function getColsForRow(row) {
   return Array.from({length: GRID_COLS}, (_, i) => i);
 }
 
+// Bounding box of the columns/rows actually in use (plus the backlog-adjacent
+// origin). Used by presentation mode to fit the real map to the screen instead
+// of reserving space for the whole empty 20x20 grid.
+function usedGridExtent() {
+  let maxC = 0, maxR = 0, any = false;
+  Object.keys(gridState || {}).forEach(k => {
+    const [r, c] = k.split(',').map(Number);
+    if (Number.isFinite(r) && Number.isFinite(c)) { any = true; if (c > maxC) maxC = c; if (r > maxR) maxR = r; }
+  });
+  // +1 to convert index->count, +1 spare column/row so the edge hex isn't flush
+  return any ? { cols: Math.min(GRID_COLS, maxC + 2), rows: Math.min(GRID_ROWS, maxR + 2) }
+             : { cols: GRID_COLS, rows: GRID_ROWS };
+}
 function computeHexLayout() {
   const scroll = document.getElementById('hexScrollArea');
   const wrapper = scroll || document.getElementById('honeycombGrid')?.parentElement?.parentElement;
@@ -2215,8 +2250,19 @@ function computeHexLayout() {
   const aw = wrapper.clientWidth || 900;
   // Flat-top hex column-stagger: cols spaced at W*0.75
   // Total width = W*0.75*(GRID_COLS-1) + W = W*(0.75*GRID_COLS + 0.25)
-  const hexFromWidth = (aw - GRID_PAD_LEFT) / (0.75 * GRID_COLS + 0.25);
-  HEX_W = Math.max(120, Math.floor(hexFromWidth));
+  if (document.body.classList.contains('present')) {
+    // Presentation mode: fit the USED area to the screen (both axes), so the whole
+    // map is visible with no scrolling. No CSS transform — hex geometry stays exact,
+    // which keeps the connection-arrow overlay pixel-correct.
+    const ext = usedGridExtent();
+    const ah = wrapper.clientHeight || 600;
+    const byW = (aw - GRID_PAD_LEFT - 8) / (0.75 * ext.cols + 0.25);
+    const byH = (ah - 8) / (0.866 * (ext.rows + 0.5));
+    HEX_W = Math.max(120, Math.floor(Math.min(byW, byH)));
+  } else {
+    const hexFromWidth = (aw - GRID_PAD_LEFT) / (0.75 * GRID_COLS + 0.25);
+    HEX_W = Math.max(120, Math.floor(hexFromWidth));
+  }
   HEX_H = Math.round(HEX_W * 0.866);
   COL_W = Math.round(HEX_W * 0.75);  // column-to-column spacing (no gap)
   ROW_H = HEX_H;                      // row-to-row spacing (no gap)
@@ -18673,11 +18719,15 @@ function renderBoard() {
   computeHexLayout();
   // Set CSS custom properties for text scaling
   container.style.setProperty('--hex-w', HEX_W + 'px');
-  // Compute grid size (col-stagger: odd cols shift down by HEX_H/2)
+  // Compute grid size (col-stagger: odd cols shift down by HEX_H/2).
+  // Presentation mode renders only the USED extent so the map fits the screen.
+  const present = document.body.classList.contains('present');
+  const ext = present ? usedGridExtent() : { cols: GRID_COLS, rows: GRID_ROWS };
+  const renderCols = ext.cols, renderRows = ext.rows;
   const laneRows = GRID_ROWS / 2;
-  const hexGridW = GRID_PAD_LEFT + (GRID_COLS - 1) * COL_W + HEX_W;
+  const hexGridW = GRID_PAD_LEFT + (renderCols - 1) * COL_W + HEX_W;
   const strategicH = laneRows * ROW_H;
-  const totalH = GRID_ROWS * ROW_H + Math.round(HEX_H * 0.5) + 4; // +HEX_H/2 for staggered odd cols
+  const totalH = renderRows * ROW_H + Math.round(HEX_H * 0.5) + 4; // +HEX_H/2 for staggered odd cols
   // Expand to fill full scroll area so no dark empty strip to the right
   const scrollArea = document.getElementById('hexScrollArea');
   const totalW = Math.max(hexGridW, scrollArea ? scrollArea.clientWidth : hexGridW);
@@ -18771,8 +18821,8 @@ function renderBoard() {
   });
 
   // Render hex cells (odd rows: 2 per zone for symmetric honeycomb)
-  for (let row = 0; row < GRID_ROWS; row++) {
-    const validCols = getColsForRow(row);
+  for (let row = 0; row < renderRows; row++) {
+    const validCols = getColsForRow(row).filter(c => c < renderCols);
     for (const col of validCols) {
       const key = `${row},${col}`;
       const hexId = gridState[key] || null;
@@ -19084,6 +19134,51 @@ function updateConnectStatus() {
      </div>
      <div class="ndb-hint">${hint}</div>`;
 }
+// ══════════════════════════════════════════
+// PRESENTATION MODE — clean full-screen canvas for workshops
+// ══════════════════════════════════════════
+// Hides the surrounding chrome and re-fits the board to the USED area, so the
+// whole map fills the screen. Fully interactive: facilitators edit live.
+function relayoutBoard() {
+  computeHexLayout();
+  if (typeof renderBoard === 'function') renderBoard();
+}
+function enterPresent() {
+  if (document.body.classList.contains('present')) return;
+  document.body.classList.add('present');
+  const el = document.documentElement;
+  if (el.requestFullscreen) el.requestFullscreen().catch(()=>{}); // browser may refuse; CSS mode still applies
+  requestAnimationFrame(relayoutBoard);
+  showToast('Presenting — press Esc to exit', 'info');
+}
+function exitPresent() {
+  if (!document.body.classList.contains('present')) return;
+  document.body.classList.remove('present');
+  if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+  requestAnimationFrame(relayoutBoard);
+}
+function togglePresent() {
+  document.body.classList.contains('present') ? exitPresent() : enterPresent();
+}
+// Keep our CSS state in sync when the browser leaves fullscreen on its own (Esc, F11).
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement && document.body.classList.contains('present')) {
+    document.body.classList.remove('present');
+    requestAnimationFrame(relayoutBoard);
+  }
+});
+// Global shortcuts: F toggles presenting, Esc exits (ignored while typing).
+document.addEventListener('keydown', e => {
+  const t = e.target;
+  if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+  if (e.key === 'Escape' && document.body.classList.contains('present') && connectMode !== 'nexus') {
+    exitPresent();
+  } else if ((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    if (document.getElementById('mainApp')?.style.display === 'none') return;
+    e.preventDefault(); togglePresent();
+  }
+});
+
 // Keyboard shortcuts while drafting a nexus path: Enter commits, Esc cancels.
 document.addEventListener('keydown', e => {
   if (connectMode !== 'nexus') return;
@@ -20869,6 +20964,11 @@ initDomainColorPicker();
 })();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- Presentation-mode exit control (only visible while presenting) -->
+<div id="presentExit">
+  <button onclick="exitPresent()" title="Exit presentation mode (Esc)">✕ Exit presenting</button>
+</div>
 
 <!-- Transition Nexus draft bar — floating so it is visible regardless of the
      (hidden) legacy connect toolbar. This is where a path is committed. -->
