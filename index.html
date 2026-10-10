@@ -1396,7 +1396,7 @@ body.present #presentExit { display:flex; }
 :root:not([data-theme="light"]) .rp-tier-band { color:var(--text-muted); }
 :root:not([data-theme="light"]) .rp-cycle-dot { border-color:var(--surface); }
 :root:not([data-theme="light"]) .rp-cycle-node::before { background:var(--border); }
-/* ══ top band — THE AGENTS / TRANSITION ARROWS (poster) ══ */
+/* ══ top band — THE AGENTS / CONNECTIONS (poster) ══ */
 .agent-circle { clip-path:polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%); border-radius:0; border:none; }
 .agent-circle.human, .agent-circle.systemic, .agent-circle.ai { background:#F2C879; }
 .agent-circle svg { width:60%; height:60%; color:#050D18; }
@@ -1896,12 +1896,12 @@ body.present #presentExit { display:flex; }
         </div>
       </div>
       <div class="ptb-panel">
-        <div class="ptb-sec"><b>TRANSITION ARROWS</b><span>laid between hexagons</span></div>
+        <div class="ptb-sec"><b>CONNECTIONS</b><span>laid between hexagons</span></div>
         <div class="ptb-cards">
           <div class="ptb-card legend" style="--ac:#3C6EB4">
             <div class="ptb-ic"><svg viewBox="0 0 120 26" fill="none"><line x1="12" y1="13" x2="98" y2="13" stroke="currentColor" stroke-width="3" stroke-dasharray="9 7" stroke-linecap="round"/><path d="M108 13 l-14 7 v-14 z" fill="currentColor"/></svg></div>
-            <div class="ptb-cname">TRANSITION PATH</div>
-            <div class="ptb-cdesc">Dashed arrow. The intended journey: anti-pattern → transition → pattern.</div>
+            <div class="ptb-cname">VALUE STREAM MAPPING</div>
+            <div class="ptb-cdesc">Dashed arrow. Map how value actually flows through the organization.</div>
           </div>
           <div class="ptb-card legend nexus" style="--ac:#19A7A1" onclick="toggleConnectMode('nexus')" title="Toggle Transition Nexus linking">
             <div class="ptb-ic"><svg viewBox="0 0 120 26" fill="none"><path d="M18 6 H60 V13" stroke="currentColor" stroke-width="3" fill="none"/><path d="M18 20 H60 V13" stroke="currentColor" stroke-width="3" fill="none"/><line x1="60" y1="13" x2="98" y2="13" stroke="currentColor" stroke-width="3"/><path d="M108 13 l-14 7 v-14 z" fill="currentColor"/></svg></div>
@@ -1932,7 +1932,7 @@ body.present #presentExit { display:flex; }
     <div class="board-area">
       <div class="board-domains" id="boardDomains"></div>
       <div class="connect-toolbar">
-        <span class="ct-label">↳ TRANSITION ARROWS</span>
+        <span class="ct-label">↳ CONNECTIONS</span>
         <button class="connect-btn nexus-btn" onclick="toggleConnectMode('nexus')"><span class="cb-icon"></span> Transition Nexus</button>
         <div class="ct-sep"></div>
         <span class="ct-label">⬡ THE AGENTS</span>
@@ -19130,7 +19130,7 @@ function updateConnectStatus() {
     if (connectMode === 'path') {
       el.innerHTML = connectFrom
         ? `"${escHtml(resolveItem(connectFrom)?.name||'')}" selected — now click the target hexagon`
-        : `Click a source hexagon to start a Transition Path`;
+        : `Click a source hexagon to start a Value Stream Mapping`;
     }
   }
   // Floating draft bar — the visible, clickable controls for building a nexus path.
@@ -19233,7 +19233,7 @@ function undoConnectStep() {
 }
 function handleConnectClick(hexId) {
   if (!connectMode) return;
-  // ── Transition Path (unchanged 2-point behaviour) ──
+  // ── Value Stream Mapping (internal type stays 'path'; 2-point behaviour) ──
   if (connectMode === 'path') {
     if (!connectFrom) { connectFrom = hexId; updateConnectStatus(); renderAllZones(); return; }
     if (connectFrom === hexId) { connectFrom=null; updateConnectStatus(); renderAllZones(); return; }
@@ -19242,7 +19242,7 @@ function handleConnectClick(hexId) {
     }
     const fromItem=resolveItem(connectFrom), toItem=resolveItem(hexId);
     connections.push(connSetNodes({id:'conn_'+Date.now(), type:'path'}, [connectFrom, hexId]));
-    addLog(`Connected "${fromItem?.name}" → "${toItem?.name}" (Transition Path)`,'success');
+    addLog(`Connected "${fromItem?.name}" → "${toItem?.name}" (Value Stream Mapping)`,'success');
     connectFrom=null; updateConnectStatus(); renderAllZones(); scheduleAutoSave();
     return;
   }
