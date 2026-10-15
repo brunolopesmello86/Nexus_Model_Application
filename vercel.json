@@ -16,14 +16,64 @@
     {
       "src": "admin.html",
       "use": "@vercel/static"
+    },
+    {
+      "src": "loop-state.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "loop-ui.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "vsm-state.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "vsm-ui.js",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/index.js" },
-    { "src": "/auth", "dest": "/auth.html" },
-    { "src": "/auth.html", "dest": "/auth.html" },
-    { "src": "/admin", "dest": "/admin.html" },
-    { "src": "/admin.html", "dest": "/admin.html" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/auth",
+      "dest": "/auth.html"
+    },
+    {
+      "src": "/auth.html",
+      "dest": "/auth.html"
+    },
+    {
+      "src": "/admin",
+      "dest": "/admin.html"
+    },
+    {
+      "src": "/admin.html",
+      "dest": "/admin.html"
+    },
+    {
+      "src": "/loop-state.js",
+      "dest": "/loop-state.js"
+    },
+    {
+      "src": "/loop-ui.js",
+      "dest": "/loop-ui.js"
+    },
+    {
+      "src": "/vsm-state.js",
+      "dest": "/vsm-state.js"
+    },
+    {
+      "src": "/vsm-ui.js",
+      "dest": "/vsm-ui.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
   ]
 }
