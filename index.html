@@ -1165,6 +1165,136 @@ body.present #presentExit { display:flex; }
 .board-hex.is-loop-anchor { box-shadow:0 0 0 2px var(--accent) inset, 0 0 12px rgba(25,167,161,.5); }
 .board-hex.has-loop::after { content:'⟳'; position:absolute; bottom:3px; right:5px; font-size:9px; color:#38b2a0; opacity:.8; z-index:5; pointer-events:none; }
 
+
+/* ══ Value Stream Mapping ══════════════════════════════════════════ */
+#valueStreamsPage { flex-direction:column; overflow-y:auto; padding:0; }
+.vs-wrap { display:flex; flex-direction:column; gap:14px; padding:16px 18px 30px; }
+.vs-head { display:flex; gap:18px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
+  padding-bottom:14px; border-bottom:1px solid var(--border); }
+.vs-head-left { flex:1; min-width:320px; display:flex; flex-direction:column; gap:9px; }
+.vs-tabs { display:flex; gap:6px; flex-wrap:wrap; }
+.vs-tab { display:flex; align-items:center; gap:7px; padding:5px 11px; border-radius:7px; border:1px solid var(--border);
+  background:var(--surface2); color:var(--text-muted); font-size:11.5px; font-weight:700; cursor:pointer; }
+.vs-tab:hover { border-color:var(--accent); color:var(--text); }
+.vs-tab.on { background:rgba(25,167,161,.12); border-color:var(--accent); color:var(--text); }
+.vs-tab.add { font-size:14px; padding:5px 10px; color:var(--accent); }
+.vs-tab-type { font-family:ui-monospace,monospace; font-size:8px; font-weight:800; letter-spacing:.1em;
+  padding:2px 5px; border-radius:3px; background:rgba(60,110,180,.25); color:#9FC4F0; }
+.vs-tab-type.core { background:rgba(25,167,161,.22); color:#7FE3DD; }
+.vs-tab-type.supporting { background:rgba(226,128,30,.2); color:#F2C879; }
+.vs-name-input { background:none; border:none; border-bottom:1px solid transparent; color:var(--text);
+  font-size:21px; font-weight:800; padding:2px 0; width:100%; font-family:inherit; }
+.vs-name-input:hover { border-bottom-color:var(--border); }
+.vs-name-input:focus { outline:none; border-bottom-color:var(--accent); }
+.vs-trigger-row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.vs-trigger-row label { font-size:9px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--text-muted); }
+.vs-trigger-row input { flex:1; min-width:170px; background:var(--surface2); border:1px solid var(--border);
+  border-radius:6px; color:var(--text); font-size:11.5px; padding:5px 9px; font-family:inherit; }
+.vs-trigger-row input:focus { outline:none; border-color:var(--accent); }
+.vs-head-right { display:flex; flex-direction:column; gap:9px; align-items:flex-end; }
+.vs-kpis { display:flex; gap:8px; }
+.vs-kpi { background:var(--surface2); border:1px solid var(--border); border-radius:9px; padding:8px 14px; text-align:center; min-width:78px; }
+.vs-kpi .v { font-size:19px; font-weight:800; color:var(--accent); font-variant-numeric:tabular-nums; line-height:1.2; }
+.vs-kpi .l { font-size:8px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--text-muted); margin-top:2px; }
+.vs-del { background:none; border:1px solid rgba(217,74,74,.4); color:#d94a4a; border-radius:6px;
+  font-size:10px; font-weight:700; padding:4px 10px; cursor:pointer; }
+.vs-del:hover { background:rgba(217,74,74,.12); }
+.vs-gap { font-size:11.5px; color:#F2C879; background:rgba(226,128,30,.1); border:1px solid rgba(226,128,30,.3);
+  border-radius:8px; padding:8px 12px; }
+/* flow */
+.vs-flowscroll { overflow-x:auto; padding-bottom:6px; }
+.vs-flow { display:flex; align-items:stretch; gap:0; min-width:min-content; }
+.vs-stage { flex:0 0 170px; background:var(--surface); border:1px solid var(--border); border-radius:10px;
+  padding:11px 11px 10px; display:flex; flex-direction:column; gap:7px; cursor:pointer; transition:border-color .15s; }
+.vs-stage:hover { border-color:var(--accent); }
+.vs-stage.on { border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent), 0 0 14px rgba(25,167,161,.16); }
+.vs-stage.empty { border-style:dashed; }
+.vs-st-num { font-family:ui-monospace,monospace; font-size:8.5px; font-weight:800; color:#050D18;
+  background:#3C6EB4; border-radius:3px; padding:2px 6px; letter-spacing:.08em; }
+.vs-st-name { font-size:13px; font-weight:800; color:var(--text); line-height:1.25; }
+.vs-st-owner { font-size:9.5px; color:var(--text-muted); font-family:ui-monospace,monospace; }
+.vs-st-owner .muted, .vs-st-foot .muted { opacity:.55; }
+.vs-caps { display:flex; flex-wrap:wrap; gap:3px; }
+.vs-cap { font-size:9px; font-weight:600; padding:2px 6px; border-radius:3px; line-height:1.3;
+  background:rgba(201,214,230,.14); color:#C9D6E6; border:1px solid rgba(201,214,230,.26); }
+.vs-cap.none { background:none; border-color:transparent; color:var(--text-muted); font-style:italic; }
+.vs-st-foot { margin-top:auto; padding-top:6px; border-top:1px solid var(--border);
+  font-size:9.5px; color:var(--text-muted); font-family:ui-monospace,monospace; }
+.vs-st-foot b { color:var(--accent); }
+.vs-arrow { flex:0 0 24px; display:flex; align-items:center; justify-content:center; color:#3C6EB4; font-size:15px; }
+.vs-addstage { flex:0 0 42px; margin-left:10px; background:var(--surface2); border:1px dashed var(--border);
+  border-radius:10px; color:var(--accent); font-size:17px; cursor:pointer; }
+.vs-addstage:hover { border-color:var(--accent); }
+/* editor */
+.vs-editor { display:grid; grid-template-columns:1fr; gap:0; border:1px solid var(--border);
+  border-radius:11px; overflow:hidden; background:var(--surface); }
+@media(min-width:900px){ .vs-editor { grid-template-columns:330px 1fr; } }
+.vs-ed-left { padding:15px 16px; border-bottom:1px solid var(--border); background:var(--surface2); }
+@media(min-width:900px){ .vs-ed-left { border-bottom:none; border-right:1px solid var(--border); } }
+.vs-ed-right { padding:15px 16px; min-width:0; }
+.vs-ed-label { font-size:9px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px; }
+.vs-ed-label b { color:var(--accent); }
+.vs-ed-name { background:none; border:none; border-bottom:1px solid transparent; color:var(--text);
+  font-size:16px; font-weight:800; width:100%; padding:2px 0; font-family:inherit; }
+.vs-ed-name:hover { border-bottom-color:var(--border); }
+.vs-ed-name:focus { outline:none; border-bottom-color:var(--accent); }
+.vs-ed-field { margin-top:10px; }
+.vs-ed-field label { display:block; font-size:9px; font-weight:800; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--text-muted); margin-bottom:3px; }
+.vs-ed-field input { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:6px;
+  color:var(--text); font-size:12px; padding:5px 9px; font-family:inherit; }
+.vs-ed-field input:focus { outline:none; border-color:var(--accent); }
+.vs-ed-actions { display:flex; gap:5px; margin-top:11px; flex-wrap:wrap; }
+.vs-ed-actions button { font-size:10px; font-weight:700; padding:4px 9px; border-radius:5px;
+  border:1px solid var(--border); background:var(--bg); color:var(--text); cursor:pointer; }
+.vs-ed-actions button:hover:not(:disabled) { border-color:var(--accent); }
+.vs-ed-actions button:disabled { opacity:.35; cursor:not-allowed; }
+.vs-ed-actions button.danger { color:#d94a4a; border-color:rgba(217,74,74,.4); }
+.vs-ed-hint { font-size:10px; color:var(--text-muted); line-height:1.45; margin-bottom:8px; }
+.vs-cappick { max-height:290px; overflow-y:auto; border:1px solid var(--border); border-radius:8px; background:var(--bg); padding:5px; }
+.vs-dom { font-size:8.5px; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--cyan); padding:7px 7px 3px; }
+.vs-capopt { display:flex; align-items:center; gap:7px; padding:4px 7px; border-radius:5px; cursor:pointer; font-size:11.5px; }
+.vs-capopt:hover { background:rgba(255,255,255,.04); }
+.vs-capopt.on { background:rgba(201,214,230,.1); }
+.vs-capopt input { flex-shrink:0; margin:0; }
+.vs-capopt-n { flex:1; color:var(--text); }
+.vs-capopt-c { font-family:ui-monospace,monospace; font-size:9px; color:var(--text-muted); }
+.vs-noprac { font-size:11.5px; color:var(--text-muted); font-style:italic; padding:14px; text-align:center;
+  border:1px dashed var(--border); border-radius:8px; }
+.vs-praclist { display:flex; flex-direction:column; max-height:330px; overflow-y:auto; }
+.vs-prac { display:flex; align-items:center; gap:9px; padding:6px 2px; border-bottom:1px solid rgba(255,255,255,.05); }
+.vs-prac:last-child { border-bottom:none; }
+.vs-prac.off { opacity:.4; }
+.vs-prac.off .vs-prac-n { text-decoration:line-through; }
+.vs-pin { background:none; border:none; color:var(--accent); font-size:11px; cursor:pointer; padding:0 2px; flex-shrink:0; }
+.vs-prac.off .vs-pin { color:var(--text-muted); }
+.vs-prac-lvl { font-family:ui-monospace,monospace; font-size:8.5px; font-weight:700; color:var(--text-muted);
+  border:1px solid var(--border); border-radius:3px; padding:1px 4px; flex-shrink:0; }
+.vs-prac-n { flex:1; font-size:12px; color:var(--text); min-width:0; }
+.vs-prac-c { font-family:ui-monospace,monospace; font-size:9px; color:var(--text-muted); flex-shrink:0; }
+.vs-prac-s { font-family:ui-monospace,monospace; font-size:11px; font-weight:700; width:34px; text-align:right;
+  font-variant-numeric:tabular-nums; flex-shrink:0; }
+.vs-prac-s.good { color:#2d9d5e; } .vs-prac-s.mid { color:#4a90d9; }
+.vs-prac-s.low { color:#E2801E; } .vs-prac-s.none { color:var(--text-muted); }
+/* empty state */
+.vs-empty { display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px; padding:60px 24px; text-align:center; }
+.vs-empty-ico { font-size:40px; color:var(--accent); }
+.vs-empty-t { font-size:17px; font-weight:800; color:var(--text); }
+.vs-empty-d { font-size:12.5px; color:var(--text-muted); max-width:62ch; line-height:1.55; }
+.vs-tpl-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:11px; margin-top:16px;
+  width:100%; max-width:960px; }
+.vs-tpl { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:14px;
+  text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:5px; }
+.vs-tpl:hover { border-color:var(--accent); background:rgba(25,167,161,.07); }
+.vs-tpl-type { font-family:ui-monospace,monospace; font-size:8px; font-weight:800; letter-spacing:.14em;
+  padding:2px 6px; border-radius:10px; align-self:flex-start;
+  background:rgba(25,167,161,.18); color:#7FE3DD; }
+.vs-tpl-type.supporting { background:rgba(226,128,30,.18); color:#F2C879; }
+.vs-tpl-type.enabling { background:rgba(60,110,180,.22); color:#9FC4F0; }
+.vs-tpl-name { font-size:14px; font-weight:800; color:var(--text); }
+.vs-tpl-stages { font-size:10.5px; color:var(--text-muted); line-height:1.45; }
 /* ══ CODEX CARD DECKS ══ */
 .toolbox-sub { font-size:9px; font-weight:400; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase; margin-left:4px; }
 /* poster CODEX deck slots — tall vertical cards, dashed colored border, centered hex + labels */
@@ -1898,11 +2028,6 @@ body.present #presentExit { display:flex; }
       <div class="ptb-panel">
         <div class="ptb-sec"><b>CONNECTIONS</b><span>laid between hexagons</span></div>
         <div class="ptb-cards">
-          <div class="ptb-card legend" style="--ac:#3C6EB4">
-            <div class="ptb-ic"><svg viewBox="0 0 120 26" fill="none"><line x1="12" y1="13" x2="98" y2="13" stroke="currentColor" stroke-width="3" stroke-dasharray="9 7" stroke-linecap="round"/><path d="M108 13 l-14 7 v-14 z" fill="currentColor"/></svg></div>
-            <div class="ptb-cname">VALUE STREAM MAPPING</div>
-            <div class="ptb-cdesc">Dashed arrow. Map how value actually flows through the organization.</div>
-          </div>
           <div class="ptb-card legend nexus" style="--ac:#19A7A1" onclick="toggleConnectMode('nexus')" title="Toggle Transition Nexus linking">
             <div class="ptb-ic"><svg viewBox="0 0 120 26" fill="none"><path d="M18 6 H60 V13" stroke="currentColor" stroke-width="3" fill="none"/><path d="M18 20 H60 V13" stroke="currentColor" stroke-width="3" fill="none"/><line x1="60" y1="13" x2="98" y2="13" stroke="currentColor" stroke-width="3"/><path d="M108 13 l-14 7 v-14 z" fill="currentColor"/></svg></div>
             <div class="ptb-cname">TRANSITION NEXUS</div>
@@ -1956,6 +2081,7 @@ body.present #presentExit { display:flex; }
           <button class="bvt-btn" id="bvtAnchors" onclick="switchBoardView('anchors')"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="2.4" fill="currentColor"/><path d="M12 2.5 V5.5 M12 18.5 V21.5 M2.5 12 H5.5 M18.5 12 H21.5" stroke="currentColor" stroke-width="1.6"/></svg>Anchors</button>
           <button class="bvt-btn active" id="bvtBoard" onclick="switchBoardView('board')"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3 L18 3 L22 12 L18 21 L6 21 L2 12 Z" stroke="currentColor" stroke-width="1.6"/><path d="M9.5 8 L14.5 8 L17 12 L14.5 16 L9.5 16 L7 12 Z" fill="currentColor"/></svg>Board</button>
           <button class="bvt-btn" id="bvtExps" onclick="switchBoardView('experiments')"><svg viewBox="0 0 24 24" fill="none"><path d="M9 3 H15 M10.5 3 V10 L5.5 19.5 A1.4 1.4 0 0 0 6.8 21.5 L17.2 21.5 A1.4 1.4 0 0 0 18.5 19.5 L13.5 10 V3" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 15 H16 L18.5 19.5 A1.4 1.4 0 0 1 17.2 21.5 L6.8 21.5 A1.4 1.4 0 0 1 5.5 19.5 Z" fill="currentColor" opacity="0.5"/></svg>Experiments</button>
+          <button class="bvt-btn" id="bvtStreams" onclick="switchBoardView('streams')"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7 H9 L12 12 L15 17 H21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4.5" cy="7" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="19.5" cy="17" r="1.8" fill="currentColor"/></svg>Value Streams</button>
           <button class="bvt-btn" id="bvtReport" onclick="switchBoardView('report')"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8.5 8 H15.5 M8.5 12 H15.5 M8.5 16 H13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Org Fit Report</button>
           <button class="bvt-btn" id="bvtPractices" onclick="switchBoardView('practices')"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 15 L11 10 L14 13 L18 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Practices</button>
         </div>
@@ -1969,6 +2095,8 @@ body.present #presentExit { display:flex; }
         <div id="reportPage" class="report-page" style="display:none;"></div>
         <!-- Practice Maturity Tracker page -->
         <div id="practicesPage" class="anchors-page" style="display:none;"></div>
+        <!-- Value Stream Mapping page (hidden until tab active) -->
+        <div id="valueStreamsPage" class="anchors-page" style="display:none;"></div>
         <div style="display:flex;flex:1;overflow:hidden;" id="boardContent">
           <!-- Hex board: has its own zone header + scrollable content -->
           <div id="hexBoardArea" style="flex:7;display:flex;flex-direction:column;overflow:hidden;">
@@ -2612,7 +2740,8 @@ async function saveGame() {
       board_risks: boardRisks,
       loop_sessions: window.loopSessions || [],
       board_instances: boardInstances,
-      anchors: anchors
+      anchors: anchors,
+      value_streams: window.valueStreams || []
     });
     if (saved && saved.board_rev != null) boardRev = Number(saved.board_rev);
     showSave('saved');
@@ -2773,6 +2902,8 @@ async function loadGame(gameId) {
   window.loopSessions = g.loop_sessions || [];
   window.activeLoop = null;
   boardInstances = g.board_instances || {};
+  window.valueStreams = Array.isArray(g.value_streams) ? g.value_streams : [];
+  window.vsActiveId = null; window.vsActiveStage = null;
   const ad = g.active_drivers || {};
   if (Array.isArray(ad)) { driverAssignments = {}; } else { driverAssignments = ad; }
   cycleNumber = g.cycle_number || 1;
@@ -2860,23 +2991,27 @@ function switchBoardView(view) {
   const reportPage = document.getElementById('reportPage');
   const anchorsPage = document.getElementById('anchorsPage');
   const practicesPage = document.getElementById('practicesPage');
+  const streamsPage = document.getElementById('valueStreamsPage');
   document.getElementById('bvtBoard').classList.toggle('active', view === 'board');
   document.getElementById('bvtAnchors').classList.toggle('active', view === 'anchors');
   document.getElementById('bvtExps').classList.toggle('active', view === 'experiments');
   document.getElementById('bvtCaps').classList.toggle('active', view === 'capabilities');
   document.getElementById('bvtReport').classList.toggle('active', view === 'report');
   document.getElementById('bvtPractices').classList.toggle('active', view === 'practices');
+  document.getElementById('bvtStreams').classList.toggle('active', view === 'streams');
   boardContent.style.display = view === 'board' ? 'flex' : 'none';
   expPage.style.display = view === 'experiments' ? 'flex' : 'none';
   capPage.style.display = view === 'capabilities' ? 'flex' : 'none';
   reportPage.style.display = view === 'report' ? 'flex' : 'none';
   if (anchorsPage) anchorsPage.style.display = view === 'anchors' ? 'flex' : 'none';
   if (practicesPage) practicesPage.style.display = view === 'practices' ? 'flex' : 'none';
+  if (streamsPage) streamsPage.style.display = view === 'streams' ? 'flex' : 'none';
   if (view === 'capabilities') renderCapabilitiesPage();
   if (view === 'experiments') renderExperimentsPage();
   if (view === 'report') renderReportPage();
   if (view === 'anchors') renderAnchorsPage();
   if (view === 'practices') renderPracticesPage();
+  if (view === 'streams' && window.renderValueStreamsPage) window.renderValueStreamsPage();
 }
 
 // ══════════════════════════════════════════
@@ -19747,6 +19882,7 @@ function addCustomPattern(){
 }
 function resetBoard(){
   if(!confirm('Reset the entire board? (anchors will be kept — clear them from the Anchors tab if needed)'))return;
+  window.valueStreams=[];window.vsActiveId=null;window.vsActiveStage=null;
   gridState={};boardInstances={};agentAssignments={};driverAssignments={};connections=[];boardMarkers=[];domainDefinitions=[];experimentResults={};practiceRepetitions={};practiceMaturity={};selectedDomainId=null;cyclePhase=0;cycleNumber=1;completedPhases.clear();logEntries=[];boardMilestones=[];boardRisks=[];window.loopSessions=[];window.activeLoop=null;
   // Reset backlog-item refs; anchors keep their marker but the item ids are re-derived on next backlog sync
   currentItems=[];
@@ -21018,6 +21154,8 @@ initDomainColorPicker();
   <button class="loop-dock-toggle" onclick="toggleLoopDock()">⟳ Möbius Loop</button>
   <div id="loopDockBody" class="loop-dock-body"></div>
 </div>
+<script src="vsm-state.js"></script>
+<script src="vsm-ui.js"></script>
 <script src="loop-state.js"></script>
 <script src="loop-ui.js"></script>
 <script>
