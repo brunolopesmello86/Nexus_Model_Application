@@ -1202,7 +1202,9 @@ body.present #presentExit { display:flex; }
 .vs-gap { font-size:11.5px; color:#F2C879; background:rgba(226,128,30,.1); border:1px solid rgba(226,128,30,.3);
   border-radius:8px; padding:8px 12px; }
 /* flow */
-.vs-flowscroll { overflow-x:auto; padding-bottom:6px; }
+.vs-flowscroll { overflow-x:auto; padding-bottom:6px; /* overflow-x:auto forces the vertical axis to clip too, so the BOTTLENECK
+     badge that hangs above a stage card needs room INSIDE the scroller */
+  padding-top:14px; }
 .vs-flow { display:flex; align-items:stretch; gap:0; min-width:min-content; }
 .vs-stage { flex:0 0 170px; background:var(--surface); border:1px solid var(--border); border-radius:10px;
   padding:11px 11px 10px; display:flex; flex-direction:column; gap:7px; cursor:pointer; transition:border-color .15s; }
@@ -1310,7 +1312,7 @@ body.present #presentExit { display:flex; }
 .vs-neck-tag { font-family:ui-monospace,monospace; font-size:8px; font-weight:800; letter-spacing:.12em;
   background:#d94a4a; color:#fff; padding:2px 7px; border-radius:10px; flex-shrink:0; }
 .vs-stage.neck { border-color:#d94a4a; box-shadow:0 0 0 1px rgba(217,74,74,.3), 0 0 18px rgba(217,74,74,.14); }
-.vs-neck-badge { position:absolute; top:-8px; right:8px; font-family:ui-monospace,monospace; font-size:7.5px;
+.vs-neck-badge { position:absolute; top:-9px; right:8px; z-index:3; font-family:ui-monospace,monospace; font-size:7.5px;
   font-weight:800; letter-spacing:.1em; background:#d94a4a; color:#fff; padding:2px 6px; border-radius:9px; }
 .vs-stage { position:relative; }
 .vs-st-prac { font-size:9.5px; color:var(--text-muted); font-family:ui-monospace,monospace; }
