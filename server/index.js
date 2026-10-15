@@ -270,7 +270,7 @@ app.put('/api/games/:gameId', async (req, res) => {
     connections, board_markers, domain_definitions,
     experiment_results, practice_repetitions, transformation_horizons,
     board_milestones, board_risks, loop_sessions, board_instances, anchors,
-    practice_maturity, expected_rev
+    practice_maturity, value_streams, expected_rev
   } = req.body;
   try {
     if (ENFORCE() && !(await requireBoard(req, res, req.params.gameId))) return;
@@ -281,6 +281,7 @@ app.put('/api/games/:gameId', async (req, res) => {
     await db.query('ALTER TABLE games ADD COLUMN IF NOT EXISTS anchors JSONB NOT NULL DEFAULT \'[]\'');
     await db.query('ALTER TABLE games ADD COLUMN IF NOT EXISTS practice_maturity JSONB NOT NULL DEFAULT \'{}\'');
     await db.query('ALTER TABLE games ADD COLUMN IF NOT EXISTS board_rev INTEGER NOT NULL DEFAULT 0');
+    await db.query("ALTER TABLE games ADD COLUMN IF NOT EXISTS value_streams JSONB NOT NULL DEFAULT '[]'");
     const rev = (expected_rev === undefined || expected_rev === null) ? null : Number(expected_rev);
     const { rows } = await db.query(`
       UPDATE games SET
@@ -291,7 +292,11 @@ app.put('/api/games/:gameId', async (req, res) => {
         experiment_results = $13, practice_repetitions = $14,
         transformation_horizons = $15, board_milestones = $16, board_risks = $17,
         loop_sessions = $18, board_instances = $19, anchors = $20,
-        practice_maturity = $21, updated_at = NOW(),
+        practice_maturity = $21,
+        -- A client that does not send value_streams (any build before this one)
+        -- must never blank it: COALESCE keeps whatever is already stored.
+        value_streams = COALESCE($24::jsonb, value_streams),
+        updated_at = NOW(),
         board_rev = COALESCE(board_rev, 0) + 1
       WHERE id = $22
         AND ($23::int IS NULL OR COALESCE(board_rev, 0) = $23::int)
@@ -311,7 +316,8 @@ app.put('/api/games/:gameId', async (req, res) => {
       JSON.stringify(anchors || []),
       JSON.stringify(practice_maturity || {}),
       req.params.gameId,
-      rev
+      rev,
+      (value_streams === undefined || value_streams === null) ? null : JSON.stringify(value_streams)
     ]);
     if (!rows.length) {
       // Zero rows: either the game doesn't exist (404) or the rev check failed (409).
@@ -2950,7 +2956,10 @@ app.delete('/api/practices/:id', async (req, res) => {
 async function ensureGamesBoardRev() {
   try {
     await db.query("ALTER TABLE games ADD COLUMN IF NOT EXISTS board_rev INTEGER NOT NULL DEFAULT 0");
-  } catch (err) { console.error('board_rev column guard error:', err.message); }
+    // Value Stream Mapping lives in its own column, never inside board_state
+    // (which already approaches the 1MB request limit). Purely additive.
+    await db.query("ALTER TABLE games ADD COLUMN IF NOT EXISTS value_streams JSONB NOT NULL DEFAULT '[]'");
+  } catch (err) { console.error('games column guard error:', err.message); }
 }
 if (process.env.VERCEL) {
   ensureGamesBoardRev()
