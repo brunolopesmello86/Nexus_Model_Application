@@ -1295,6 +1295,45 @@ body.present #presentExit { display:flex; }
 .vs-tpl-type.enabling { background:rgba(60,110,180,.22); color:#9FC4F0; }
 .vs-tpl-name { font-size:14px; font-weight:800; color:var(--text); }
 .vs-tpl-stages { font-size:10.5px; color:var(--text-muted); line-height:1.45; }
+
+/* ── VSM stage fitness / bottleneck / modal ── */
+.vs-name-row { display:flex; align-items:center; gap:9px; }
+.vs-type-chip { font-family:ui-monospace,monospace; font-size:8px; font-weight:800; letter-spacing:.12em;
+  padding:3px 8px; border-radius:11px; cursor:pointer; border:1px solid transparent;
+  background:rgba(25,167,161,.2); color:#7FE3DD; flex-shrink:0; }
+.vs-type-chip.enabling { background:rgba(60,110,180,.24); color:#9FC4F0; }
+.vs-type-chip.supporting { background:rgba(226,128,30,.2); color:#F2C879; }
+.vs-type-chip:hover { border-color:currentColor; }
+.vs-kpi.fit .v.muted { color:var(--text-muted); }
+.vs-neck { display:flex; align-items:center; gap:9px; flex-wrap:wrap; font-size:12px; color:var(--text);
+  background:rgba(217,74,74,.09); border:1px solid rgba(217,74,74,.35); border-radius:8px; padding:8px 12px; }
+.vs-neck-tag { font-family:ui-monospace,monospace; font-size:8px; font-weight:800; letter-spacing:.12em;
+  background:#d94a4a; color:#fff; padding:2px 7px; border-radius:10px; flex-shrink:0; }
+.vs-stage.neck { border-color:#d94a4a; box-shadow:0 0 0 1px rgba(217,74,74,.3), 0 0 18px rgba(217,74,74,.14); }
+.vs-neck-badge { position:absolute; top:-8px; right:8px; font-family:ui-monospace,monospace; font-size:7.5px;
+  font-weight:800; letter-spacing:.1em; background:#d94a4a; color:#fff; padding:2px 6px; border-radius:9px; }
+.vs-stage { position:relative; }
+.vs-st-prac { font-size:9.5px; color:var(--text-muted); font-family:ui-monospace,monospace; }
+.vs-st-prac b { color:var(--accent); }
+.vs-fit { margin-top:5px; }
+.vs-fit.none .vs-fit-l { font-size:9px; font-style:italic; color:var(--text-muted); opacity:.75; }
+.vs-fitbar { height:5px; border-radius:3px; background:rgba(255,255,255,.08); overflow:hidden; }
+.vs-fitbar i { display:block; height:100%; border-radius:3px; }
+.vs-fitrow { display:flex; justify-content:space-between; align-items:baseline; margin-top:3px;
+  font-family:ui-monospace,monospace; font-size:9px; letter-spacing:.06em; }
+.vs-fit-l { color:var(--text-muted); text-transform:uppercase; }
+.vs-fit-v { font-weight:700; font-variant-numeric:tabular-nums; }
+.vs-fit-cov { font-family:ui-monospace,monospace; font-size:8.5px; color:var(--text-muted); opacity:.7; margin-top:1px; }
+.vs-modal { position:fixed; inset:0; z-index:9999; background:rgba(2,7,14,.78); display:flex;
+  align-items:center; justify-content:center; padding:24px; }
+.vs-modal-box { background:var(--surface); border:1px solid var(--border); border-radius:14px;
+  max-width:820px; width:100%; max-height:86vh; overflow-y:auto; box-shadow:0 22px 60px rgba(0,0,0,.55); }
+.vs-modal-hd { display:flex; align-items:center; justify-content:space-between; padding:16px 20px;
+  border-bottom:1px solid var(--border); }
+.vs-modal-hd h3 { margin:0; font-size:16px; font-weight:800; color:var(--text); }
+.vs-modal-hd button { background:none; border:none; color:var(--text-muted); font-size:15px; cursor:pointer; }
+.vs-modal-hd button:hover { color:var(--text); }
+.vs-tpl-grid.in-modal { padding:18px 20px 22px; margin-top:0; max-width:none; }
 /* ══ CODEX CARD DECKS ══ */
 .toolbox-sub { font-size:9px; font-weight:400; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase; margin-left:4px; }
 /* poster CODEX deck slots — tall vertical cards, dashed colored border, centered hex + labels */

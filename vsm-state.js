@@ -26,6 +26,29 @@ window.VS_TEMPLATES = [
   { key:'blank', name:'Blank stream', type:'core', trigger:'', outcome:'', stages:['Stage 1'] }
 ];
 
+
+// ── Safe access to app globals ───────────────────────────────────────
+// index.html declares these with `let`, so they never become window
+// properties — but classic scripts share the global lexical scope, so the
+// bare identifier resolves. Guarded with typeof so this file can also be
+// loaded in isolation (tests) without throwing.
+function vsLib(){
+  try { return (typeof capabilitiesLibrary !== 'undefined' && Array.isArray(capabilitiesLibrary)) ? capabilitiesLibrary : []; }
+  catch (e) { return []; }
+}
+function vsReps(pid){
+  try { return (typeof practiceRepetitions !== 'undefined' && practiceRepetitions) ? (practiceRepetitions[pid] || 0) : 0; }
+  catch (e) { return 0; }
+}
+function vsHabitCount(pid){
+  try { return (typeof pmHabits === 'function') ? pmHabits(pid).length : 0; }
+  catch (e) { return 0; }
+}
+function vsPracFitness(pid){
+  try { return (typeof pmStats === 'function') ? (pmStats(pid).fitness || 0) : 0; }
+  catch (e) { return 0; }
+}
+
 function vsUid(p){ return p + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 
 window.vsActive = function(){
@@ -110,7 +133,7 @@ window.vsTogglePractice = function(stageId, pracId){
 // Mapping a capability brings all of its practices; `unpinned` subtracts.
 window.vsStagePractices = function(stageId){
   const st = window.vsStage(stageId); if (!st) return [];
-  const lib = window.capabilitiesLibrary || [];
+  const lib = vsLib();
   const un = new Set(st.unpinned || []);
   const out = [];
   (st.capabilityIds || []).forEach(cid => {
@@ -142,4 +165,73 @@ window.vsStreamCounts = function(){
 window.vsGaps = function(){
   const s = window.vsActive(); if (!s) return [];
   return s.stages.filter(st => !(st.capabilityIds || []).length).map(st => st.name);
+};
+
+// ── Stage fitness ────────────────────────────────────────────────────
+// A practice counts toward a stage's score only once it is actually tracked
+// (habits scored, or repetitions logged). Averaging untracked practices in
+// would report "Fragile" for a stage that simply has not been measured yet —
+// so coverage is reported separately rather than folded into the number.
+window.vsPracticeTracked = function(pid){
+  return vsHabitCount(pid) > 0 || vsReps(pid) > 0;
+};
+
+window.vsStageFitness = function(stageId){
+  const placed = window.vsStagePractices(stageId).filter(p => p.pinned);
+  const tracked = placed.filter(p => window.vsPracticeTracked(p.id));
+  if (!tracked.length) {
+    return { measured:false, score:null, placed:placed.length, tracked:0, coverage:0 };
+  }
+  const sum = tracked.reduce((a,p) => a + vsPracFitness(p.id), 0);
+  return {
+    measured:true,
+    score: Math.round(sum / tracked.length),
+    placed: placed.length,
+    tracked: tracked.length,
+    coverage: placed.length ? Math.round(tracked.length / placed.length * 100) : 0
+  };
+};
+
+// Same bands as the Practices tracker so the two surfaces agree.
+window.vsBand = function(v){
+  if (typeof pmBand === 'function') { try { return pmBand(v); } catch(e){} }
+  if (v >= 80) return { n:'Antifragile', c:'#0072ce' };
+  if (v >= 60) return { n:'Resilient',   c:'#2d9d5e' };
+  if (v >= 40) return { n:'Stable',      c:'#f2c14e' };
+  if (v >= 20) return { n:'Emerging',    c:'#f5821f' };
+  return         { n:'Fragile',     c:'#d94a4a' };
+};
+
+// Stream fitness = average of the stages that are actually measured.
+window.vsStreamFitness = function(){
+  const s = window.vsActive(); if (!s) return { measured:false, score:null, measuredStages:0, totalStages:0 };
+  const f = s.stages.map(st => window.vsStageFitness(st.id)).filter(x => x.measured);
+  if (!f.length) return { measured:false, score:null, measuredStages:0, totalStages:s.stages.length };
+  return {
+    measured:true,
+    score: Math.round(f.reduce((a,x) => a + x.score, 0) / f.length),
+    measuredStages: f.length,
+    totalStages: s.stages.length
+  };
+};
+
+// The weakest measured stage — a bottleneck can only be claimed where there is data.
+window.vsBottleneck = function(){
+  const s = window.vsActive(); if (!s) return null;
+  let worst = null;
+  s.stages.forEach(st => {
+    const f = window.vsStageFitness(st.id);
+    if (!f.measured) return;
+    if (!worst || f.score < worst.score) worst = { id: st.id, name: st.name, score: f.score };
+  });
+  return worst;
+};
+
+// Let the stream type be changed after creation (it is set by the template).
+window.VS_TYPES = ['core','enabling','supporting'];
+window.vsCycleType = function(){
+  const s = window.vsActive(); if (!s) return;
+  const i = window.VS_TYPES.indexOf(s.type || 'core');
+  s.type = window.VS_TYPES[(i + 1) % window.VS_TYPES.length];
+  if (window.scheduleAutoSave) window.scheduleAutoSave();
 };
