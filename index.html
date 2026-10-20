@@ -752,6 +752,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Ar
 .exp-mv.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
 .exp-mv.primary:hover { opacity:.9; }
 .exp-mv.danger { color:#d94a4a; border-color:rgba(217,74,74,.5); }
+.exp-mv.exp-del { margin-left:auto; opacity:.55; }
+.exp-mv.exp-del:hover { opacity:1; background:rgba(217,74,74,.14); border-color:#d94a4a; }
 .exp-mv.danger:hover { background:rgba(217,74,74,.12); border-color:#d94a4a; }
 .exp-mv.reopen { color:#e8943a; border-color:rgba(232,148,58,.5); }
 .exp-mv.reopen:hover { background:rgba(232,148,58,.12); border-color:#e8943a; }
@@ -4403,6 +4405,8 @@ function experimentModalHtml(key) {
       ${stage==='abandoned' ? `<span style="font-size:11px;font-weight:700;color:${meta.c}">● Abandoned</span>` : ''}
       ${stage==='abandoned' && !er.closedPath ? `<button class="exp-mv reopen" onclick="reopenExperiment('${escHtml(key)}')" title="Create a fresh experiment for the same practice; this abandoned attempt stays as history">↻ Reopen for a new attempt</button>` : ''}
       <span class="exp-pts" style="color:${meta.pts?meta.c:'var(--text-muted)'}">${meta.pts?'+':''}${meta.pts} pts</span>
+      <button class="exp-mv danger exp-del" onclick="deleteExperiment('${escHtml(key)}')"
+        title="Delete this experiment for good — the only place that does">Delete</button>
     </div>`;
 }
 function openExperimentModal(key) {
@@ -19437,10 +19441,66 @@ function handleConnectClick(hexId) {
   renderAllZones();
 }
 function deleteConnection(connId) {
-  connections = connections.filter(c=>c.id!==connId);
-  addLog('Connection removed','warning');
+  const conn = connections.find(c => c.id === connId);
+  if (!conn) return;
+  const label = (typeof connPathLabel === 'function') ? connPathLabel(conn) : connId;
+  const isNexus = conn.type === 'nexus';
+  // experiments belong to the Experiments tab, not to the line on the board:
+  // removing the nexus keeps every record and its fitness impact
+  const expKeys = (typeof getConnExpKeys === 'function')
+    ? getConnExpKeys(conn.id).filter(k => experimentResults[k]) : [];
+  const open = expKeys.filter(k => {
+    const st = experimentResults[k] && experimentResults[k].stage;
+    return st === 'pending' || st === 'running' || st === 'review';
+  });
+
+  let msg = isNexus
+    ? `Remove the Transition Nexus "${label}"?\n\nThe line comes off the board. You can draw a new one here later.`
+    : `Remove this connection?\n\n"${label}"`;
+  if (expKeys.length) {
+    msg += `\n\n${expKeys.length} experiment${expKeys.length > 1 ? 's' : ''} ${expKeys.length > 1 ? 'are' : 'is'} attached.`
+      + `\nThey are kept in the Experiments tab and keep counting towards fitness.`
+      + (open.length ? `\n\n${open.length} of them ${open.length > 1 ? 'are' : 'is'} still open.` : '')
+      + `\nExperiments are only ever deleted from the Experiments tab.`;
+  }
+  if (!confirm(msg)) return;
+
+  // mark, don't drop: the record survives its nexus
+  expKeys.forEach(k => {
+    if (experimentResults[k]) {
+      experimentResults[k].closedPath = true;
+      experimentResults[k].pathLabel = label;
+    }
+  });
+  connections = connections.filter(c => c.id !== connId);
+  addLog(isNexus ? `Removed Transition Nexus "${label}"` : 'Connection removed', 'warning');
+  if (expKeys.length) {
+    showToast(`Nexus removed — ${expKeys.length} experiment${expKeys.length > 1 ? 's' : ''} kept in the Experiments tab.`, 'success');
+  }
   renderConnections();
+  if (typeof renderExperimentsPage === 'function') renderExperimentsPage();
+  if (typeof renderFitnessPanel === 'function') renderFitnessPanel();
+  if (typeof updateStats === 'function') updateStats();
   scheduleAutoSave();
+}
+
+/** The only place an experiment is ever destroyed — the Experiments tab. */
+function deleteExperiment(key) {
+  const er = experimentResults[key];
+  if (!er) return;
+  const name = (er.practiceName || er.title || key).toString();
+  if (!confirm(`Delete the experiment "${name}"?\n\n`
+    + `Its record, its history and its effect on fitness are removed for good. `
+    + `This cannot be undone.\n\nRemoving a Transition Nexus does not do this — only this button does.`)) return;
+  delete experimentResults[key];
+  addLog(`Deleted experiment "${name}"`, 'warning');
+  if (typeof closeExperimentModal === 'function') closeExperimentModal();
+  if (typeof renderExperimentsPage === 'function') renderExperimentsPage();
+  if (typeof renderFitnessPanel === 'function') renderFitnessPanel();
+  if (typeof updateStats === 'function') updateStats();
+  if (typeof renderConnections === 'function') renderConnections();
+  scheduleAutoSave();
+  showToast('Experiment deleted.', 'warning');
 }
 // ── Connection geometry helpers ──
 // Get hex bounding box relative to the scrollable hex area
@@ -19622,6 +19682,11 @@ function renderConnections() {
       del.setAttribute('cx', delCx); del.setAttribute('cy', delPt.y);
       del.setAttribute('r', '7'); del.setAttribute('class', 'conn-delete');
       del.addEventListener('click', () => deleteConnection(conn.id));
+      const delTitle = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+      delTitle.textContent = conn.type === 'nexus'
+        ? 'Remove this Transition Nexus — asks first, and keeps any experiments'
+        : 'Remove this connection — asks first';
+      del.appendChild(delTitle);
       g.appendChild(del);
       const delX = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       delX.setAttribute('x', delCx); delX.setAttribute('y', delPt.y + 3);
@@ -19664,6 +19729,11 @@ function renderConnections() {
       del.setAttribute('cx', mp.x); del.setAttribute('cy', mp.y);
       del.setAttribute('r', '7'); del.setAttribute('class', 'conn-delete');
       del.addEventListener('click', () => deleteConnection(conn.id));
+      const delTitle = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+      delTitle.textContent = conn.type === 'nexus'
+        ? 'Remove this Transition Nexus — asks first, and keeps any experiments'
+        : 'Remove this connection — asks first';
+      del.appendChild(delTitle);
       g.appendChild(del);
       const delX = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       delX.setAttribute('x', mp.x); delX.setAttribute('y', mp.y + 3);
