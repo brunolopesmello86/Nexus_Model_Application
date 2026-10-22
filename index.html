@@ -1338,6 +1338,25 @@ body.present #presentExit { display:flex; }
 .vs-modal-hd button { background:none; border:none; color:var(--text-muted); font-size:15px; cursor:pointer; }
 .vs-modal-hd button:hover { color:var(--text); }
 .vs-tpl-grid.in-modal { padding:18px 20px 22px; margin-top:0; max-width:none; }
+
+/* ── Destructive-action confirm ── */
+.bc-overlay { position:fixed; inset:0; z-index:10000; background:rgba(2,7,14,.8);
+  display:flex; align-items:center; justify-content:center; padding:24px; backdrop-filter:blur(2px); }
+.bc-box { width:100%; max-width:480px; background:var(--surface); border:1px solid var(--border);
+  border-top:4px solid #d94a4a; border-radius:14px; box-shadow:0 22px 60px rgba(0,0,0,.6); overflow:hidden; }
+.bc-hd { display:flex; align-items:center; gap:11px; padding:17px 20px 12px; }
+.bc-ico { font-size:17px; color:#d94a4a; flex-shrink:0; }
+.bc-hd h3 { margin:0; font-size:16px; font-weight:800; color:var(--text); line-height:1.3; }
+.bc-body { padding:0 20px 4px; }
+.bc-body p { margin:0 0 9px; font-size:12.5px; line-height:1.55; color:var(--text-muted); }
+.bc-body p strong { color:var(--text); font-weight:700; }
+.bc-actions { display:flex; justify-content:flex-end; gap:9px; padding:13px 20px 17px; }
+.bc-btn { padding:8px 17px; border-radius:8px; border:1px solid var(--border); background:var(--surface2);
+  color:var(--text); font-size:12.5px; font-weight:700; cursor:pointer; font-family:inherit; }
+.bc-btn:hover { border-color:var(--accent); }
+.bc-btn:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.bc-btn.danger { background:rgba(217,74,74,.14); border-color:rgba(217,74,74,.5); color:#ff9b9b; }
+.bc-btn.danger:hover { background:#d94a4a; border-color:#d94a4a; color:#fff; }
 /* ══ CODEX CARD DECKS ══ */
 .toolbox-sub { font-size:9px; font-weight:400; color:var(--text-muted); letter-spacing:1.5px; text-transform:uppercase; margin-left:4px; }
 /* poster CODEX deck slots — tall vertical cards, dashed colored border, centered hex + labels */
@@ -19225,7 +19244,78 @@ function zonePrettyName(z){
   const map={current_strategic:'Current Reality (Strategic)',current_operational:'Current Reality (Operational)',path_strategic:'Transformation Path (Strategic)',path_operational:'Transformation Path (Operational)'};
   return map[z]||z;
 }
+
+// ══════════════════════════════════════════
+// DESTRUCTIVE-ACTION CONFIRM (board elements)
+// ══════════════════════════════════════════
+// Nothing on the board is removed on a single click. Each confirm states the
+// blast radius — what else goes with it — because the cost of a wrong delete
+// here is a facilitator's workshop, not a row in a table.
+let _bcOnOk = null;
+function boardConfirm(title, lines, okLabel, onOk) {
+  closeBoardConfirm();
+  _bcOnOk = onOk;
+  const d = document.createElement('div');
+  d.id = 'boardConfirm'; d.className = 'bc-overlay';
+  d.innerHTML = `<div class="bc-box" role="alertdialog" aria-modal="true" aria-labelledby="bcTitle">
+      <div class="bc-hd"><span class="bc-ico">⚠</span><h3 id="bcTitle">${escHtml(title)}</h3></div>
+      <div class="bc-body">${(lines||[]).map(l => `<p>${l}</p>`).join('')}</div>
+      <div class="bc-actions">
+        <button class="bc-btn" id="bcCancel" onclick="closeBoardConfirm()">Cancel</button>
+        <button class="bc-btn danger" onclick="boardConfirmOk()">${escHtml(okLabel || 'Delete')}</button>
+      </div>
+    </div>`;
+  d.addEventListener('click', e => { if (e.target === d) closeBoardConfirm(); });
+  document.body.appendChild(d);
+  setTimeout(() => { const c = document.getElementById('bcCancel'); if (c) c.focus(); }, 30);
+}
+function boardConfirmOk() { const fn = _bcOnOk; closeBoardConfirm(); if (typeof fn === 'function') fn(); }
+function closeBoardConfirm() {
+  const d = document.getElementById('boardConfirm'); if (d) d.remove(); _bcOnOk = null;
+}
+// Esc cancels, Enter confirms — Cancel holds focus so Enter on an accidental
+// keypress does nothing destructive until the user tabs to the danger button.
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('boardConfirm')) return;
+  if (e.key === 'Escape') { e.preventDefault(); closeBoardConfirm(); }
+});
+
 function removeHex(id,coordKey){
+  const item = resolveItem(id);
+  const name = item ? item.name : 'this card';
+  const kind = item ? (item.type === 'antipattern' ? 'Anti-Pattern'
+                     : item.type === 'capability' ? 'Capability'
+                     : item.type === 'agent' ? 'Agent'
+                     : item.type === 'pattern' ? 'Pattern' : 'card') : 'card';
+  // Blast radius: which connections survive the splice and which are dropped,
+  // and what that costs in experiments.
+  const touching = connections.filter(c => connNodes(c).includes(id));
+  let droppedConns = 0, offBoardExps = 0;
+  touching.forEach(c => {
+    const left = connNodes(c).filter(n => n !== id);
+    const survives = c.type === 'nexus' ? pathIsValid(left) : left.length >= 2;
+    if (!survives) {
+      droppedConns++;
+      if (typeof getConnExpKeys === 'function') {
+        offBoardExps += getConnExpKeys(c.id).filter(k => experimentResults[k]).length;
+      }
+    }
+  });
+  const areas = domainDefinitions.filter(d => (d.hexIds||[]).includes(id)).length;
+  const lines = [`<strong>${escHtml(kind)} — ${escHtml(name)}</strong>`];
+  if (touching.length) {
+    lines.push(droppedConns
+      ? `It sits on ${touching.length} connection${touching.length>1?'s':''}. ${droppedConns} of them would no longer be a valid path and <strong>will be removed</strong>; the rest close up around it.`
+      : `It sits on ${touching.length} connection${touching.length>1?'s':''}, which will close up around it and stay on the board.`);
+  }
+  if (offBoardExps) {
+    lines.push(`<strong>${offBoardExps} experiment${offBoardExps>1?'s':''}</strong> on the removed connection${droppedConns>1?'s':''} will leave the board. The records stay in the Experiments tab.`);
+  }
+  if (areas) lines.push(`It is inside ${areas} counter-mapped area${areas>1?'s':''} and will be taken out of ${areas>1?'them':'it'}.`);
+  lines.push(`The card itself stays in the Codex — only this placement is removed.`);
+  boardConfirm(`Remove "${name}" from the board?`, lines, '✕ Remove card', () => removeHexConfirmed(id, coordKey));
+}
+function removeHexConfirmed(id,coordKey){
   delete gridState[coordKey];
   delete boardInstances[id];
   delete agentAssignments[id];
@@ -19454,16 +19544,18 @@ function deleteConnection(connId) {
     return st === 'pending' || st === 'running' || st === 'review';
   });
 
-  let msg = isNexus
-    ? `Remove the Transition Nexus "${label}"?\n\nThe line comes off the board. You can draw a new one here later.`
-    : `Remove this connection?\n\n"${label}"`;
+  const lines = [`<strong>${isNexus ? 'Transition Nexus' : 'Connection'} — ${escHtml(label)}</strong>`,
+    isNexus ? `The line comes off the board. You can draw a new one here later.`
+            : `The connection comes off the board.`];
   if (expKeys.length) {
-    msg += `\n\n${expKeys.length} experiment${expKeys.length > 1 ? 's' : ''} ${expKeys.length > 1 ? 'are' : 'is'} attached.`
-      + `\nThey are kept in the Experiments tab and keep counting towards fitness.`
-      + (open.length ? `\n\n${open.length} of them ${open.length > 1 ? 'are' : 'is'} still open.` : '')
-      + `\nExperiments are only ever deleted from the Experiments tab.`;
+    lines.push(`<strong>${expKeys.length} experiment${expKeys.length > 1 ? 's' : ''}</strong> attached`
+      + (open.length ? `, ${open.length} still open` : '')
+      + `. They are kept in the Experiments tab and keep counting towards fitness — experiments are only ever deleted from there.`);
   }
-  if (!confirm(msg)) return;
+  boardConfirm(isNexus ? `Remove this Transition Nexus?` : `Remove this connection?`,
+               lines, '✕ Remove', () => deleteConnectionConfirmed(connId, label, isNexus, expKeys));
+}
+function deleteConnectionConfirmed(connId, label, isNexus, expKeys) {
 
   // mark, don't drop: the record survives its nexus
   expKeys.forEach(k => {
@@ -20097,6 +20189,18 @@ function createDomain(){
   showToast(`Area "${name}" armed — click hexes to draw its boundary (click the "${name}" chip again to stop)`,'hint');
 }
 function deleteDomain(domId){
+  const d = domainDefinitions.find(x => x.id === domId);
+  const n = d ? (d.hexIds||[]).length : 0;
+  boardConfirm(
+    `Remove the area "${d ? d.name : 'this area'}"?`,
+    [`<strong>Counter-mapped area — ${escHtml(d ? d.name : '')}</strong>`,
+     n ? `The boundary is removed. The ${n} hex${n>1?'es':''} inside it stay on the board.`
+       : `The boundary is removed. No hexes are affected.`],
+    '✕ Remove area',
+    () => deleteDomainConfirmed(domId)
+  );
+}
+function deleteDomainConfirmed(domId){
   domainDefinitions=domainDefinitions.filter(d=>d.id!==domId);
   if(selectedDomainId===domId)selectedDomainId=null;
   renderBoard();renderDomainList();scheduleAutoSave();syncCounterMappingCard();
